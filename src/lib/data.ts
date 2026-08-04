@@ -1,0 +1,410 @@
+export type Temperature = "Quente" | "Morno" | "Frio";
+export type StageId =
+  | "prospeccao"
+  | "contato"
+  | "qualificacao"
+  | "diagnostico"
+  | "demonstracao"
+  | "proposta"
+  | "negociacao"
+  | "ganho"
+  | "perdido";
+
+export const STAGES: { id: StageId; label: string }[] = [
+  { id: "prospeccao", label: "Prospecção" },
+  { id: "contato", label: "Contato Inicial" },
+  { id: "qualificacao", label: "Qualificação" },
+  { id: "diagnostico", label: "Diagnóstico" },
+  { id: "demonstracao", label: "Demonstração" },
+  { id: "proposta", label: "Proposta" },
+  { id: "negociacao", label: "Negociação" },
+  { id: "ganho", label: "Fechado Ganho" },
+  { id: "perdido", label: "Fechado Perdido" },
+];
+
+export type Opportunity = {
+  id: string;
+  title: string;
+  company: string;
+  companyId: string;
+  contact: string;
+  value: number;
+  stage: StageId;
+  temperature: Temperature;
+  probability: number;
+  health: number;
+  daysInStage: number;
+  nextActivity: string;
+  nextActivityDate: string;
+  owner: string;
+  closeDate: string;
+  segment: string;
+  source: string;
+  nextStep: string;
+  summary: string;
+  pains: string[];
+  objections: string[];
+  suggestions: string[];
+  risks: string[];
+  arguments: string[];
+  timeline: { date: string; title: string; detail: string; type: string }[];
+  notes: { author: string; date: string; text: string }[];
+  checklist: { label: string; done: boolean }[];
+  files: { name: string; size: string; date: string }[];
+  proposals: { id: string; value: number; status: string; sent: string; expires: string }[];
+  meetings: { date: string; title: string; participants: string; summary: string }[];
+};
+
+export const OWNERS = [
+  "Marina Duarte",
+  "Rafael Lopes",
+  "Camila Nunes",
+  "Thiago Bastos",
+  "Juliana Prado",
+];
+
+const SEGMENTS = ["SaaS", "Indústria", "Varejo", "Serviços", "Saúde", "Educação"];
+const SOURCES = ["Inbound", "Outbound", "Indicação", "Evento", "Parceria", "Site"];
+
+const COMPANY_NAMES = [
+  "Nexora Tecnologia",
+  "Grupo Aurora",
+  "Vetra Indústria",
+  "Lumen Saúde",
+  "Bright Varejo",
+  "Orbita Labs",
+  "Cortex Systems",
+  "Vialog Transportes",
+  "Solaris Energia",
+  "Kaizen Educação",
+  "Prisma Consultoria",
+  "Fluxo Digital",
+  "Atlas Alimentos",
+  "Norvik Seguros",
+  "Zenit Software",
+  "Meridian Bank",
+  "Terrano Agro",
+  "Vibrant Mídia",
+];
+
+const CONTACT_NAMES = [
+  "Ana Beatriz Rocha",
+  "Carlos Menezes",
+  "Débora Lima",
+  "Eduardo Farias",
+  "Fernanda Alves",
+  "Gustavo Pinto",
+  "Helena Castro",
+  "Igor Marques",
+  "Joana Ribeiro",
+  "Lucas Andrade",
+  "Mariana Teixeira",
+  "Nelson Cardoso",
+  "Patrícia Gomes",
+  "Rodrigo Sales",
+  "Sofia Barbosa",
+  "Tiago Moura",
+  "Vanessa Coelho",
+  "William Duarte",
+];
+
+const ROLES = [
+  "CEO",
+  "Diretor Comercial",
+  "Head de Vendas",
+  "CFO",
+  "Gerente de Operações",
+  "COO",
+  "Head de Marketing",
+];
+
+function seeded(i: number, mod: number) {
+  return (i * 7919 + 104729) % mod;
+}
+
+export const companies = COMPANY_NAMES.map((name, i) => ({
+  id: `emp-${i + 1}`,
+  name,
+  segment: SEGMENTS[i % SEGMENTS.length]!,
+  mrr: 4000 + seeded(i, 26) * 1200,
+  owner: OWNERS[i % OWNERS.length]!,
+  opportunities: 1 + (i % 4),
+  status: i % 5 === 0 ? "Cliente" : i % 3 === 0 ? "Em negociação" : "Prospect",
+  site: `${name.split(" ")[0]!.toLowerCase()}.com.br`,
+  city: ["São Paulo", "Curitiba", "Belo Horizonte", "Recife", "Porto Alegre"][i % 5]!,
+  employees: [40, 120, 320, 850, 1500][i % 5]!,
+}));
+
+export const contacts = CONTACT_NAMES.map((name, i) => ({
+  id: `ct-${i + 1}`,
+  name,
+  role: ROLES[i % ROLES.length]!,
+  company: COMPANY_NAMES[i % COMPANY_NAMES.length]!,
+  companyId: `emp-${(i % COMPANY_NAMES.length) + 1}`,
+  phone: `+55 11 9${seeded(i, 9000) + 1000}-${seeded(i + 3, 9000) + 1000}`,
+  whatsapp: `+55 11 9${seeded(i + 1, 9000) + 1000}-${seeded(i + 5, 9000) + 1000}`,
+  email: `${name.split(" ")[0]!.toLowerCase()}@${COMPANY_NAMES[i % COMPANY_NAMES.length]!.split(" ")[0]!.toLowerCase()}.com.br`,
+  linkedin: `linkedin.com/in/${name.toLowerCase().replace(/\s+/g, "-")}`,
+  relationship: ["Forte", "Neutro", "Em construção"][i % 3]!,
+  lastInteraction: `há ${1 + (i % 12)} dias`,
+}));
+
+const STAGE_DIST: StageId[] = [
+  "prospeccao",
+  "prospeccao",
+  "contato",
+  "contato",
+  "qualificacao",
+  "qualificacao",
+  "diagnostico",
+  "demonstracao",
+  "demonstracao",
+  "proposta",
+  "proposta",
+  "negociacao",
+  "negociacao",
+  "ganho",
+  "ganho",
+  "perdido",
+  "qualificacao",
+  "proposta",
+  "negociacao",
+  "demonstracao",
+  "contato",
+  "diagnostico",
+  "ganho",
+  "prospeccao",
+];
+
+const PROB: Record<StageId, number> = {
+  prospeccao: 10,
+  contato: 20,
+  qualificacao: 35,
+  diagnostico: 45,
+  demonstracao: 60,
+  proposta: 72,
+  negociacao: 85,
+  ganho: 100,
+  perdido: 0,
+};
+
+export const opportunities: Opportunity[] = STAGE_DIST.map((stage, i) => {
+  const company = companies[i % companies.length]!;
+  const contact = contacts[i % contacts.length]!;
+  const value = 18000 + seeded(i, 40) * 4500;
+  const health = stage === "perdido" ? 22 + seeded(i, 15) : 45 + seeded(i, 50);
+  const temperature: Temperature =
+    health > 78 ? "Quente" : health > 55 ? "Morno" : "Frio";
+  return {
+    id: `op-${i + 1}`,
+    title: `${company.name} — Implantação Conversu`,
+    company: company.name,
+    companyId: company.id,
+    contact: contact.name,
+    value,
+    stage,
+    temperature,
+    probability: PROB[stage],
+    health,
+    daysInStage: 1 + seeded(i, 28),
+    nextActivity: ["Follow-up por WhatsApp", "Call de alinhamento", "Envio de proposta", "Reunião de diagnóstico", "E-mail de retomada"][i % 5]!,
+    nextActivityDate: `${String(1 + (i % 27)).padStart(2, "0")}/08/2026`,
+    owner: OWNERS[i % OWNERS.length]!,
+    closeDate: `${String(5 + (i % 24)).padStart(2, "0")}/${String(8 + (i % 3)).padStart(2, "0")}/2026`,
+    segment: company.segment,
+    source: SOURCES[i % SOURCES.length]!,
+    nextStep: ["Validar orçamento com o CFO", "Agendar demo técnica", "Revisar escopo da proposta", "Confirmar decisor final"][i % 4]!,
+    summary: `${company.name} busca estruturar o processo comercial e ganhar previsibilidade de receita. A conversa avançou com ${contact.name} (${contact.role}) e o time avalia substituir a operação atual em planilhas.`,
+    pains: [
+      "Falta de previsibilidade no forecast",
+      "Processo comercial em planilhas",
+      "Baixa visibilidade do funil pela liderança",
+    ],
+    objections: [
+      "Preocupação com tempo de implantação",
+      "Comparativo de preço com concorrente",
+      "Necessidade de aprovação do board",
+    ],
+    suggestions: [
+      "Enviar business case com ROI em 6 meses",
+      "Agendar sessão técnica com o time de operações",
+      "Definir data de decisão junto ao decisor",
+    ],
+    risks: [
+      health < 55 ? "Sem interação há mais de 10 dias" : "Decisor secundário ainda não engajado",
+      "Proposta próxima do vencimento",
+    ],
+    arguments: [
+      "Redução de 30% no ciclo de vendas",
+      "Forecast ponderado automático",
+      "Onboarding assistido em 14 dias",
+    ],
+    timeline: [
+      { date: "02/08/2026", title: "Proposta enviada", detail: "Documento comercial v2 enviado por e-mail.", type: "proposta" },
+      { date: "28/07/2026", title: "Reunião de demonstração", detail: "Demo com time comercial e operações.", type: "reuniao" },
+      { date: "21/07/2026", title: "Diagnóstico concluído", detail: "Mapeamento do funil atual e gargalos.", type: "atividade" },
+      { date: "14/07/2026", title: "Contato inicial", detail: "Primeira conversa de qualificação.", type: "atividade" },
+    ],
+    notes: [
+      { author: OWNERS[i % OWNERS.length]!, date: "02/08/2026", text: "Decisor pediu comparativo com solução atual até sexta." },
+      { author: OWNERS[(i + 1) % OWNERS.length]!, date: "27/07/2026", text: "Time técnico validou integração com o ERP." },
+    ],
+    checklist: [
+      { label: "Decisor identificado", done: true },
+      { label: "Orçamento confirmado", done: i % 2 === 0 },
+      { label: "Diagnóstico realizado", done: true },
+      { label: "Proposta enviada", done: PROB[stage] >= 72 },
+      { label: "Data de decisão definida", done: PROB[stage] >= 85 },
+    ],
+    files: [
+      { name: "Proposta-Conversu-v2.pdf", size: "820 KB", date: "02/08/2026" },
+      { name: "Diagnostico-comercial.xlsx", size: "312 KB", date: "21/07/2026" },
+    ],
+    proposals: [
+      { id: `PR-${1000 + i}`, value, status: PROB[stage] >= 85 ? "Em negociação" : "Enviada", sent: "02/08/2026", expires: "16/08/2026" },
+    ],
+    meetings: [
+      { date: "28/07/2026", title: "Demonstração da plataforma", participants: `${contact.name}, ${OWNERS[i % OWNERS.length]!}`, summary: "Time demonstrou interesse em forecast e automações de follow-up." },
+      { date: "21/07/2026", title: "Diagnóstico comercial", participants: `${contact.name}`, summary: "Mapeados gargalos de qualificação e perda de leads." },
+    ],
+  };
+});
+
+export const activities = Array.from({ length: 22 }, (_, i) => ({
+  id: `at-${i + 1}`,
+  type: ["Ligação", "WhatsApp", "E-mail", "Follow-up", "Tarefa", "Reunião"][i % 6]!,
+  title: [
+    "Retomar contato com decisor",
+    "Enviar case de sucesso",
+    "Confirmar presença na demo",
+    "Revisar proposta comercial",
+    "Atualizar próxima etapa",
+    "Alinhamento técnico",
+  ][i % 6]!,
+  company: companies[i % companies.length]!.name,
+  contact: contacts[i % contacts.length]!.name,
+  owner: OWNERS[i % OWNERS.length]!,
+  status: ["Pendente", "Concluída", "Atrasada"][i % 3]!,
+  priority: ["Alta", "Média", "Baixa"][i % 3]!,
+  date: `${String(1 + (i % 28)).padStart(2, "0")}/08/2026`,
+}));
+
+export const meetings = Array.from({ length: 10 }, (_, i) => ({
+  id: `rn-${i + 1}`,
+  title: ["Demonstração da plataforma", "Diagnóstico comercial", "Apresentação de proposta", "Kickoff de implantação", "Follow-up executivo"][i % 5]!,
+  company: companies[i % companies.length]!.name,
+  contact: contacts[i % contacts.length]!.name,
+  owner: OWNERS[i % OWNERS.length]!,
+  date: `${String(4 + (i % 20)).padStart(2, "0")}/08/2026`,
+  time: `${9 + (i % 8)}:00`,
+  duration: `${30 + (i % 3) * 15} min`,
+  status: i % 4 === 0 ? "Hoje" : i % 3 === 0 ? "Realizada" : "Agendada",
+}));
+
+export const proposals = opportunities.slice(0, 12).map((o, i) => ({
+  id: `PR-${2000 + i}`,
+  company: o.company,
+  opportunity: o.title,
+  value: o.value,
+  owner: o.owner,
+  status: ["Enviada", "Em negociação", "Aceita", "Vencendo", "Recusada"][i % 5]!,
+  sent: `${String(1 + (i % 20)).padStart(2, "0")}/08/2026`,
+  expires: `${String(10 + (i % 18)).padStart(2, "0")}/08/2026`,
+}));
+
+export const currency = (v: number) =>
+  v.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
+
+export const compact = (v: number) =>
+  `R$ ${(v / 1000).toLocaleString("pt-BR", { maximumFractionDigits: 0 })}k`;
+
+const open = opportunities.filter((o) => o.stage !== "ganho" && o.stage !== "perdido");
+const won = opportunities.filter((o) => o.stage === "ganho");
+const lost = opportunities.filter((o) => o.stage === "perdido");
+
+export const metrics = {
+  pipelineTotal: open.reduce((s, o) => s + o.value, 0),
+  forecast: Math.round(open.reduce((s, o) => s + (o.value * o.probability) / 100, 0)),
+  expectedRevenue: open
+    .filter((o) => o.probability >= 60)
+    .reduce((s, o) => s + o.value, 0),
+  closedRevenue: won.reduce((s, o) => s + o.value, 0),
+  ticket: Math.round(
+    opportunities.reduce((s, o) => s + o.value, 0) / opportunities.length,
+  ),
+  winRate: Math.round((won.length / (won.length + lost.length)) * 100),
+  atRisk: open.filter((o) => o.health < 55 || o.daysInStage > 18).length,
+  nextClosings: open.filter((o) => o.probability >= 72).length,
+  pendingActivities: activities.filter((a) => a.status !== "Concluída").length,
+  meetingsToday: meetings.filter((m) => m.status === "Hoje").length,
+};
+
+export const pipelineByStage = STAGES.filter(
+  (s) => s.id !== "ganho" && s.id !== "perdido",
+).map((s) => ({
+  name: s.label,
+  valor: opportunities.filter((o) => o.stage === s.id).reduce((a, o) => a + o.value, 0),
+}));
+
+export const pipelineByOwner = OWNERS.map((owner) => ({
+  name: owner.split(" ")[0]!,
+  valor: open.filter((o) => o.owner === owner).reduce((a, o) => a + o.value, 0),
+}));
+
+export const pipelineBySegment = SEGMENTS.map((seg) => ({
+  name: seg,
+  valor: open.filter((o) => o.segment === seg).reduce((a, o) => a + o.value, 0),
+}));
+
+export const leadSources = SOURCES.map((src) => ({
+  name: src,
+  value: opportunities.filter((o) => o.source === src).length,
+}));
+
+export const funnelConversion = STAGES.filter((s) => s.id !== "perdido").map((s, i) => ({
+  name: s.label,
+  taxa: Math.max(8, 100 - i * 11),
+}));
+
+export const monthly = [
+  { name: "Mar", receita: 268000, forecast: 310000 },
+  { name: "Abr", receita: 312000, forecast: 340000 },
+  { name: "Mai", receita: 289000, forecast: 355000 },
+  { name: "Jun", receita: 374000, forecast: 390000 },
+  { name: "Jul", receita: 421000, forecast: 430000 },
+  { name: "Ago", receita: 268000, forecast: 465000 },
+  { name: "Set", receita: 0, forecast: 498000 },
+  { name: "Out", receita: 0, forecast: 540000 },
+];
+
+export const lossReasons = [
+  { name: "Preço", value: 34 },
+  { name: "Timing", value: 22 },
+  { name: "Concorrente", value: 19 },
+  { name: "Sem budget", value: 15 },
+  { name: "Sem resposta", value: 10 },
+];
+
+export const salesCycle = OWNERS.map((o, i) => ({
+  name: o.split(" ")[0]!,
+  dias: 28 + ((i * 9) % 26),
+}));
+
+export const ranking = OWNERS.map((owner, i) => {
+  const ops = opportunities.filter((o) => o.owner === owner);
+  return {
+    owner,
+    pipeline: ops.filter((o) => o.stage !== "ganho" && o.stage !== "perdido").reduce((a, o) => a + o.value, 0),
+    fechado: ops.filter((o) => o.stage === "ganho").reduce((a, o) => a + o.value, 0),
+    negocios: ops.length,
+    winRate: 38 + ((i * 13) % 34),
+  };
+}).sort((a, b) => b.fechado - a.fechado);
+
+export const todayItems = {
+  followUps: activities.filter((a) => a.type === "Follow-up").slice(0, 4),
+  expiringProposals: proposals.filter((p) => p.status === "Vencendo" || p.status === "Enviada").slice(0, 4),
+  stale: open.filter((o) => o.daysInStage > 15).slice(0, 4),
+  waiting: open.filter((o) => o.probability >= 72).slice(0, 4),
+  meetings: meetings.slice(0, 4),
+};

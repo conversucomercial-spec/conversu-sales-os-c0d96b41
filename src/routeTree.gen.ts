@@ -10,33 +10,167 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AtividadesRouteImport } from './routes/atividades'
+import { Route as ConfiguracoesRouteImport } from './routes/configuracoes'
+import { Route as ContatosRouteImport } from './routes/contatos'
+import { Route as EmpresasRouteImport } from './routes/empresas'
+import { Route as ForecastRouteImport } from './routes/forecast'
+import { Route as IaComercialRouteImport } from './routes/ia-comercial'
+import { Route as PipelineRouteImport } from './routes/pipeline'
+import { Route as PropostasRouteImport } from './routes/propostas'
+import { Route as RelatoriosRouteImport } from './routes/relatorios'
+import { Route as ReunioesRouteImport } from './routes/reunioes'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AtividadesRoute = AtividadesRouteImport.update({
+  id: '/atividades',
+  path: '/atividades',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConfiguracoesRoute = ConfiguracoesRouteImport.update({
+  id: '/configuracoes',
+  path: '/configuracoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContatosRoute = ContatosRouteImport.update({
+  id: '/contatos',
+  path: '/contatos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmpresasRoute = EmpresasRouteImport.update({
+  id: '/empresas',
+  path: '/empresas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForecastRoute = ForecastRouteImport.update({
+  id: '/forecast',
+  path: '/forecast',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IaComercialRoute = IaComercialRouteImport.update({
+  id: '/ia-comercial',
+  path: '/ia-comercial',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PipelineRoute = PipelineRouteImport.update({
+  id: '/pipeline',
+  path: '/pipeline',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PropostasRoute = PropostasRouteImport.update({
+  id: '/propostas',
+  path: '/propostas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RelatoriosRoute = RelatoriosRouteImport.update({
+  id: '/relatorios',
+  path: '/relatorios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReunioesRoute = ReunioesRouteImport.update({
+  id: '/reunioes',
+  path: '/reunioes',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/atividades': typeof AtividadesRoute
+  '/configuracoes': typeof ConfiguracoesRoute
+  '/contatos': typeof ContatosRoute
+  '/empresas': typeof EmpresasRoute
+  '/forecast': typeof ForecastRoute
+  '/ia-comercial': typeof IaComercialRoute
+  '/pipeline': typeof PipelineRoute
+  '/propostas': typeof PropostasRoute
+  '/relatorios': typeof RelatoriosRoute
+  '/reunioes': typeof ReunioesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/atividades': typeof AtividadesRoute
+  '/configuracoes': typeof ConfiguracoesRoute
+  '/contatos': typeof ContatosRoute
+  '/empresas': typeof EmpresasRoute
+  '/forecast': typeof ForecastRoute
+  '/ia-comercial': typeof IaComercialRoute
+  '/pipeline': typeof PipelineRoute
+  '/propostas': typeof PropostasRoute
+  '/relatorios': typeof RelatoriosRoute
+  '/reunioes': typeof ReunioesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/atividades': typeof AtividadesRoute
+  '/configuracoes': typeof ConfiguracoesRoute
+  '/contatos': typeof ContatosRoute
+  '/empresas': typeof EmpresasRoute
+  '/forecast': typeof ForecastRoute
+  '/ia-comercial': typeof IaComercialRoute
+  '/pipeline': typeof PipelineRoute
+  '/propostas': typeof PropostasRoute
+  '/relatorios': typeof RelatoriosRoute
+  '/reunioes': typeof ReunioesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/atividades'
+    | '/configuracoes'
+    | '/contatos'
+    | '/empresas'
+    | '/forecast'
+    | '/ia-comercial'
+    | '/pipeline'
+    | '/propostas'
+    | '/relatorios'
+    | '/reunioes'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/atividades'
+    | '/configuracoes'
+    | '/contatos'
+    | '/empresas'
+    | '/forecast'
+    | '/ia-comercial'
+    | '/pipeline'
+    | '/propostas'
+    | '/relatorios'
+    | '/reunioes'
+  id:
+    | '__root__'
+    | '/'
+    | '/atividades'
+    | '/configuracoes'
+    | '/contatos'
+    | '/empresas'
+    | '/forecast'
+    | '/ia-comercial'
+    | '/pipeline'
+    | '/propostas'
+    | '/relatorios'
+    | '/reunioes'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AtividadesRoute: typeof AtividadesRoute
+  ConfiguracoesRoute: typeof ConfiguracoesRoute
+  ContatosRoute: typeof ContatosRoute
+  EmpresasRoute: typeof EmpresasRoute
+  ForecastRoute: typeof ForecastRoute
+  IaComercialRoute: typeof IaComercialRoute
+  PipelineRoute: typeof PipelineRoute
+  PropostasRoute: typeof PropostasRoute
+  RelatoriosRoute: typeof RelatoriosRoute
+  ReunioesRoute: typeof ReunioesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,22 +182,92 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/atividades': {
+      id: '/atividades'
+      path: '/atividades'
+      fullPath: '/atividades'
+      preLoaderRoute: typeof AtividadesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/configuracoes': {
+      id: '/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/configuracoes'
+      preLoaderRoute: typeof ConfiguracoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contatos': {
+      id: '/contatos'
+      path: '/contatos'
+      fullPath: '/contatos'
+      preLoaderRoute: typeof ContatosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/empresas': {
+      id: '/empresas'
+      path: '/empresas'
+      fullPath: '/empresas'
+      preLoaderRoute: typeof EmpresasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forecast': {
+      id: '/forecast'
+      path: '/forecast'
+      fullPath: '/forecast'
+      preLoaderRoute: typeof ForecastRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ia-comercial': {
+      id: '/ia-comercial'
+      path: '/ia-comercial'
+      fullPath: '/ia-comercial'
+      preLoaderRoute: typeof IaComercialRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pipeline': {
+      id: '/pipeline'
+      path: '/pipeline'
+      fullPath: '/pipeline'
+      preLoaderRoute: typeof PipelineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/propostas': {
+      id: '/propostas'
+      path: '/propostas'
+      fullPath: '/propostas'
+      preLoaderRoute: typeof PropostasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/relatorios': {
+      id: '/relatorios'
+      path: '/relatorios'
+      fullPath: '/relatorios'
+      preLoaderRoute: typeof RelatoriosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reunioes': {
+      id: '/reunioes'
+      path: '/reunioes'
+      fullPath: '/reunioes'
+      preLoaderRoute: typeof ReunioesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AtividadesRoute: AtividadesRoute,
+  ConfiguracoesRoute: ConfiguracoesRoute,
+  ContatosRoute: ContatosRoute,
+  EmpresasRoute: EmpresasRoute,
+  ForecastRoute: ForecastRoute,
+  IaComercialRoute: IaComercialRoute,
+  PipelineRoute: PipelineRoute,
+  PropostasRoute: PropostasRoute,
+  RelatoriosRoute: RelatoriosRoute,
+  ReunioesRoute: ReunioesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
