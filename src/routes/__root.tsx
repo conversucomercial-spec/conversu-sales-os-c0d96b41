@@ -81,20 +81,24 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Conversu Sales OS" },
+      { title: "Dashboard comercial | Conversu Sales OS" },
       {
         name: "description",
-        content: "Plataforma inteligente de gestão comercial: pipeline, forecast e produtividade.",
+        content: "Visão executiva do funil: pipeline, forecast, receita, win rate e prioridades do dia.",
       },
       { name: "author", content: "Conversu" },
-      { property: "og:title", content: "Conversu Sales OS" },
+      { property: "og:title", content: "Dashboard comercial | Conversu Sales OS" },
       {
         property: "og:description",
-        content: "Plataforma inteligente de gestão comercial: pipeline, forecast e produtividade.",
+        content: "Visão executiva do funil: pipeline, forecast, receita, win rate e prioridades do dia.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Dashboard comercial | Conversu Sales OS" },
+      { name: "twitter:description", content: "Visão executiva do funil: pipeline, forecast, receita, win rate e prioridades do dia." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/76b93a7f-e754-42b0-bb8c-12d029414131/id-preview-c0c949d9--c7f85ae9-d1eb-48af-b7c2-72335ae37d91.lovable.app-1785861432722.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/76b93a7f-e754-42b0-bb8c-12d029414131/id-preview-c0c949d9--c7f85ae9-d1eb-48af-b7c2-72335ae37d91.lovable.app-1785861432722.png" },
     ],
     links: [
       {

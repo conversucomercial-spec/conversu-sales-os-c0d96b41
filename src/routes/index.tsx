@@ -40,7 +40,7 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "Dashboard comercial | Conversu Sales OS" },
       {
         property: "og:description",
-        content: "Pipeline, forecast, receita e prioridades do dia em uma única tela.",
+        content: "Visão executiva do funil: pipeline, forecast, receita, win rate e prioridades do dia.",
       },
     ],
   }),
