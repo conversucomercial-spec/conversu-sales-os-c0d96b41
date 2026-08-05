@@ -488,3 +488,173 @@ export const todayItems = {
   waiting: open.filter((o) => o.probability >= 72).slice(0, 4),
   meetings: meetings.slice(0, 4),
 };
+/* -------------------------------------------------------------------------
+ * Camada de seleção (view-models)
+ * Toda a UI consome estes seletores em vez de recalcular regras nas telas.
+ * Na próxima fase basta trocar a origem dos dados mantendo estas assinaturas.
+ * ---------------------------------------------------------------------- */
+
+export const STALE_DAYS = 10;
+
+export const isStale = (o: Opportunity) => o.lastContactDays >= STALE_DAYS;
+
+/** Passos que ainda faltam para a oportunidade avançar de etapa. */
+export const pendingSteps = (o: Opportunity) =>
+  o.checklist.filter((c) => !c.done).map((c) => c.label);
+
+export const openOpportunities = open;
+export const wonOpportunities = won;
+
+export type CompanyRow = (typeof companies)[number] & {
+  contactsCount: number;
+  opportunitiesCount: number;
+  openValue: number;
+  lastInteraction: string;
+  nextActivity: string;
+  nextActivityDate: string;
+  note: string;
+  summary: string;
+};
+
+export const companyRows: CompanyRow[] = companies.map((c, i) => {
+  const ops = opportunities.filter((o) => o.companyId === c.id);
+  const openOps = ops.filter((o) => o.stage !== "ganho" && o.stage !== "perdido");
+  const ref = openOps[0] ?? ops[0];
+  return {
+    ...c,
+    contactsCount: contacts.filter((ct) => ct.companyId === c.id).length,
+    opportunitiesCount: ops.length,
+    openValue: openOps.reduce((s, o) => s + o.value, 0),
+    lastInteraction: ref?.lastContact ?? "—",
+    nextActivity: ref?.nextActivity ?? "Sem atividade agendada",
+    nextActivityDate: ref?.nextActivityDate ?? "—",
+    note: [
+      "Conta prioritária do trimestre.",
+      "Decisão depende do board.",
+      "Expansão prevista para o próximo ciclo.",
+      "Relacionamento aquecido via indicação.",
+    ][i % 4]!,
+    summary: `${c.name} está em ${openOps.length} negociação(ões) ativa(s) conduzidas por ${c.owner}, com potencial de ${currency(
+      openOps.reduce((s, o) => s + o.value, 0),
+    )} em receita.`,
+  };
+});
+
+export type ContactRow = (typeof contacts)[number] & {
+  influence: "Decisor" | "Influenciador" | "Usuário";
+  owner: string;
+  nextActivity: string;
+  nextActivityDate: string;
+};
+
+export const contactRows: ContactRow[] = contacts.map((c, i) => {
+  const op = opportunities.find((o) => o.companyId === c.companyId);
+  return {
+    ...c,
+    influence: (["Decisor", "Influenciador", "Usuário"] as const)[i % 3]!,
+    owner: op?.owner ?? OWNERS[i % OWNERS.length]!,
+    nextActivity: op?.nextActivity ?? "Sem atividade agendada",
+    nextActivityDate: op?.nextActivityDate ?? "—",
+  };
+});
+
+/** Histórico de alterações da oportunidade (auditoria). */
+export const opportunityHistory = (o: Opportunity) => [
+  { date: o.timeline[0]?.date ?? "02/08/2026", title: "Etapa alterada", detail: `Movida para ${STAGES.find((s) => s.id === o.stage)?.label}.` },
+  { date: "29/07/2026", title: "Valor atualizado", detail: `Valor ajustado para ${currency(o.value)}.` },
+  { date: "24/07/2026", title: "Responsável definido", detail: `${o.owner} assumiu a condução.` },
+  { date: "14/07/2026", title: "Oportunidade criada", detail: `Origem: ${o.source}.` },
+];
+
+/** Widgets operacionais do dashboard. */
+export const dashboard = {
+  overdueFollowUps: activities.filter((a) => a.bucket === "atrasadas").slice(0, 5),
+  todayActivities: activities.filter((a) => a.bucket === "hoje").slice(0, 5),
+  upcomingMeetings: meetings.filter((m) => m.status !== "Realizada").slice(0, 5),
+  noInteraction: open.filter(isStale).sort((a, b) => b.lastContactDays - a.lastContactDays).slice(0, 5),
+  closingSoon: open
+    .filter((o) => o.probability >= 72)
+    .sort((a, b) => parseBR(a.closeDate).getTime() - parseBR(b.closeDate).getTime())
+    .slice(0, 5),
+  renewals: companyRows
+    .filter((c) => c.status === "Cliente")
+    .slice(0, 4)
+    .map((c, i) => ({
+      id: c.id,
+      company: c.name,
+      value: c.mrr * 12,
+      date: `${String(12 + i * 4).padStart(2, "0")}/09/2026`,
+      owner: c.owner,
+    })),
+  alerts: [
+    ...open.filter((o) => o.daysInStage > 20).slice(0, 2).map((o) => ({
+      id: `al-stage-${o.id}`,
+      tone: "danger" as const,
+      title: `${o.company} parada há ${o.daysInStage} dias`,
+      detail: `Etapa ${STAGES.find((s) => s.id === o.stage)?.label} sem avanço.`,
+    })),
+    ...proposals.filter((p) => p.status === "Vencendo").slice(0, 2).map((p) => ({
+      id: `al-prop-${p.id}`,
+      tone: "warning" as const,
+      title: `Proposta ${p.id} vencendo`,
+      detail: `${p.company} · vence em ${p.expires}.`,
+    })),
+    ...activities.filter((a) => a.bucket === "atrasadas" && a.priority === "Alta").slice(0, 2).map((a) => ({
+      id: `al-act-${a.id}`,
+      tone: "danger" as const,
+      title: `${a.type} atrasada — ${a.company}`,
+      detail: `${a.title} · previsto ${a.date}.`,
+    })),
+  ],
+};
+
+export const valueByStage = STAGES.filter((s) => s.id !== "ganho" && s.id !== "perdido").map((s) => {
+  const items = open.filter((o) => o.stage === s.id);
+  return {
+    id: s.id,
+    label: s.label,
+    count: items.length,
+    value: items.reduce((a, o) => a + o.value, 0),
+  };
+});
+
+export type SearchEntity = "Empresa" | "Contato" | "Oportunidade" | "Atividade";
+
+export type SearchResult = {
+  id: string;
+  entity: SearchEntity;
+  title: string;
+  subtitle: string;
+  to: string;
+};
+
+export const searchIndex: SearchResult[] = [
+  ...opportunities.map((o) => ({
+    id: o.id,
+    entity: "Oportunidade" as const,
+    title: o.title,
+    subtitle: `${currency(o.value)} · ${o.owner}`,
+    to: "/pipeline",
+  })),
+  ...companyRows.map((c) => ({
+    id: c.id,
+    entity: "Empresa" as const,
+    title: c.name,
+    subtitle: `${c.segment} · ${c.owner}`,
+    to: "/empresas",
+  })),
+  ...contactRows.map((c) => ({
+    id: c.id,
+    entity: "Contato" as const,
+    title: c.name,
+    subtitle: `${c.role} · ${c.company}`,
+    to: "/contatos",
+  })),
+  ...activities.map((a) => ({
+    id: a.id,
+    entity: "Atividade" as const,
+    title: a.title,
+    subtitle: `${a.type} · ${a.company} · ${a.date}`,
+    to: "/atividades",
+  })),
+];
