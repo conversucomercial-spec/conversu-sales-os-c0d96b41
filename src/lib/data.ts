@@ -307,24 +307,67 @@ export const opportunities: Opportunity[] = STAGE_DIST.map((stage, i) => {
   };
 });
 
-export const activities = Array.from({ length: 22 }, (_, i) => ({
-  id: `at-${i + 1}`,
-  type: ["Ligação", "WhatsApp", "E-mail", "Follow-up", "Tarefa", "Reunião"][i % 6]!,
-  title: [
-    "Retomar contato com decisor",
-    "Enviar case de sucesso",
-    "Confirmar presença na demo",
-    "Revisar proposta comercial",
-    "Atualizar próxima etapa",
-    "Alinhamento técnico",
-  ][i % 6]!,
-  company: companies[i % companies.length]!.name,
-  contact: contacts[i % contacts.length]!.name,
-  owner: OWNERS[i % OWNERS.length]!,
-  status: ["Pendente", "Concluída", "Atrasada"][i % 3]!,
-  priority: ["Alta", "Média", "Baixa"][i % 3]!,
-  date: `${String(1 + (i % 28)).padStart(2, "0")}/08/2026`,
-}));
+export type Activity = {
+  id: string;
+  type: string;
+  title: string;
+  company: string;
+  companyId: string;
+  contact: string;
+  opportunity: string;
+  opportunityId: string;
+  owner: string;
+  status: "Pendente" | "Concluída" | "Atrasada";
+  priority: Priority;
+  date: string;
+  notes: string;
+  bucket: ActivityBucket;
+};
+
+export const activities: Activity[] = Array.from({ length: 26 }, (_, i) => {
+  const op = opportunities[i % opportunities.length]!;
+  const date = `${String(1 + (i % 28)).padStart(2, "0")}/08/2026`;
+  const delta = daysFromToday(date);
+  const status = (i % 7 === 0 ? "Concluída" : delta < 0 ? "Atrasada" : "Pendente") as Activity["status"];
+  const bucket: ActivityBucket =
+    status === "Concluída"
+      ? "concluidas"
+      : delta < 0
+        ? "atrasadas"
+        : delta === 0
+          ? "hoje"
+          : delta <= 7
+            ? "semana"
+            : "futuras";
+  return {
+    id: `at-${i + 1}`,
+    type: ["Ligação", "WhatsApp", "E-mail", "Follow-up", "Tarefa", "Reunião"][i % 6]!,
+    title: [
+      "Retomar contato com decisor",
+      "Enviar case de sucesso",
+      "Confirmar presença na demo",
+      "Revisar proposta comercial",
+      "Atualizar próxima etapa",
+      "Alinhamento técnico",
+    ][i % 6]!,
+    company: op.company,
+    companyId: op.companyId,
+    contact: op.contact,
+    opportunity: op.title,
+    opportunityId: op.id,
+    owner: op.owner,
+    status,
+    priority: (["Alta", "Média", "Baixa"] as Priority[])[i % 3]!,
+    date,
+    notes: [
+      "Decisor pediu retorno após reunião de diretoria.",
+      "Enviar material antes das 12h.",
+      "Confirmar participação do time técnico.",
+      "Checar condição comercial com o financeiro.",
+    ][i % 4]!,
+    bucket,
+  };
+});
 
 export const meetings = Array.from({ length: 10 }, (_, i) => ({
   id: `rn-${i + 1}`,
