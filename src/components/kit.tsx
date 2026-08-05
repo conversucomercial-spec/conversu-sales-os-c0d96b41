@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import type { Temperature } from "@/lib/data";
-import { Flame, Snowflake, Thermometer, type LucideIcon } from "lucide-react";
+import { Flame, Snowflake, Sparkles, Thermometer, type LucideIcon } from "lucide-react";
 
 export function PageHeader({
   title,
@@ -185,5 +185,245 @@ export function EmptyHint({ children }: { children: ReactNode }) {
     <p className="rounded-lg border border-dashed p-4 text-center text-xs text-muted-foreground">
       {children}
     </p>
+  );
+}
+
+/* -------------------------------------------------------------------------
+ * Biblioteca compartilhada Conversu — badges, widgets e estados
+ * ---------------------------------------------------------------------- */
+
+const STATUS_TONE: Record<string, "neutral" | "success" | "warning" | "danger" | "info"> = {
+  Pendente: "info",
+  "Concluída": "success",
+  Atrasada: "danger",
+  Cliente: "success",
+  "Em negociação": "warning",
+  Prospect: "info",
+  Enviada: "info",
+  Aceita: "success",
+  Vencendo: "warning",
+  Recusada: "danger",
+  Hoje: "warning",
+  Agendada: "info",
+  Realizada: "success",
+  Decisor: "success",
+  Influenciador: "info",
+  "Usuário": "neutral",
+  Forte: "success",
+  Neutro: "neutral",
+  "Em construção": "warning",
+};
+
+export function StatusBadge({ status }: { status: string }) {
+  return <Tag tone={STATUS_TONE[status] ?? "neutral"}>{status}</Tag>;
+}
+
+export function PriorityBadge({ value }: { value: "Alta" | "Média" | "Baixa" }) {
+  return (
+    <Tag tone={value === "Alta" ? "danger" : value === "Média" ? "warning" : "neutral"}>
+      {value}
+    </Tag>
+  );
+}
+
+export function EmptyState({
+  icon: Icon,
+  title,
+  description,
+  action,
+}: {
+  icon?: LucideIcon;
+  title: string;
+  description?: string;
+  action?: ReactNode;
+}) {
+  return (
+    <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed px-6 py-10 text-center">
+      {Icon && (
+        <span className="grid h-10 w-10 place-items-center rounded-xl bg-secondary text-muted-foreground">
+          <Icon className="h-4.5 w-4.5" />
+        </span>
+      )}
+      <p className="text-sm font-semibold">{title}</p>
+      {description && <p className="max-w-sm text-xs text-muted-foreground">{description}</p>}
+      {action && <div className="mt-2">{action}</div>}
+    </div>
+  );
+}
+
+/** Ações rápidas padronizadas (registrar contato, agendar, propor…). */
+export function QuickActions({
+  actions,
+  className,
+}: {
+  actions: { label: string; icon: LucideIcon; onClick?: () => void; primary?: boolean }[];
+  className?: string;
+}) {
+  return (
+    <div className={cn("flex flex-wrap gap-2", className)}>
+      {actions.map((a) => (
+        <button
+          key={a.label}
+          onClick={a.onClick}
+          className={cn(
+            "focus-ring inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors",
+            a.primary
+              ? "border-transparent bg-primary text-primary-foreground hover:bg-primary/90"
+              : "bg-card hover:bg-secondary",
+          )}
+        >
+          <a.icon className="h-3.5 w-3.5" />
+          {a.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/** Métrica compacta para listas de indicadores rápidos. */
+export function MetricWidget({
+  label,
+  value,
+  hint,
+  tone = "default",
+}: {
+  label: string;
+  value: string | number;
+  hint?: string;
+  tone?: "default" | "brand" | "flow" | "mind" | "danger";
+}) {
+  const cls = {
+    default: "text-foreground",
+    brand: "text-primary",
+    flow: "text-flow",
+    mind: "text-mind",
+    danger: "text-danger",
+  }[tone];
+  return (
+    <div className="min-w-0 rounded-xl border bg-secondary/40 px-3 py-2.5">
+      <p className="truncate text-[11px] text-muted-foreground">{label}</p>
+      <p className={cn("mt-0.5 font-display text-lg font-bold tabular-nums", cls)}>{value}</p>
+      {hint && <p className="truncate text-[11px] text-muted-foreground">{hint}</p>}
+    </div>
+  );
+}
+
+/**
+ * Widget do dashboard. Aceita `reserved` para marcar espaços destinados a
+ * módulos inteligentes que serão ligados na próxima fase.
+ */
+export function DashboardWidget({
+  title,
+  description,
+  icon: Icon,
+  action,
+  reserved = false,
+  className,
+  bodyClassName,
+  children,
+}: {
+  title: string;
+  description?: string;
+  icon?: LucideIcon;
+  action?: ReactNode;
+  reserved?: boolean;
+  className?: string;
+  bodyClassName?: string;
+  children: ReactNode;
+}) {
+  return (
+    <section
+      className={cn(
+        "card-surface flex min-w-0 flex-col overflow-hidden",
+        reserved && "border-dashed bg-accent/30 shadow-none",
+        className,
+      )}
+    >
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b px-4 py-3">
+        <div className="flex min-w-0 items-center gap-2">
+          {Icon && (
+            <span
+              className={cn(
+                "grid h-7 w-7 shrink-0 place-items-center rounded-lg",
+                reserved ? "bg-mind/12 text-mind" : "bg-accent text-accent-foreground",
+              )}
+            >
+              <Icon className="h-3.5 w-3.5" />
+            </span>
+          )}
+          <div className="min-w-0">
+            <h2 className="truncate text-sm font-semibold">{title}</h2>
+            {description && (
+              <p className="truncate text-[11px] text-muted-foreground">{description}</p>
+            )}
+          </div>
+        </div>
+        {action}
+      </div>
+      <div className={cn("flex-1 p-4", bodyClassName)}>{children}</div>
+    </section>
+  );
+}
+
+/** Linha compacta reutilizada em todos os widgets de lista. */
+export function ListRow({
+  primary,
+  secondary,
+  meta,
+  trailing,
+  onClick,
+}: {
+  primary: string;
+  secondary?: string;
+  meta?: string;
+  trailing?: ReactNode;
+  onClick?: () => void;
+}) {
+  const Comp = onClick ? "button" : "div";
+  return (
+    <Comp
+      onClick={onClick}
+      className={cn(
+        "grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors",
+        onClick && "focus-ring hover:bg-secondary",
+      )}
+    >
+      <div className="min-w-0">
+        <p className="truncate text-sm font-medium">{primary}</p>
+        {secondary && <p className="truncate text-[11px] text-muted-foreground">{secondary}</p>}
+      </div>
+      <div className="flex shrink-0 items-center gap-2">
+        {meta && <span className="text-xs font-semibold tabular-nums">{meta}</span>}
+        {trailing}
+      </div>
+    </Comp>
+  );
+}
+
+/**
+ * Placeholder padronizado para módulos de IA.
+ * Mantém o layout final já dimensionado; basta trocar `children` pelo conteúdo real.
+ */
+export function AiSlot({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description?: string;
+  children?: ReactNode;
+}) {
+  return (
+    <div className="rounded-xl border border-dashed border-mind/30 bg-mind/[0.04] p-4">
+      <div className="flex items-center gap-2">
+        <span className="mind-gradient grid h-6 w-6 place-items-center rounded-md text-mind-foreground">
+          <Sparkles className="h-3 w-3" />
+        </span>
+        <p className="text-xs font-semibold text-mind">{title}</p>
+        <span className="font-hand ml-auto text-sm text-mind/70">em breve</span>
+      </div>
+      {description && <p className="mt-2 text-xs text-muted-foreground">{description}</p>}
+      {children}
+    </div>
   );
 }

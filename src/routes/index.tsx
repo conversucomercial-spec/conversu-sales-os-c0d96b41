@@ -2,21 +2,38 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   AlarmClock,
   BadgeDollarSign,
+  Bot,
   CalendarClock,
+  CalendarDays,
   CircleDollarSign,
   Flame,
   Layers,
   ListChecks,
   Percent,
+  RefreshCcw,
   Target,
   TrendingUp,
+  TriangleAlert,
   Wallet,
 } from "lucide-react";
-import { KpiCard, PageHeader, Panel, Tag } from "@/components/kit";
+import {
+  AiSlot,
+  DashboardWidget,
+  EmptyState,
+  KpiCard,
+  ListRow,
+  MetricWidget,
+  PageHeader,
+  Panel,
+  PriorityBadge,
+  StatusBadge,
+  Tag,
+} from "@/components/kit";
 import { BarValueChart, ConversionChart, DonutChart, Legend, RevenueChart } from "@/components/charts";
 import {
   compact,
   currency,
+  dashboard,
   funnelConversion,
   leadSources,
   metrics,
@@ -24,7 +41,7 @@ import {
   pipelineByOwner,
   pipelineBySegment,
   pipelineByStage,
-  todayItems,
+  valueByStage,
 } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 
@@ -35,52 +52,27 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Visão executiva do funil: pipeline, forecast, receita, win rate e prioridades do dia.",
+          "Visão operacional do funil: prioridades do dia, follow-ups atrasados, negociações sem interação, forecast e receita.",
       },
       { property: "og:title", content: "Dashboard comercial | Conversu Sales OS" },
       {
         property: "og:description",
-        content: "Visão executiva do funil: pipeline, forecast, receita, win rate e prioridades do dia.",
+        content:
+          "Prioridades do dia, follow-ups atrasados, negociações paradas, fechamentos próximos e receita.",
       },
     ],
   }),
   component: Dashboard,
 });
 
-function TodayList({
-  title,
-  items,
-}: {
-  title: string;
-  items: { key: string; primary: string; secondary: string; tag?: string }[];
-}) {
-  return (
-    <div className="rounded-xl border p-4">
-      <p className="text-xs font-semibold">{title}</p>
-      <ul className="mt-3 space-y-2.5">
-        {items.map((i) => (
-          <li key={i.key} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
-            <div className="min-w-0">
-              <p className="truncate text-sm font-medium">{i.primary}</p>
-              <p className="truncate text-[11px] text-muted-foreground">{i.secondary}</p>
-            </div>
-            {i.tag && <Tag tone="info">{i.tag}</Tag>}
-          </li>
-        ))}
-        {items.length === 0 && (
-          <li className="text-xs text-muted-foreground">Nada por aqui hoje.</li>
-        )}
-      </ul>
-    </div>
-  );
-}
-
 function Dashboard() {
+  const openTotal = valueByStage.reduce((s, v) => s + v.value, 0);
+
   return (
     <div className="space-y-6">
       <PageHeader
         title="Dashboard"
-        description="Terça, 4 de agosto de 2026 — visão consolidada da operação comercial"
+        description="Terça, 4 de agosto de 2026 — o que precisa da sua decisão hoje"
         actions={
           <Button variant="outline" size="sm" asChild>
             <Link to="/pipeline">Abrir pipeline</Link>
@@ -101,62 +93,159 @@ function Dashboard() {
         <KpiCard label="Reuniões hoje" value={metrics.meetingsToday} icon={CalendarClock} />
       </div>
 
-      <Panel
-        title="Hoje"
-        description="O que precisa da sua atenção agora"
-        actions={
-          <Tag tone="warning">
-            <AlarmClock className="mr-1 h-3 w-3" /> Prioridades
-          </Tag>
-        }
-        bodyClassName="grid gap-3 md:grid-cols-2 xl:grid-cols-3"
-      >
-        <TodayList
-          title="Follow-ups de hoje"
-          items={todayItems.followUps.map((a) => ({
-            key: a.id,
-            primary: a.title,
-            secondary: `${a.company} · ${a.owner}`,
-            tag: a.priority,
-          }))}
-        />
-        <TodayList
-          title="Propostas vencendo"
-          items={todayItems.expiringProposals.map((p) => ({
-            key: p.id,
-            primary: `${p.company} — ${currency(p.value)}`,
-            secondary: `Vence em ${p.expires}`,
-            tag: p.status,
-          }))}
-        />
-        <TodayList
-          title="Negociações sem atualização"
-          items={todayItems.stale.map((o) => ({
-            key: o.id,
-            primary: o.company,
-            secondary: `${o.daysInStage} dias na etapa · ${o.owner}`,
-            tag: "Parada",
-          }))}
-        />
-        <TodayList
-          title="Clientes aguardando resposta"
-          items={todayItems.waiting.map((o) => ({
-            key: o.id,
-            primary: o.company,
-            secondary: o.nextStep,
-            tag: `${o.probability}%`,
-          }))}
-        />
-        <TodayList
-          title="Reuniões do dia"
-          items={todayItems.meetings.map((m) => ({
-            key: m.id,
-            primary: m.title,
-            secondary: `${m.time} · ${m.company}`,
-            tag: m.status,
-          }))}
-        />
+      <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
+        <DashboardWidget
+          title="Follow-ups atrasados"
+          description="Compromissos que já venceram"
+          icon={AlarmClock}
+          action={<Tag tone="danger">{dashboard.overdueFollowUps.length}</Tag>}
+          bodyClassName="p-2"
+        >
+          {dashboard.overdueFollowUps.length ? (
+            <ul className="space-y-0.5">
+              {dashboard.overdueFollowUps.map((a) => (
+                <li key={a.id}>
+                  <ListRow
+                    primary={a.title}
+                    secondary={`${a.company} · ${a.owner} · previsto ${a.date}`}
+                    trailing={<PriorityBadge value={a.priority} />}
+                  />
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <EmptyState icon={AlarmClock} title="Nenhum follow-up atrasado" />
+          )}
+        </DashboardWidget>
+
+        <DashboardWidget
+          title="Agenda de hoje"
+          description="Atividades e reuniões do dia"
+          icon={CalendarDays}
+          bodyClassName="p-2"
+        >
+          <ul className="space-y-0.5">
+            {dashboard.todayActivities.map((a) => (
+              <li key={a.id}>
+                <ListRow
+                  primary={a.title}
+                  secondary={`${a.type} · ${a.company}`}
+                  trailing={<StatusBadge status={a.status} />}
+                />
+              </li>
+            ))}
+            {dashboard.upcomingMeetings.map((m) => (
+              <li key={m.id}>
+                <ListRow
+                  primary={m.title}
+                  secondary={`${m.time} · ${m.company}`}
+                  trailing={<StatusBadge status={m.status} />}
+                />
+              </li>
+            ))}
+          </ul>
+        </DashboardWidget>
+
+        <DashboardWidget
+          title="Negociações sem interação"
+          description={`Sem contato há 10 dias ou mais`}
+          icon={TriangleAlert}
+          action={<Tag tone="warning">{dashboard.noInteraction.length}</Tag>}
+          bodyClassName="p-2"
+        >
+          {dashboard.noInteraction.length ? (
+            <ul className="space-y-0.5">
+              {dashboard.noInteraction.map((o) => (
+                <li key={o.id}>
+                  <ListRow
+                    primary={o.company}
+                    secondary={`${o.lastContactDays} dias sem contato · ${o.owner}`}
+                    meta={currency(o.value)}
+                  />
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <EmptyState icon={TriangleAlert} title="Toda a carteira está aquecida" />
+          )}
+        </DashboardWidget>
+
+        <DashboardWidget
+          title="Fechamentos próximos"
+          description="Alta probabilidade nas próximas semanas"
+          icon={Wallet}
+          bodyClassName="p-2"
+        >
+          <ul className="space-y-0.5">
+            {dashboard.closingSoon.map((o) => (
+              <li key={o.id}>
+                <ListRow
+                  primary={o.company}
+                  secondary={`${o.nextStep} · fecha em ${o.closeDate}`}
+                  meta={currency(o.value)}
+                  trailing={<Tag tone="success">{o.probability}%</Tag>}
+                />
+              </li>
+            ))}
+          </ul>
+        </DashboardWidget>
+
+        <DashboardWidget
+          title="Renovações previstas"
+          description="Contratos de clientes ativos"
+          icon={RefreshCcw}
+          bodyClassName="p-2"
+        >
+          <ul className="space-y-0.5">
+            {dashboard.renewals.map((r) => (
+              <li key={r.id}>
+                <ListRow primary={r.company} secondary={`${r.date} · ${r.owner}`} meta={currency(r.value)} />
+              </li>
+            ))}
+          </ul>
+        </DashboardWidget>
+
+        <DashboardWidget
+          title="Alertas operacionais"
+          description="Riscos detectados nas regras atuais"
+          icon={Flame}
+          bodyClassName="space-y-2"
+        >
+          {dashboard.alerts.map((a) => (
+            <div key={a.id} className="rounded-lg border p-2.5">
+              <div className="flex items-center gap-2">
+                <Tag tone={a.tone}>{a.tone === "danger" ? "Crítico" : "Atenção"}</Tag>
+                <p className="truncate text-xs font-semibold">{a.title}</p>
+              </div>
+              <p className="mt-1 text-[11px] text-muted-foreground">{a.detail}</p>
+            </div>
+          ))}
+        </DashboardWidget>
+      </div>
+
+      <Panel title="Distribuição do funil" description="Volume e valor por etapa aberta" bodyClassName="grid gap-2.5 sm:grid-cols-3 lg:grid-cols-7">
+        {valueByStage.map((s) => (
+          <MetricWidget
+            key={s.id}
+            label={s.label}
+            value={compact(s.value)}
+            hint={`${s.count} negociações · ${Math.round((s.value / (openTotal || 1)) * 100)}% do funil`}
+            tone="brand"
+          />
+        ))}
       </Panel>
+
+      <DashboardWidget
+        title="Copiloto comercial"
+        description="Espaço reservado para os módulos inteligentes da próxima fase"
+        icon={Bot}
+        reserved
+        bodyClassName="grid gap-3 md:grid-cols-3"
+      >
+        <AiSlot title="Resumo do dia" description="Síntese automática das negociações que mudaram desde ontem." />
+        <AiSlot title="Próximas ações sugeridas" description="Recomendações de follow-up priorizadas por chance de avanço." />
+        <AiSlot title="Risco do funil" description="Detecção automática de negociações em risco e motivos prováveis." />
+      </DashboardWidget>
 
       <div className="grid gap-4 xl:grid-cols-3">
         <Panel title="Pipeline por etapa" className="xl:col-span-2">
