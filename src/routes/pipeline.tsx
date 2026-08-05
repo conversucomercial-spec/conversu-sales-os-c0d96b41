@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Filter, LayoutGrid, Rows3 } from "lucide-react";
-import { PageHeader, EmptyState, Tag, StatusBadge, PriorityBadge, HealthScore, TemperatureBadge } from "@/components/kit";
+import { PageHeader, EmptyState, Tag, PriorityBadge, HealthScore, TemperatureBadge } from "@/components/kit";
 import { OpportunityCard } from "@/components/entity-cards";
 import { SearchField, FilterSelect, Toolbar } from "@/components/toolbar";
 import { OpportunityDrawer } from "@/components/opportunity-drawer";
