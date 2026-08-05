@@ -224,6 +224,9 @@ export const opportunities: Opportunity[] = STAGE_DIST.map((stage, i) => {
   const health = stage === "perdido" ? 22 + seeded(i, 15) : 45 + seeded(i, 50);
   const temperature: Temperature =
     health > 78 ? "Quente" : health > 55 ? "Morno" : "Frio";
+  const daysInStage = 1 + seeded(i, 28);
+  const lastContactDays = 1 + seeded(i + 2, 21);
+  const lastContactDate = new Date(TODAY.getTime() - lastContactDays * 86400000);
   return {
     id: `op-${i + 1}`,
     title: `${company.name} — Implantação Conversu`,
@@ -235,7 +238,12 @@ export const opportunities: Opportunity[] = STAGE_DIST.map((stage, i) => {
     temperature,
     probability: PROB[stage],
     health,
-    daysInStage: 1 + seeded(i, 28),
+    daysInStage,
+    priority: (health >= 78 || PROB[stage] >= 72 ? "Alta" : health >= 55 ? "Média" : "Baixa") as Priority,
+    lastContact: `${String(lastContactDate.getDate()).padStart(2, "0")}/${String(
+      lastContactDate.getMonth() + 1,
+    ).padStart(2, "0")}/${lastContactDate.getFullYear()}`,
+    lastContactDays,
     nextActivity: ["Follow-up por WhatsApp", "Call de alinhamento", "Envio de proposta", "Reunião de diagnóstico", "E-mail de retomada"][i % 5]!,
     nextActivityDate: `${String(1 + (i % 27)).padStart(2, "0")}/08/2026`,
     owner: OWNERS[i % OWNERS.length]!,
