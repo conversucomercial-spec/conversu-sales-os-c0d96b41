@@ -1,4 +1,30 @@
 export type Temperature = "Quente" | "Morno" | "Frio";
+export type Priority = "Alta" | "Média" | "Baixa";
+
+/** Data de referência do ambiente mockado. Trocar por `new Date()` na fase de dados reais. */
+export const TODAY = new Date(2026, 7, 4);
+
+/** Converte "dd/mm/yyyy" em Date. */
+export function parseBR(date: string) {
+  const [d, m, y] = date.split("/").map(Number);
+  return new Date(y!, (m ?? 1) - 1, d ?? 1);
+}
+
+/** Diferença em dias entre uma data "dd/mm/yyyy" e o dia de referência. */
+export function daysFromToday(date: string) {
+  return Math.round((parseBR(date).getTime() - TODAY.getTime()) / 86400000);
+}
+
+export type ActivityBucket = "atrasadas" | "hoje" | "semana" | "futuras" | "concluidas";
+
+export const ACTIVITY_BUCKETS: { id: ActivityBucket; label: string }[] = [
+  { id: "hoje", label: "Hoje" },
+  { id: "atrasadas", label: "Atrasadas" },
+  { id: "semana", label: "Esta semana" },
+  { id: "futuras", label: "Futuras" },
+  { id: "concluidas", label: "Concluídas" },
+];
+
 export type StageId =
   | "prospeccao"
   | "contato"
@@ -34,6 +60,9 @@ export type Opportunity = {
   probability: number;
   health: number;
   daysInStage: number;
+  priority: Priority;
+  lastContact: string;
+  lastContactDays: number;
   nextActivity: string;
   nextActivityDate: string;
   owner: string;
