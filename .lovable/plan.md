@@ -36,7 +36,7 @@ Pipeline passa a ser o núcleo da operação, sem etapas hardcoded:
 
 Sem editor administrativo completo nesta sprint: a configuração vive em um módulo mockado, pronto para vir do banco depois.
 
-## Parte 2 — Autenticação (Lovable Cloud)
+## Parte 5 — Autenticação (Lovable Cloud)
 
 O CRM deixa de ser público: todo o sistema passa a exigir login.
 
