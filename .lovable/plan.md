@@ -9,7 +9,7 @@ Revisão do estado atual: Dashboard, Pipeline (Kanban + lista + drawer), Empresa
 3. **Propostas** — tabela estática. Falta KPI de vencendo em 7 dias, filtros e drawer com itens, condições, histórico e vínculo com a oportunidade.
 4. **Forecast** — falta o comparativo Comprometido / Provável / Otimista, forecast ponderado por responsável e a lista de fechamentos previstos do mês.
 5. **IA Comercial** — falta a página com os slots reservados por bloco (resumo, dores, objeções, próximos passos, riscos, argumentos, insights) usando o `AiSlot`, em estado "aguardando integração".
-6. **Relatórios** — falta ranking de vendedores, motivos de perda e ciclo médio de venda (os dados já existem em `data.ts`, mas não estão renderizados).
+6. **Relatórios** — falta motivos de perda e ciclo médio de venda (os dados já existem em `data.ts`, mas não estão renderizados). Ranking de vendedores fica fora por enquanto.
 7. **Configurações** — virar página real de preferências (perfil, equipe, integrações, aparência), preparada para o backend.
 8. **Detalhes transversais** — drawer da oportunidade com abas completas (Notas, Arquivos, Propostas, Checklist), estados vazios consistentes e ajustes de responsividade.
 
