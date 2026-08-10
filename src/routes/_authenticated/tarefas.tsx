@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { CheckSquare } from "lucide-react";
 
@@ -30,21 +31,15 @@ const COLUMNS = [
 function TarefasPage() {
   const base = activities.filter((a) => a.type === "Tarefa" || a.type === "Follow-up");
 
-  const { query, setQuery, items, filterProps } = useCollection({
+  const [owner, setOwner] = useState("todos");
+
+  const { query, setQuery, items } = useCollection({
     items: base,
     searchFields: (a) => [a.title, a.company, a.contact, a.opportunity, a.owner],
-    filters: {},
+    filters: { owner: { value: owner, all: "todos", get: (a) => a.owner } },
     sortBy: (a) => a.date,
     direction: "asc",
   });
-  void filterProps;
-
-  const [owner, setOwner] = [
-    undefined as unknown as string,
-    undefined as unknown as (v: string) => void,
-  ];
-  void owner;
-  void setOwner;
 
   return (
     <div className="space-y-5">
@@ -53,8 +48,8 @@ function TarefasPage() {
       <Toolbar>
         <SearchField value={query} onChange={setQuery} placeholder="Buscar tarefa, empresa ou oportunidade…" className="flex-1" />
         <FilterSelect
-          value="todos"
-          onChange={() => {}}
+          value={owner}
+          onChange={setOwner}
           options={[{ value: "todos", label: "Todos os responsáveis" }, ...OWNERS.map((o) => ({ value: o, label: o }))]}
         />
       </Toolbar>
