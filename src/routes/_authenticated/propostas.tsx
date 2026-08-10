@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import { compact, currency, proposals } from "@/lib/data";
 
-export const Route = createFileRoute("/propostas")({
+export const Route = createFileRoute("/_authenticated/propostas")({
   head: () => ({
     meta: [
       { title: "Propostas | Conversu Sales OS" },

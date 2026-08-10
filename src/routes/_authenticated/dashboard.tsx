@@ -45,7 +45,7 @@ import {
 } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
       { title: "Dashboard comercial | Conversu Sales OS" },

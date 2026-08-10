@@ -5,7 +5,7 @@ import { AiInsightPanel } from "@/components/ai-panel";
 import { Button } from "@/components/ui/button";
 import { opportunities } from "@/lib/data";
 
-export const Route = createFileRoute("/ia-comercial")({
+export const Route = createFileRoute("/_authenticated/ia-comercial")({
   head: () => ({
     meta: [
       { title: "IA Comercial | Conversu Sales OS" },

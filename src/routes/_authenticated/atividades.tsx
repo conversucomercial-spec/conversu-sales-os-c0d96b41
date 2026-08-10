@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/table";
 import { activities, OWNERS } from "@/lib/data";
 
-export const Route = createFileRoute("/atividades")({
+export const Route = createFileRoute("/_authenticated/atividades")({
   head: () => ({
     meta: [
       { title: "Atividades | Conversu Sales OS" },

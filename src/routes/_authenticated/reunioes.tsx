@@ -3,7 +3,7 @@ import { CalendarDays, Clock, Users } from "lucide-react";
 import { KpiCard, PageHeader, Panel, Tag } from "@/components/kit";
 import { meetings } from "@/lib/data";
 
-export const Route = createFileRoute("/reunioes")({
+export const Route = createFileRoute("/_authenticated/reunioes")({
   head: () => ({
     meta: [
       { title: "Reuniões | Conversu Sales OS" },
