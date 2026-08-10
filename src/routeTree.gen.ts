@@ -19,6 +19,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedEmpresasRouteImport } from './routes/_authenticated/empresas'
 import { Route as AuthenticatedForecastRouteImport } from './routes/_authenticated/forecast'
 import { Route as AuthenticatedIaComercialRouteImport } from './routes/_authenticated/ia-comercial'
+import { Route as AuthenticatedMetasRouteImport } from './routes/_authenticated/metas'
 import { Route as AuthenticatedPipelineRouteImport } from './routes/_authenticated/pipeline'
 import { Route as AuthenticatedPropostasRouteImport } from './routes/_authenticated/propostas'
 import { Route as AuthenticatedRelatoriosRouteImport } from './routes/_authenticated/relatorios'
@@ -75,6 +76,11 @@ const AuthenticatedIaComercialRoute =
     path: '/ia-comercial',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedMetasRoute = AuthenticatedMetasRouteImport.update({
+  id: '/metas',
+  path: '/metas',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedPipelineRoute = AuthenticatedPipelineRouteImport.update({
   id: '/pipeline',
   path: '/pipeline',
@@ -106,6 +112,7 @@ export interface FileRoutesByFullPath {
   '/empresas': typeof AuthenticatedEmpresasRoute
   '/forecast': typeof AuthenticatedForecastRoute
   '/ia-comercial': typeof AuthenticatedIaComercialRoute
+  '/metas': typeof AuthenticatedMetasRoute
   '/pipeline': typeof AuthenticatedPipelineRoute
   '/propostas': typeof AuthenticatedPropostasRoute
   '/relatorios': typeof AuthenticatedRelatoriosRoute
@@ -121,6 +128,7 @@ export interface FileRoutesByTo {
   '/empresas': typeof AuthenticatedEmpresasRoute
   '/forecast': typeof AuthenticatedForecastRoute
   '/ia-comercial': typeof AuthenticatedIaComercialRoute
+  '/metas': typeof AuthenticatedMetasRoute
   '/pipeline': typeof AuthenticatedPipelineRoute
   '/propostas': typeof AuthenticatedPropostasRoute
   '/relatorios': typeof AuthenticatedRelatoriosRoute
@@ -138,6 +146,7 @@ export interface FileRoutesById {
   '/_authenticated/empresas': typeof AuthenticatedEmpresasRoute
   '/_authenticated/forecast': typeof AuthenticatedForecastRoute
   '/_authenticated/ia-comercial': typeof AuthenticatedIaComercialRoute
+  '/_authenticated/metas': typeof AuthenticatedMetasRoute
   '/_authenticated/pipeline': typeof AuthenticatedPipelineRoute
   '/_authenticated/propostas': typeof AuthenticatedPropostasRoute
   '/_authenticated/relatorios': typeof AuthenticatedRelatoriosRoute
@@ -155,6 +164,7 @@ export interface FileRouteTypes {
     | '/empresas'
     | '/forecast'
     | '/ia-comercial'
+    | '/metas'
     | '/pipeline'
     | '/propostas'
     | '/relatorios'
@@ -170,6 +180,7 @@ export interface FileRouteTypes {
     | '/empresas'
     | '/forecast'
     | '/ia-comercial'
+    | '/metas'
     | '/pipeline'
     | '/propostas'
     | '/relatorios'
@@ -186,6 +197,7 @@ export interface FileRouteTypes {
     | '/_authenticated/empresas'
     | '/_authenticated/forecast'
     | '/_authenticated/ia-comercial'
+    | '/_authenticated/metas'
     | '/_authenticated/pipeline'
     | '/_authenticated/propostas'
     | '/_authenticated/relatorios'
@@ -270,6 +282,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIaComercialRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/metas': {
+      id: '/_authenticated/metas'
+      path: '/metas'
+      fullPath: '/metas'
+      preLoaderRoute: typeof AuthenticatedMetasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/pipeline': {
       id: '/_authenticated/pipeline'
       path: '/pipeline'
@@ -309,6 +328,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedEmpresasRoute: typeof AuthenticatedEmpresasRoute
   AuthenticatedForecastRoute: typeof AuthenticatedForecastRoute
   AuthenticatedIaComercialRoute: typeof AuthenticatedIaComercialRoute
+  AuthenticatedMetasRoute: typeof AuthenticatedMetasRoute
   AuthenticatedPipelineRoute: typeof AuthenticatedPipelineRoute
   AuthenticatedPropostasRoute: typeof AuthenticatedPropostasRoute
   AuthenticatedRelatoriosRoute: typeof AuthenticatedRelatoriosRoute
@@ -323,6 +343,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedEmpresasRoute: AuthenticatedEmpresasRoute,
   AuthenticatedForecastRoute: AuthenticatedForecastRoute,
   AuthenticatedIaComercialRoute: AuthenticatedIaComercialRoute,
+  AuthenticatedMetasRoute: AuthenticatedMetasRoute,
   AuthenticatedPipelineRoute: AuthenticatedPipelineRoute,
   AuthenticatedPropostasRoute: AuthenticatedPropostasRoute,
   AuthenticatedRelatoriosRoute: AuthenticatedRelatoriosRoute,
