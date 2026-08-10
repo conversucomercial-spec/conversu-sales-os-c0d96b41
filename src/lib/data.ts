@@ -428,28 +428,64 @@ export const activities: Activity[] = Array.from({ length: 26 }, (_, i) => {
   };
 });
 
-export const meetings = Array.from({ length: 10 }, (_, i) => ({
-  id: `rn-${i + 1}`,
-  title: ["Demonstração da plataforma", "Diagnóstico comercial", "Apresentação de proposta", "Kickoff de implantação", "Follow-up executivo"][i % 5]!,
-  company: companies[i % companies.length]!.name,
-  contact: contacts[i % contacts.length]!.name,
-  owner: OWNERS[i % OWNERS.length]!,
-  date: `${String(4 + (i % 20)).padStart(2, "0")}/08/2026`,
-  time: `${9 + (i % 8)}:00`,
-  duration: `${30 + (i % 3) * 15} min`,
-  status: i % 4 === 0 ? "Hoje" : i % 3 === 0 ? "Realizada" : "Agendada",
-}));
+export const meetings = Array.from({ length: 14 }, (_, i) => {
+  const op = opportunities[i % opportunities.length]!;
+  return {
+    id: `rn-${i + 1}`,
+    title: ["Demonstração da plataforma", "Diagnóstico comercial", "Apresentação de proposta", "Kickoff de implantação", "Follow-up executivo"][i % 5]!,
+    company: op.company,
+    contact: op.contact,
+    owner: op.owner,
+    date: `${String(3 + (i % 14)).padStart(2, "0")}/08/2026`,
+    time: `${String(9 + (i % 8)).padStart(2, "0")}:00`,
+    duration: `${30 + (i % 3) * 15} min`,
+    status: i % 4 === 0 ? "Hoje" : i % 3 === 0 ? "Realizada" : "Agendada",
+    opportunity: op.title,
+    opportunityId: op.id,
+    participants: [op.contact, op.owner, i % 2 === 0 ? "Equipe técnica Conversu" : "Diretoria"].join(", "),
+    agenda: [
+      "Contexto e objetivos do cliente",
+      "Demonstração do fluxo comercial",
+      "Impacto esperado e próximos passos",
+    ],
+    summary:
+      i % 3 === 0
+        ? "Cliente validou o ganho de previsibilidade e pediu proposta com escopo de implantação."
+        : "Reunião ainda não realizada — resumo será registrado ao final.",
+  };
+});
 
 export const proposals = opportunities.slice(0, 12).map((o, i) => ({
   id: `PR-${2000 + i}`,
   company: o.company,
+  companyId: o.companyId,
   opportunity: o.title,
+  opportunityId: o.id,
   value: o.value,
   owner: o.owner,
   status: ["Enviada", "Em negociação", "Aceita", "Vencendo", "Recusada"][i % 5]!,
   sent: `${String(1 + (i % 20)).padStart(2, "0")}/08/2026`,
-  expires: `${String(10 + (i % 18)).padStart(2, "0")}/08/2026`,
+  expires: `${String(5 + (i % 18)).padStart(2, "0")}/08/2026`,
+  items: [
+    { label: "Licença Conversu Sales OS", qty: 6 + (i % 30), unit: Math.round(o.value * 0.55 / (6 + (i % 30))) },
+    { label: "Implantação assistida", qty: 1, unit: Math.round(o.value * 0.3) },
+    { label: "Treinamento do time comercial", qty: 1, unit: Math.round(o.value * 0.15) },
+  ],
+  conditions: {
+    payment: ["Mensal", "Trimestral", "Anual antecipado"][i % 3]!,
+    term: ["12 meses", "24 meses"][i % 2]!,
+    discount: `${(i % 4) * 5}%`,
+    setup: i % 2 === 0 ? "Incluso" : "Cobrado à parte",
+  },
+  history: [
+    { date: `${String(1 + (i % 20)).padStart(2, "0")}/08/2026`, event: "Proposta enviada por e-mail" },
+    { date: `${String(2 + (i % 20)).padStart(2, "0")}/08/2026`, event: "Cliente confirmou recebimento" },
+    { date: `${String(3 + (i % 20)).padStart(2, "0")}/08/2026`, event: "Leitura conjunta agendada" },
+  ],
 }));
+
+export type Meeting = (typeof meetings)[number];
+export type Proposal = (typeof proposals)[number];
 
 export const currency = (v: number) =>
   v.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
