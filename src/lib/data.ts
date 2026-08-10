@@ -63,6 +63,10 @@ export type Opportunity = {
   priority: Priority;
   lastContact: string;
   lastContactDays: number;
+  origin: OriginKey;
+  partner?: string;
+  pipelineId: string;
+  custom: Record<string, string>;
   nextActivity: string;
   nextActivityDate: string;
   owner: string;
@@ -94,6 +98,28 @@ export const OWNERS = [
 
 const SEGMENTS = ["SaaS", "Indústria", "Varejo", "Serviços", "Saúde", "Educação"];
 const SOURCES = ["Inbound", "Outbound", "Indicação", "Evento", "Parceria", "Site"];
+
+/** Origem comercial normalizada (mesmo formato que a API deve devolver). */
+export type OriginKey = "outbound" | "inbound" | "parceiro" | "indicacao" | "outros";
+
+export const PARTNERS = [
+  "Alpha Consultoria",
+  "RevOps Brasil",
+  "Nucleo Digital",
+  "Growth Partners",
+];
+
+const ORIGIN_BY_SOURCE: Record<string, OriginKey> = {
+  Inbound: "inbound",
+  Outbound: "outbound",
+  "Indicação": "indicacao",
+  Evento: "outros",
+  Parceria: "parceiro",
+  Site: "inbound",
+};
+
+export const originFromSource = (source: string): OriginKey =>
+  ORIGIN_BY_SOURCE[source] ?? "outros";
 
 const COMPANY_NAMES = [
   "Nexora Tecnologia",
@@ -162,6 +188,12 @@ export const companies = COMPANY_NAMES.map((name, i) => ({
   site: `${name.split(" ")[0]!.toLowerCase()}.com.br`,
   city: ["São Paulo", "Curitiba", "Belo Horizonte", "Recife", "Porto Alegre"][i % 5]!,
   employees: [40, 120, 320, 850, 1500][i % 5]!,
+  origin: originFromSource(SOURCES[i % SOURCES.length]!),
+  partner:
+    originFromSource(SOURCES[i % SOURCES.length]!) === "parceiro" ||
+    originFromSource(SOURCES[i % SOURCES.length]!) === "indicacao"
+      ? PARTNERS[i % PARTNERS.length]!
+      : undefined,
 }));
 
 export const contacts = CONTACT_NAMES.map((name, i) => ({
@@ -227,6 +259,8 @@ export const opportunities: Opportunity[] = STAGE_DIST.map((stage, i) => {
   const daysInStage = 1 + seeded(i, 28);
   const lastContactDays = 1 + seeded(i + 2, 21);
   const lastContactDate = new Date(TODAY.getTime() - lastContactDays * 86400000);
+  const source = SOURCES[i % SOURCES.length]!;
+  const origin = originFromSource(source);
   return {
     id: `op-${i + 1}`,
     title: `${company.name} — Implantação Conversu`,
@@ -244,12 +278,37 @@ export const opportunities: Opportunity[] = STAGE_DIST.map((stage, i) => {
       lastContactDate.getMonth() + 1,
     ).padStart(2, "0")}/${lastContactDate.getFullYear()}`,
     lastContactDays,
+    origin,
+    partner: origin === "parceiro" || origin === "indicacao" ? PARTNERS[i % PARTNERS.length]! : undefined,
+    pipelineId:
+      origin === "parceiro" || origin === "indicacao"
+        ? "parcerias"
+        : origin === "inbound"
+          ? "inbound"
+          : value > 120000
+            ? "enterprise"
+            : "outbound",
+    custom: {
+      produto: ["Sales OS", "Sales OS + IA", "Enterprise"][i % 3]!,
+      segmento: company.segment,
+      volume: String(120 + seeded(i, 400)),
+      budget: String(value),
+      concorrente: ["Planilhas", "CRM legado", "Pipedrive", "HubSpot"][i % 4]!,
+      crm: ["Planilhas", "Pipedrive", "HubSpot", "Nenhum"][i % 4]!,
+      usuarios: String(6 + (i % 40)),
+      decisor: contact.name,
+      timing: ["Imediato", "30 dias", "90 dias", "Sem prazo"][i % 4]!,
+      canal: ["Site", "Webinar", "Indicação", "Evento"][i % 4]!,
+      comissao: "15% recorrente",
+      coSelling: i % 2 === 0 ? "Sim" : "Não",
+      juridico: ["Não iniciada", "Em andamento", "Concluída"][i % 3]!,
+    },
     nextActivity: ["Follow-up por WhatsApp", "Call de alinhamento", "Envio de proposta", "Reunião de diagnóstico", "E-mail de retomada"][i % 5]!,
     nextActivityDate: `${String(1 + (i % 27)).padStart(2, "0")}/08/2026`,
     owner: OWNERS[i % OWNERS.length]!,
     closeDate: `${String(5 + (i % 24)).padStart(2, "0")}/${String(8 + (i % 3)).padStart(2, "0")}/2026`,
     segment: company.segment,
-    source: SOURCES[i % SOURCES.length]!,
+    source,
     nextStep: ["Validar orçamento com o CFO", "Agendar demo técnica", "Revisar escopo da proposta", "Confirmar decisor final"][i % 4]!,
     summary: `${company.name} busca estruturar o processo comercial e ganhar previsibilidade de receita. A conversa avançou com ${contact.name} (${contact.role}) e o time avalia substituir a operação atual em planilhas.`,
     pains: [
