@@ -11,6 +11,8 @@ import {
   Sparkle,
   BarChart3,
   Settings,
+  Target,
+  CheckSquare,
 } from "lucide-react";
 
 import {
@@ -26,9 +28,10 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { UserMenu } from "@/components/user-menu";
 
 const main = [
-  { title: "Dashboard", url: "/", icon: LayoutDashboard },
+  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Pipeline", url: "/pipeline", icon: KanbanSquare },
   { title: "Empresas", url: "/empresas", icon: Building2 },
   { title: "Contatos", url: "/contatos", icon: Users },
@@ -38,10 +41,12 @@ const execution = [
   { title: "Atividades", url: "/atividades", icon: ListChecks },
   { title: "Reuniões", url: "/reunioes", icon: CalendarDays },
   { title: "Propostas", url: "/propostas", icon: FileText },
+  { title: "Tarefas", url: "/tarefas", icon: CheckSquare },
 ];
 
 const intelligence = [
   { title: "Forecast", url: "/forecast", icon: TrendingUp },
+  { title: "Metas", url: "/metas", icon: Target },
   { title: "IA Comercial", url: "/ia-comercial", icon: Sparkle },
   { title: "Relatórios", url: "/relatorios", icon: BarChart3 },
   { title: "Configurações", url: "/configuracoes", icon: Settings },
@@ -62,8 +67,7 @@ export function AppSidebar() {
       <SidebarGroupContent>
         <SidebarMenu>
           {items.map((item) => {
-            const active =
-              item.url === "/" ? pathname === "/" : pathname.startsWith(item.url);
+            const active = pathname.startsWith(item.url);
             return (
               <SidebarMenuItem key={item.url}>
                 <SidebarMenuButton asChild isActive={active} tooltip={item.title}>
@@ -101,17 +105,7 @@ export function AppSidebar() {
         {group("Inteligência", intelligence)}
       </SidebarContent>
       <SidebarFooter className="p-3">
-        <div className="flex min-w-0 items-center gap-2.5 rounded-xl border bg-card p-2">
-          <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-accent text-xs font-semibold text-accent-foreground">
-            MD
-          </div>
-          {!collapsed && (
-            <div className="min-w-0">
-              <p className="truncate text-xs font-semibold">Marina Duarte</p>
-              <p className="truncate text-[11px] text-muted-foreground">Head de Vendas</p>
-            </div>
-          )}
-        </div>
+        <UserMenu compact={collapsed} />
       </SidebarFooter>
     </Sidebar>
   );
