@@ -64,7 +64,7 @@ export type Opportunity = {
   lastContact: string;
   lastContactDays: number;
   origin: OriginKey;
-  partner?: string;
+  partner?: string | undefined;
   pipelineId: string;
   custom: Record<string, string>;
   nextActivity: string;
