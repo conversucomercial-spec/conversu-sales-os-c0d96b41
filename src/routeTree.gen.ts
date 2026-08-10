@@ -9,121 +9,123 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AtividadesRouteImport } from './routes/atividades'
-import { Route as ConfiguracoesRouteImport } from './routes/configuracoes'
-import { Route as ContatosRouteImport } from './routes/contatos'
-import { Route as EmpresasRouteImport } from './routes/empresas'
-import { Route as ForecastRouteImport } from './routes/forecast'
-import { Route as IaComercialRouteImport } from './routes/ia-comercial'
-import { Route as PipelineRouteImport } from './routes/pipeline'
-import { Route as PropostasRouteImport } from './routes/propostas'
-import { Route as RelatoriosRouteImport } from './routes/relatorios'
-import { Route as ReunioesRouteImport } from './routes/reunioes'
+import { Route as AuthenticatedAtividadesRouteImport } from './routes/_authenticated/atividades'
+import { Route as AuthenticatedConfiguracoesRouteImport } from './routes/_authenticated/configuracoes'
+import { Route as AuthenticatedContatosRouteImport } from './routes/_authenticated/contatos'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedEmpresasRouteImport } from './routes/_authenticated/empresas'
+import { Route as AuthenticatedForecastRouteImport } from './routes/_authenticated/forecast'
+import { Route as AuthenticatedIaComercialRouteImport } from './routes/_authenticated/ia-comercial'
+import { Route as AuthenticatedPipelineRouteImport } from './routes/_authenticated/pipeline'
+import { Route as AuthenticatedPropostasRouteImport } from './routes/_authenticated/propostas'
+import { Route as AuthenticatedRelatoriosRouteImport } from './routes/_authenticated/relatorios'
+import { Route as AuthenticatedReunioesRouteImport } from './routes/_authenticated/reunioes'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AtividadesRoute = AtividadesRouteImport.update({
-  id: '/atividades',
+const AuthenticatedAtividadesRoute = AuthenticatedAtividadesRouteImport.update({
+  id: '/_authenticated/atividades',
   path: '/atividades',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ConfiguracoesRoute = ConfiguracoesRouteImport.update({
-  id: '/configuracoes',
-  path: '/configuracoes',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContatosRoute = ContatosRouteImport.update({
-  id: '/contatos',
+const AuthenticatedConfiguracoesRoute =
+  AuthenticatedConfiguracoesRouteImport.update({
+    id: '/_authenticated/configuracoes',
+    path: '/configuracoes',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedContatosRoute = AuthenticatedContatosRouteImport.update({
+  id: '/_authenticated/contatos',
   path: '/contatos',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EmpresasRoute = EmpresasRouteImport.update({
-  id: '/empresas',
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/_authenticated/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedEmpresasRoute = AuthenticatedEmpresasRouteImport.update({
+  id: '/_authenticated/empresas',
   path: '/empresas',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ForecastRoute = ForecastRouteImport.update({
-  id: '/forecast',
+const AuthenticatedForecastRoute = AuthenticatedForecastRouteImport.update({
+  id: '/_authenticated/forecast',
   path: '/forecast',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IaComercialRoute = IaComercialRouteImport.update({
-  id: '/ia-comercial',
-  path: '/ia-comercial',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PipelineRoute = PipelineRouteImport.update({
-  id: '/pipeline',
+const AuthenticatedIaComercialRoute =
+  AuthenticatedIaComercialRouteImport.update({
+    id: '/_authenticated/ia-comercial',
+    path: '/ia-comercial',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedPipelineRoute = AuthenticatedPipelineRouteImport.update({
+  id: '/_authenticated/pipeline',
   path: '/pipeline',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PropostasRoute = PropostasRouteImport.update({
-  id: '/propostas',
+const AuthenticatedPropostasRoute = AuthenticatedPropostasRouteImport.update({
+  id: '/_authenticated/propostas',
   path: '/propostas',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RelatoriosRoute = RelatoriosRouteImport.update({
-  id: '/relatorios',
+const AuthenticatedRelatoriosRoute = AuthenticatedRelatoriosRouteImport.update({
+  id: '/_authenticated/relatorios',
   path: '/relatorios',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ReunioesRoute = ReunioesRouteImport.update({
-  id: '/reunioes',
+const AuthenticatedReunioesRoute = AuthenticatedReunioesRouteImport.update({
+  id: '/_authenticated/reunioes',
   path: '/reunioes',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/atividades': typeof AtividadesRoute
-  '/configuracoes': typeof ConfiguracoesRoute
-  '/contatos': typeof ContatosRoute
-  '/empresas': typeof EmpresasRoute
-  '/forecast': typeof ForecastRoute
-  '/ia-comercial': typeof IaComercialRoute
-  '/pipeline': typeof PipelineRoute
-  '/propostas': typeof PropostasRoute
-  '/relatorios': typeof RelatoriosRoute
-  '/reunioes': typeof ReunioesRoute
+  '/atividades': typeof AuthenticatedAtividadesRoute
+  '/configuracoes': typeof AuthenticatedConfiguracoesRoute
+  '/contatos': typeof AuthenticatedContatosRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/empresas': typeof AuthenticatedEmpresasRoute
+  '/forecast': typeof AuthenticatedForecastRoute
+  '/ia-comercial': typeof AuthenticatedIaComercialRoute
+  '/pipeline': typeof AuthenticatedPipelineRoute
+  '/propostas': typeof AuthenticatedPropostasRoute
+  '/relatorios': typeof AuthenticatedRelatoriosRoute
+  '/reunioes': typeof AuthenticatedReunioesRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/atividades': typeof AtividadesRoute
-  '/configuracoes': typeof ConfiguracoesRoute
-  '/contatos': typeof ContatosRoute
-  '/empresas': typeof EmpresasRoute
-  '/forecast': typeof ForecastRoute
-  '/ia-comercial': typeof IaComercialRoute
-  '/pipeline': typeof PipelineRoute
-  '/propostas': typeof PropostasRoute
-  '/relatorios': typeof RelatoriosRoute
-  '/reunioes': typeof ReunioesRoute
+  '/atividades': typeof AuthenticatedAtividadesRoute
+  '/configuracoes': typeof AuthenticatedConfiguracoesRoute
+  '/contatos': typeof AuthenticatedContatosRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/empresas': typeof AuthenticatedEmpresasRoute
+  '/forecast': typeof AuthenticatedForecastRoute
+  '/ia-comercial': typeof AuthenticatedIaComercialRoute
+  '/pipeline': typeof AuthenticatedPipelineRoute
+  '/propostas': typeof AuthenticatedPropostasRoute
+  '/relatorios': typeof AuthenticatedRelatoriosRoute
+  '/reunioes': typeof AuthenticatedReunioesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/atividades': typeof AtividadesRoute
-  '/configuracoes': typeof ConfiguracoesRoute
-  '/contatos': typeof ContatosRoute
-  '/empresas': typeof EmpresasRoute
-  '/forecast': typeof ForecastRoute
-  '/ia-comercial': typeof IaComercialRoute
-  '/pipeline': typeof PipelineRoute
-  '/propostas': typeof PropostasRoute
-  '/relatorios': typeof RelatoriosRoute
-  '/reunioes': typeof ReunioesRoute
+  '/_authenticated/atividades': typeof AuthenticatedAtividadesRoute
+  '/_authenticated/configuracoes': typeof AuthenticatedConfiguracoesRoute
+  '/_authenticated/contatos': typeof AuthenticatedContatosRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/empresas': typeof AuthenticatedEmpresasRoute
+  '/_authenticated/forecast': typeof AuthenticatedForecastRoute
+  '/_authenticated/ia-comercial': typeof AuthenticatedIaComercialRoute
+  '/_authenticated/pipeline': typeof AuthenticatedPipelineRoute
+  '/_authenticated/propostas': typeof AuthenticatedPropostasRoute
+  '/_authenticated/relatorios': typeof AuthenticatedRelatoriosRoute
+  '/_authenticated/reunioes': typeof AuthenticatedReunioesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
     | '/atividades'
     | '/configuracoes'
     | '/contatos'
+    | '/dashboard'
     | '/empresas'
     | '/forecast'
     | '/ia-comercial'
@@ -133,10 +135,10 @@ export interface FileRouteTypes {
     | '/reunioes'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
     | '/atividades'
     | '/configuracoes'
     | '/contatos'
+    | '/dashboard'
     | '/empresas'
     | '/forecast'
     | '/ia-comercial'
@@ -146,138 +148,128 @@ export interface FileRouteTypes {
     | '/reunioes'
   id:
     | '__root__'
-    | '/'
-    | '/atividades'
-    | '/configuracoes'
-    | '/contatos'
-    | '/empresas'
-    | '/forecast'
-    | '/ia-comercial'
-    | '/pipeline'
-    | '/propostas'
-    | '/relatorios'
-    | '/reunioes'
+    | '/_authenticated/atividades'
+    | '/_authenticated/configuracoes'
+    | '/_authenticated/contatos'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/empresas'
+    | '/_authenticated/forecast'
+    | '/_authenticated/ia-comercial'
+    | '/_authenticated/pipeline'
+    | '/_authenticated/propostas'
+    | '/_authenticated/relatorios'
+    | '/_authenticated/reunioes'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  AtividadesRoute: typeof AtividadesRoute
-  ConfiguracoesRoute: typeof ConfiguracoesRoute
-  ContatosRoute: typeof ContatosRoute
-  EmpresasRoute: typeof EmpresasRoute
-  ForecastRoute: typeof ForecastRoute
-  IaComercialRoute: typeof IaComercialRoute
-  PipelineRoute: typeof PipelineRoute
-  PropostasRoute: typeof PropostasRoute
-  RelatoriosRoute: typeof RelatoriosRoute
-  ReunioesRoute: typeof ReunioesRoute
+  AuthenticatedAtividadesRoute: typeof AuthenticatedAtividadesRoute
+  AuthenticatedConfiguracoesRoute: typeof AuthenticatedConfiguracoesRoute
+  AuthenticatedContatosRoute: typeof AuthenticatedContatosRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedEmpresasRoute: typeof AuthenticatedEmpresasRoute
+  AuthenticatedForecastRoute: typeof AuthenticatedForecastRoute
+  AuthenticatedIaComercialRoute: typeof AuthenticatedIaComercialRoute
+  AuthenticatedPipelineRoute: typeof AuthenticatedPipelineRoute
+  AuthenticatedPropostasRoute: typeof AuthenticatedPropostasRoute
+  AuthenticatedRelatoriosRoute: typeof AuthenticatedRelatoriosRoute
+  AuthenticatedReunioesRoute: typeof AuthenticatedReunioesRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/atividades': {
-      id: '/atividades'
+    '/_authenticated/atividades': {
+      id: '/_authenticated/atividades'
       path: '/atividades'
       fullPath: '/atividades'
-      preLoaderRoute: typeof AtividadesRouteImport
+      preLoaderRoute: typeof AuthenticatedAtividadesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/configuracoes': {
-      id: '/configuracoes'
+    '/_authenticated/configuracoes': {
+      id: '/_authenticated/configuracoes'
       path: '/configuracoes'
       fullPath: '/configuracoes'
-      preLoaderRoute: typeof ConfiguracoesRouteImport
+      preLoaderRoute: typeof AuthenticatedConfiguracoesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/contatos': {
-      id: '/contatos'
+    '/_authenticated/contatos': {
+      id: '/_authenticated/contatos'
       path: '/contatos'
       fullPath: '/contatos'
-      preLoaderRoute: typeof ContatosRouteImport
+      preLoaderRoute: typeof AuthenticatedContatosRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/empresas': {
-      id: '/empresas'
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/empresas': {
+      id: '/_authenticated/empresas'
       path: '/empresas'
       fullPath: '/empresas'
-      preLoaderRoute: typeof EmpresasRouteImport
+      preLoaderRoute: typeof AuthenticatedEmpresasRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/forecast': {
-      id: '/forecast'
+    '/_authenticated/forecast': {
+      id: '/_authenticated/forecast'
       path: '/forecast'
       fullPath: '/forecast'
-      preLoaderRoute: typeof ForecastRouteImport
+      preLoaderRoute: typeof AuthenticatedForecastRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/ia-comercial': {
-      id: '/ia-comercial'
+    '/_authenticated/ia-comercial': {
+      id: '/_authenticated/ia-comercial'
       path: '/ia-comercial'
       fullPath: '/ia-comercial'
-      preLoaderRoute: typeof IaComercialRouteImport
+      preLoaderRoute: typeof AuthenticatedIaComercialRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/pipeline': {
-      id: '/pipeline'
+    '/_authenticated/pipeline': {
+      id: '/_authenticated/pipeline'
       path: '/pipeline'
       fullPath: '/pipeline'
-      preLoaderRoute: typeof PipelineRouteImport
+      preLoaderRoute: typeof AuthenticatedPipelineRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/propostas': {
-      id: '/propostas'
+    '/_authenticated/propostas': {
+      id: '/_authenticated/propostas'
       path: '/propostas'
       fullPath: '/propostas'
-      preLoaderRoute: typeof PropostasRouteImport
+      preLoaderRoute: typeof AuthenticatedPropostasRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/relatorios': {
-      id: '/relatorios'
+    '/_authenticated/relatorios': {
+      id: '/_authenticated/relatorios'
       path: '/relatorios'
       fullPath: '/relatorios'
-      preLoaderRoute: typeof RelatoriosRouteImport
+      preLoaderRoute: typeof AuthenticatedRelatoriosRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/reunioes': {
-      id: '/reunioes'
+    '/_authenticated/reunioes': {
+      id: '/_authenticated/reunioes'
       path: '/reunioes'
       fullPath: '/reunioes'
-      preLoaderRoute: typeof ReunioesRouteImport
+      preLoaderRoute: typeof AuthenticatedReunioesRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  AtividadesRoute: AtividadesRoute,
-  ConfiguracoesRoute: ConfiguracoesRoute,
-  ContatosRoute: ContatosRoute,
-  EmpresasRoute: EmpresasRoute,
-  ForecastRoute: ForecastRoute,
-  IaComercialRoute: IaComercialRoute,
-  PipelineRoute: PipelineRoute,
-  PropostasRoute: PropostasRoute,
-  RelatoriosRoute: RelatoriosRoute,
-  ReunioesRoute: ReunioesRoute,
+  AuthenticatedAtividadesRoute: AuthenticatedAtividadesRoute,
+  AuthenticatedConfiguracoesRoute: AuthenticatedConfiguracoesRoute,
+  AuthenticatedContatosRoute: AuthenticatedContatosRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedEmpresasRoute: AuthenticatedEmpresasRoute,
+  AuthenticatedForecastRoute: AuthenticatedForecastRoute,
+  AuthenticatedIaComercialRoute: AuthenticatedIaComercialRoute,
+  AuthenticatedPipelineRoute: AuthenticatedPipelineRoute,
+  AuthenticatedPropostasRoute: AuthenticatedPropostasRoute,
+  AuthenticatedRelatoriosRoute: AuthenticatedRelatoriosRoute,
+  AuthenticatedReunioesRoute: AuthenticatedReunioesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
