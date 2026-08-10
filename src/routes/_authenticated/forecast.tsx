@@ -20,7 +20,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-export const Route = createFileRoute("/forecast")({
+export const Route = createFileRoute("/_authenticated/forecast")({
   head: () => ({
     meta: [
       { title: "Forecast | Conversu Sales OS" },

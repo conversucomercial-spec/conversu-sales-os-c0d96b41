@@ -24,7 +24,7 @@ import {
   type StageId,
 } from "@/lib/data";
 
-export const Route = createFileRoute("/pipeline")({
+export const Route = createFileRoute("/_authenticated/pipeline")({
   head: () => ({
     meta: [
       { title: "Pipeline de vendas | Conversu Sales OS" },

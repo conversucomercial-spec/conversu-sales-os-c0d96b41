@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/table";
 import { companies, contacts, currency, opportunities } from "@/lib/data";
 
-export const Route = createFileRoute("/empresas")({
+export const Route = createFileRoute("/_authenticated/empresas")({
   head: () => ({
     meta: [
       { title: "Empresas | Conversu Sales OS" },

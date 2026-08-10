@@ -30,7 +30,7 @@ export function AppTopbar() {
 
   const go = (to: string) => {
     setOpen(false);
-    navigate({ to });
+    navigate({ to } as never);
   };
 
   return (
@@ -63,14 +63,16 @@ export function AppTopbar() {
           <CommandEmpty>Nenhum resultado encontrado.</CommandEmpty>
           <CommandGroup heading="Navegação">
             {[
-              ["Dashboard", "/"],
+              ["Dashboard", "/dashboard"],
               ["Pipeline", "/pipeline"],
               ["Empresas", "/empresas"],
               ["Contatos", "/contatos"],
               ["Atividades", "/atividades"],
               ["Reuniões", "/reunioes"],
               ["Propostas", "/propostas"],
+              ["Tarefas", "/tarefas"],
               ["Forecast", "/forecast"],
+              ["Metas", "/metas"],
               ["IA Comercial", "/ia-comercial"],
               ["Relatórios", "/relatorios"],
               ["Configurações", "/configuracoes"],
