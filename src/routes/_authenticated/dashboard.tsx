@@ -35,15 +35,12 @@ import {
   currency,
   dashboard,
   funnelConversion,
-  leadSources,
-  metrics,
   monthly,
-  pipelineByOwner,
-  pipelineBySegment,
-  pipelineByStage,
-  valueByStage,
 } from "@/lib/data";
 import { Button } from "@/components/ui/button";
+import { useCrm } from "@/hooks/use-crm";
+import { buildCrmMetrics } from "@/lib/crm-metrics";
+import { useMemo } from "react";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -66,6 +63,18 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 });
 
 function Dashboard() {
+  const { data } = useCrm();
+  const crm = useMemo(() => buildCrmMetrics(data.opportunities), [data.opportunities]);
+  const {
+    metrics,
+    valueByStage,
+    pipelineByStage,
+    pipelineByOwner,
+    pipelineBySegment,
+    leadSources,
+    noInteraction,
+    closingSoon,
+  } = crm;
   const openTotal = valueByStage.reduce((s, v) => s + v.value, 0);
 
   return (
@@ -89,8 +98,8 @@ function Dashboard() {
         <KpiCard label="Win rate" value={`${metrics.winRate}%`} icon={Percent} tone="success" />
         <KpiCard label="Negociações em risco" value={metrics.atRisk} icon={Flame} tone="danger" hint="sem avanço recente" />
         <KpiCard label="Próximos fechamentos" value={metrics.nextClosings} icon={Wallet} hint="prob. ≥ 72%" />
-        <KpiCard label="Atividades pendentes" value={metrics.pendingActivities} icon={ListChecks} tone="warning" />
-        <KpiCard label="Reuniões hoje" value={metrics.meetingsToday} icon={CalendarClock} />
+        <KpiCard label="Atividades pendentes" value={dashboard.pendingActivities} icon={ListChecks} tone="warning" />
+        <KpiCard label="Reuniões hoje" value={dashboard.meetingsToday} icon={CalendarClock} />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
@@ -150,12 +159,12 @@ function Dashboard() {
           title="Negociações sem interação"
           description={`Sem contato há 10 dias ou mais`}
           icon={TriangleAlert}
-          action={<Tag tone="warning">{dashboard.noInteraction.length}</Tag>}
+          action={<Tag tone="warning">{noInteraction.length}</Tag>}
           bodyClassName="p-2"
         >
-          {dashboard.noInteraction.length ? (
+          {noInteraction.length ? (
             <ul className="space-y-0.5">
-              {dashboard.noInteraction.map((o) => (
+              {noInteraction.map((o) => (
                 <li key={o.id}>
                   <ListRow
                     primary={o.company}
@@ -177,7 +186,7 @@ function Dashboard() {
           bodyClassName="p-2"
         >
           <ul className="space-y-0.5">
-            {dashboard.closingSoon.map((o) => (
+            {closingSoon.map((o) => (
               <li key={o.id}>
                 <ListRow
                   primary={o.company}
