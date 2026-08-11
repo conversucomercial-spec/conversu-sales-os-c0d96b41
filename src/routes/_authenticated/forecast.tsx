@@ -10,10 +10,10 @@ import {
   compact,
   currency,
   funnelConversion,
-  metrics,
   monthly,
-  opportunities,
 } from "@/lib/data";
+import { useCrm } from "@/hooks/use-crm";
+import { buildCrmMetrics } from "@/lib/crm-metrics";
 import {
   Table,
   TableBody,
@@ -36,6 +36,9 @@ export const Route = createFileRoute("/_authenticated/forecast")({
 });
 
 function ForecastPage() {
+  const { data } = useCrm();
+  const opportunities = data.opportunities;
+  const metrics = useMemo(() => buildCrmMetrics(opportunities).metrics, [opportunities]);
   const [partner, setPartner] = useState("todos");
   const [origin, setOrigin] = useState("todas");
 
@@ -48,7 +51,7 @@ function ForecastPage() {
           (partner === "todos" || o.partner === partner) &&
           (origin === "todas" || o.origin === origin),
       ),
-    [partner, origin],
+    [opportunities, partner, origin],
   );
 
   const byOwner = useMemo(() => {
