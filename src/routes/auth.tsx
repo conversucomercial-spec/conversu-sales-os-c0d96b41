@@ -85,13 +85,7 @@ function AuthPage() {
     navigate({ to: "/dashboard", replace: true });
   };
 
-  if (checking) {
-    return (
-      <div className="grid min-h-screen place-items-center bg-background">
-        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-      </div>
-    );
-  }
+  if (checking) return null;
 
   return (
     <div className="grid min-h-screen w-full bg-background lg:grid-cols-2">
