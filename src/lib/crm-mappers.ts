@@ -89,7 +89,7 @@ export function mapContact(
     name: row.name,
     role: row.role ?? "—",
     company: extra.companyName,
-    companyId: row.company_id,
+    companyId: row.company_id ?? "",
     phone: row.phone ?? "",
     whatsapp: row.whatsapp ?? "",
     email: row.email ?? "",

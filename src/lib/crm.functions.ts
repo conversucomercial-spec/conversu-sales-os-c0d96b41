@@ -50,7 +50,9 @@ export const listCrm = createServerFn({ method: "GET" })
         }),
       ),
       contacts: contactRows.map((row) =>
-        mapContact(row, { companyName: companyById.get(row.company_id)?.name ?? "—" }),
+        mapContact(row, {
+          companyName: (row.company_id ? companyById.get(row.company_id)?.name : undefined) ?? "—",
+        }),
       ),
       opportunities,
       stages: stageRows.map((s) => ({
