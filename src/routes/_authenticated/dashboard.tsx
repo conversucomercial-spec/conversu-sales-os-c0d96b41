@@ -35,6 +35,7 @@ import {
   currency,
   dashboard,
   funnelConversion,
+  metrics as activityMetrics,
   monthly,
 } from "@/lib/data";
 import { Button } from "@/components/ui/button";
@@ -98,8 +99,8 @@ function Dashboard() {
         <KpiCard label="Win rate" value={`${metrics.winRate}%`} icon={Percent} tone="success" />
         <KpiCard label="Negociações em risco" value={metrics.atRisk} icon={Flame} tone="danger" hint="sem avanço recente" />
         <KpiCard label="Próximos fechamentos" value={metrics.nextClosings} icon={Wallet} hint="prob. ≥ 72%" />
-        <KpiCard label="Atividades pendentes" value={dashboard.pendingActivities} icon={ListChecks} tone="warning" />
-        <KpiCard label="Reuniões hoje" value={dashboard.meetingsToday} icon={CalendarClock} />
+        <KpiCard label="Atividades pendentes" value={activityMetrics.pendingActivities} icon={ListChecks} tone="warning" />
+        <KpiCard label="Reuniões hoje" value={activityMetrics.meetingsToday} icon={CalendarClock} />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
