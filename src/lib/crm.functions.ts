@@ -18,8 +18,12 @@ export const listCrm = createServerFn({ method: "GET" })
       ]);
 
     const err =
-      companiesRes.error ?? contactsRes.error ?? opsRes.error ?? stagesRes.error ??
-      pipelinesRes.error ?? profilesRes.error;
+      companiesRes.error ??
+      contactsRes.error ??
+      opsRes.error ??
+      stagesRes.error ??
+      pipelinesRes.error ??
+      profilesRes.error;
     if (err) throw new Error(err.message);
 
     const owners = new Map((profilesRes.data ?? []).map((p) => [p.id, p.full_name]));
