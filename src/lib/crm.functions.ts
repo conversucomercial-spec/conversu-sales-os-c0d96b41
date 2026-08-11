@@ -18,8 +18,12 @@ export const listCrm = createServerFn({ method: "GET" })
       ]);
 
     const err =
-      companiesRes.error ?? contactsRes.error ?? opsRes.error ?? stagesRes.error ??
-      pipelinesRes.error ?? profilesRes.error;
+      companiesRes.error ??
+      contactsRes.error ??
+      opsRes.error ??
+      stagesRes.error ??
+      pipelinesRes.error ??
+      profilesRes.error;
     if (err) throw new Error(err.message);
 
     const owners = new Map((profilesRes.data ?? []).map((p) => [p.id, p.full_name]));
@@ -65,7 +69,7 @@ export const listCrm = createServerFn({ method: "GET" })
     };
   });
 
-/** Move uma oportunidade para outra etapa (mesmo funil quando possível). */
+/** Move uma oportunidade para outra etapa do MESMO funil. Nunca troca de pipeline. */
 export const moveOpportunityStage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { id: string; stageKey: string }) => input)
@@ -79,29 +83,19 @@ export const moveOpportunityStage = createServerFn({ method: "POST" })
     if (opError) throw new Error(opError.message);
     if (!op) throw new Error("Oportunidade não encontrada");
 
-    let { data: stage } = await supabase
+    const { data: stage, error: stageError } = await supabase
       .from("stages")
       .select("id, pipeline_id, probability")
       .eq("pipeline_id", op.pipeline_id)
       .eq("key", data.stageKey)
       .maybeSingle();
-
-    if (!stage) {
-      const fallback = await supabase
-        .from("stages")
-        .select("id, pipeline_id, probability")
-        .eq("key", data.stageKey)
-        .limit(1)
-        .maybeSingle();
-      stage = fallback.data;
-    }
-    if (!stage) throw new Error("Etapa não encontrada");
+    if (stageError) throw new Error(stageError.message);
+    if (!stage) throw new Error("Etapa não pertence ao funil desta oportunidade");
 
     const { error } = await supabase
       .from("opportunities")
       .update({
         stage_id: stage.id,
-        pipeline_id: stage.pipeline_id,
         probability: stage.probability,
         days_in_stage: 0,
         stage_changed_at: new Date().toISOString(),
