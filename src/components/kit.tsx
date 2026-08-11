@@ -122,9 +122,11 @@ export function TemperatureBadge({ value }: { value: Temperature }) {
 export function Tag({
   children,
   tone = "neutral",
+  className,
 }: {
   children: ReactNode;
   tone?: "neutral" | "success" | "warning" | "danger" | "info";
+  className?: string;
 }) {
   const cls = {
     neutral: "bg-secondary text-secondary-foreground border-border",
@@ -138,6 +140,7 @@ export function Tag({
       className={cn(
         "inline-flex items-center rounded-md border px-2 py-0.5 text-[11px] font-medium",
         cls,
+        className,
       )}
     >
       {children}
