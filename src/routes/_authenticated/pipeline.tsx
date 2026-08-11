@@ -91,6 +91,19 @@ function PipelinePage() {
   const moveTo = (stage: StageId) => {
     if (!dragId) return;
     const current = items.find((o) => o.id === dragId);
+    if (current && current.stage !== stage) {
+      const valid = data.stages.some(
+        (s) => s.pipelineKey === current.pipelineId && s.key === stage,
+      );
+      if (!valid) {
+        toast.error("Etapa indisponível neste funil", {
+          description: `A negociação está no funil "${current.pipelineId}", que não possui esta etapa.`,
+        });
+        setDragId(null);
+        setOverStage(null);
+        return;
+      }
+    }
     setItems((prev) =>
       prev.map((o) => (o.id === dragId ? { ...o, stage, daysInStage: 0 } : o)),
     );
