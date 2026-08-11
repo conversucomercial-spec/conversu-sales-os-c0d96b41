@@ -1,5 +1,8 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 import { Filter, LayoutGrid, Rows3 } from "lucide-react";
 import { PageHeader, EmptyState, Tag, PriorityBadge, HealthScore, TemperatureBadge } from "@/components/kit";
 import { OpportunityCard } from "@/components/entity-cards";
@@ -17,12 +20,12 @@ import {
 import {
   compact,
   currency,
-  opportunities as seedOpportunities,
-  OWNERS,
   STAGES,
   type Opportunity,
   type StageId,
 } from "@/lib/data";
+import { useCrm, CRM_QUERY_KEY } from "@/hooks/use-crm";
+import { moveOpportunityStage } from "@/lib/crm.functions";
 
 export const Route = createFileRoute("/_authenticated/pipeline")({
   head: () => ({
@@ -44,8 +47,12 @@ export const Route = createFileRoute("/_authenticated/pipeline")({
 });
 
 function PipelinePage() {
-  /** Estado local do protótipo — trocar por mutação de API na fase de dados reais. */
-  const [items, setItems] = useState<Opportunity[]>(seedOpportunities);
+  const { data, isLoading } = useCrm();
+  const queryClient = useQueryClient();
+  const moveStage = useServerFn(moveOpportunityStage);
+  /** Cópia local para feedback imediato no arraste; sincronizada com o banco. */
+  const [items, setItems] = useState<Opportunity[]>([]);
+  useEffect(() => setItems(data.opportunities), [data.opportunities]);
   const [selected, setSelected] = useState<Opportunity | null>(null);
   const [query, setQuery] = useState("");
   const [owner, setOwner] = useState("todos");
@@ -54,6 +61,18 @@ function PipelinePage() {
   const [view, setView] = useState<"kanban" | "lista">("kanban");
   const [dragId, setDragId] = useState<string | null>(null);
   const [overStage, setOverStage] = useState<StageId | null>(null);
+
+  const owners = data.owners;
+
+  const mutation = useMutation({
+    mutationFn: (vars: { id: string; stageKey: StageId }) =>
+      moveStage({ data: { id: vars.id, stageKey: vars.stageKey } }),
+    onError: (error: Error) => {
+      toast.error("Não foi possível mover a oportunidade", { description: error.message });
+      void queryClient.invalidateQueries({ queryKey: CRM_QUERY_KEY });
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: CRM_QUERY_KEY }),
+  });
 
   const filtered = useMemo(
     () =>
@@ -71,9 +90,11 @@ function PipelinePage() {
 
   const moveTo = (stage: StageId) => {
     if (!dragId) return;
+    const current = items.find((o) => o.id === dragId);
     setItems((prev) =>
       prev.map((o) => (o.id === dragId ? { ...o, stage, daysInStage: 0 } : o)),
     );
+    if (current && current.stage !== stage) mutation.mutate({ id: dragId, stageKey: stage });
     setDragId(null);
     setOverStage(null);
   };
@@ -82,9 +103,13 @@ function PipelinePage() {
     <div className="space-y-5">
       <PageHeader
         title="Pipeline"
-        description={`${filtered.length} oportunidades · ${compact(
-          filtered.reduce((s, o) => s + o.value, 0),
-        )} em jogo`}
+        description={
+          isLoading
+            ? "Carregando oportunidades…"
+            : `${filtered.length} oportunidades · ${compact(
+                filtered.reduce((s, o) => s + o.value, 0),
+              )} em jogo`
+        }
         actions={
           <div className="flex rounded-lg border p-0.5">
             <Button
@@ -117,7 +142,7 @@ function PipelinePage() {
           onChange={setOwner}
           options={[
             { value: "todos", label: "Todos os responsáveis" },
-            ...OWNERS.map((o) => ({ value: o, label: o })),
+            ...owners.map((o) => ({ value: o, label: o })),
           ]}
         />
         <FilterSelect
