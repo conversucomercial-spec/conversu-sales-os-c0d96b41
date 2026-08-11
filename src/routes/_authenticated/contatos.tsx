@@ -12,7 +12,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { contacts, opportunities } from "@/lib/data";
+import { useCrm } from "@/hooks/use-crm";
+import type { CrmContact } from "@/lib/crm-mappers";
 
 export const Route = createFileRoute("/_authenticated/contatos")({
   head: () => ({
@@ -26,11 +27,11 @@ export const Route = createFileRoute("/_authenticated/contatos")({
   component: ContatosPage,
 });
 
-type Contact = (typeof contacts)[number];
-
 function ContatosPage() {
+  const { data, isLoading } = useCrm();
+  const contacts = data.contacts;
   const [query, setQuery] = useState("");
-  const [selected, setSelected] = useState<Contact | null>(null);
+  const [selected, setSelected] = useState<CrmContact | null>(null);
 
   const rows = useMemo(
     () =>
@@ -39,12 +40,15 @@ function ContatosPage() {
           c.name.toLowerCase().includes(query.toLowerCase()) ||
           c.company.toLowerCase().includes(query.toLowerCase()),
       ),
-    [query],
+    [contacts, query],
   );
 
   return (
     <div className="space-y-5">
-      <PageHeader title="Contatos" description={`${rows.length} pessoas mapeadas nas contas`} />
+      <PageHeader
+        title="Contatos"
+        description={isLoading ? "Carregando contatos…" : `${rows.length} pessoas mapeadas nas contas`}
+      />
 
       <Panel bodyClassName="p-0">
         <div className="relative border-b p-3">
@@ -118,7 +122,11 @@ function ContatosPage() {
                 </div>
               </Panel>
               <Panel title="Histórico">
-                <Timeline items={opportunities[0]!.timeline} />
+                <Timeline
+                  items={
+                    data.opportunities.find((o) => o.companyId === selected.companyId)?.timeline ?? []
+                  }
+                />
               </Panel>
             </div>
           )}
