@@ -1,26 +1,32 @@
+import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Building2, Bot, CalendarDays, Database, Mail, MessageCircle, Notebook, Users } from "lucide-react";
+import { Bot, CalendarDays, Database, Loader2, Mail, MessageCircle, Notebook } from "lucide-react";
+import { toast } from "sonner";
 import { PageHeader, Panel, Tag } from "@/components/kit";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { OWNERS, STAGES } from "@/lib/data";
+import { supabase } from "@/integrations/supabase/client";
+import { initials, useSession } from "@/hooks/use-session";
+import { ALL_GOALS, CARD_FIELD_LABELS, PIPELINES } from "@/lib/config";
+import { OWNERS } from "@/lib/data";
 
 export const Route = createFileRoute("/_authenticated/configuracoes")({
   head: () => ({
     meta: [
       { title: "Configurações | Conversu Sales OS" },
-      { name: "description", content: "Configure equipe, etapas do funil, preferências e integrações futuras da plataforma." },
+      { name: "description", content: "Perfil, equipe, integrações, aparência e configuração comercial da plataforma." },
       { property: "og:title", content: "Configurações | Conversu Sales OS" },
-      { property: "og:description", content: "Equipe, etapas do funil, preferências e integrações da plataforma." },
+      { property: "og:description", content: "Perfil, equipe, integrações e configuração comercial." },
     ],
   }),
   component: ConfigPage,
 });
 
 const integrations = [
-  { icon: Database, name: "Supabase / PostgreSQL", desc: "Persistência de dados e autenticação" },
+  { icon: Database, name: "Banco de dados", desc: "Persistência de dados e autenticação" },
   { icon: Notebook, name: "Notion", desc: "Sincronização de bases e documentos" },
   { icon: MessageCircle, name: "WhatsApp", desc: "Registro automático de conversas" },
   { icon: Mail, name: "E-mail", desc: "Captura de threads e templates" },
@@ -28,72 +34,101 @@ const integrations = [
   { icon: Bot, name: "IA Comercial", desc: "Resumos, score e recomendações" },
 ];
 
+function ProfileTab() {
+  const { user, profile, role } = useSession();
+  const [fullName, setFullName] = useState("");
+  const [jobTitle, setJobTitle] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!profile) return;
+    setFullName(profile.full_name ?? "");
+    setJobTitle(profile.job_title ?? "");
+    setAvatarUrl(profile.avatar_url ?? "");
+  }, [profile]);
+
+  const save = async () => {
+    if (!user) return;
+    setSaving(true);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ full_name: fullName, job_title: jobTitle, avatar_url: avatarUrl || null })
+      .eq("id", user.id);
+    setSaving(false);
+    if (error) toast.error("Não foi possível salvar o perfil.");
+    else toast.success("Perfil atualizado.");
+  };
+
+  return (
+    <Panel title="Perfil" description="Dados da sua conta" bodyClassName="space-y-4">
+      <div className="flex items-center gap-3">
+        {avatarUrl ? (
+          <img src={avatarUrl} alt={fullName} className="h-12 w-12 rounded-xl object-cover" />
+        ) : (
+          <span className="brand-gradient grid h-12 w-12 place-items-center rounded-xl text-sm font-semibold text-primary-foreground">
+            {initials(fullName || user?.email || "C")}
+          </span>
+        )}
+        <div className="min-w-0">
+          <p className="truncate text-sm font-semibold">{fullName || "Sem nome"}</p>
+          <p className="truncate text-xs text-muted-foreground">{user?.email}</p>
+        </div>
+        <Tag tone={role === "gestor" ? "success" : "info"} className="ml-auto">
+          {role === "gestor" ? "Gestor" : "Vendedor"}
+        </Tag>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-1.5">
+          <Label htmlFor="nome">Nome completo</Label>
+          <Input id="nome" value={fullName} onChange={(e) => setFullName(e.target.value)} />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="cargo">Cargo</Label>
+          <Input id="cargo" value={jobTitle} onChange={(e) => setJobTitle(e.target.value)} placeholder="Executivo(a) comercial" />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="avatar">URL do avatar</Label>
+          <Input id="avatar" value={avatarUrl} onChange={(e) => setAvatarUrl(e.target.value)} placeholder="https://…" />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="mail">E-mail</Label>
+          <Input id="mail" value={user?.email ?? ""} disabled />
+        </div>
+      </div>
+
+      <Button onClick={save} disabled={saving} className="w-full sm:w-auto">
+        {saving && <Loader2 className="h-4 w-4 animate-spin" />} Salvar perfil
+      </Button>
+    </Panel>
+  );
+}
+
 function ConfigPage() {
   return (
     <div className="space-y-5">
-      <PageHeader title="Configurações" description="Preferências da operação comercial e integrações" />
+      <PageHeader title="Configurações" description="Perfil, equipe, integrações e o núcleo comercial configurável" />
 
-      <Tabs defaultValue="geral">
+      <Tabs defaultValue="perfil">
         <TabsList className="flex w-full flex-wrap justify-start">
-          <TabsTrigger value="geral">Geral</TabsTrigger>
-          <TabsTrigger value="funil">Funil</TabsTrigger>
+          <TabsTrigger value="perfil">Perfil</TabsTrigger>
           <TabsTrigger value="equipe">Equipe</TabsTrigger>
           <TabsTrigger value="integracoes">Integrações</TabsTrigger>
+          <TabsTrigger value="aparencia">Aparência</TabsTrigger>
+          <TabsTrigger value="comercial">Comercial</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="geral" className="mt-4 space-y-4">
-          <Panel title="Organização" bodyClassName="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-1.5">
-              <Label>Nome da empresa</Label>
-              <Input defaultValue="Conversu" />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Moeda padrão</Label>
-              <Input defaultValue="BRL (R$)" />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Meta mensal de receita</Label>
-              <Input defaultValue="R$ 500.000" />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Fuso horário</Label>
-              <Input defaultValue="America/Sao_Paulo" />
-            </div>
-          </Panel>
-          <Panel title="Preferências" bodyClassName="space-y-3">
-            {[
-              ["Alertas de negociação em risco", true],
-              ["Resumo diário por e-mail", true],
-              ["Criar follow-up automático após reunião", false],
-            ].map(([label, on]) => (
-              <div key={label as string} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-lg border p-3">
-                <span className="min-w-0 truncate text-sm">{label as string}</span>
-                <Switch defaultChecked={on as boolean} />
-              </div>
-            ))}
-          </Panel>
-        </TabsContent>
-
-        <TabsContent value="funil" className="mt-4">
-          <Panel title="Etapas do pipeline" bodyClassName="space-y-2.5">
-            {STAGES.map((s, i) => (
-              <div key={s.id} className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-lg border p-3">
-                <span className="grid h-6 w-6 place-items-center rounded-md bg-secondary text-[11px] font-semibold">{i + 1}</span>
-                <span className="min-w-0 truncate text-sm font-medium">{s.label}</span>
-                <Tag tone={s.id === "ganho" ? "success" : s.id === "perdido" ? "danger" : "info"}>
-                  {s.id === "ganho" ? "Ganho" : s.id === "perdido" ? "Perdido" : "Ativa"}
-                </Tag>
-              </div>
-            ))}
-          </Panel>
+        <TabsContent value="perfil" className="mt-4">
+          <ProfileTab />
         </TabsContent>
 
         <TabsContent value="equipe" className="mt-4">
-          <Panel title="Time comercial" bodyClassName="space-y-2.5">
+          <Panel title="Time comercial" description="Gestão de convites e papéis chega na próxima fase" bodyClassName="space-y-2.5">
             {OWNERS.map((o, i) => (
               <div key={o} className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-lg border p-3">
                 <span className="grid h-8 w-8 place-items-center rounded-lg bg-accent text-xs font-semibold text-accent-foreground">
-                  {o.split(" ").map((n) => n[0]).join("")}
+                  {initials(o)}
                 </span>
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium">{o}</p>
@@ -101,7 +136,7 @@ function ConfigPage() {
                     {i === 0 ? "Head de Vendas" : "Executivo(a) comercial"}
                   </p>
                 </div>
-                <Tag tone={i === 0 ? "success" : "neutral"}>{i === 0 ? "Admin" : "Vendedor"}</Tag>
+                <Tag tone={i === 0 ? "success" : "neutral"}>{i === 0 ? "Gestor" : "Vendedor"}</Tag>
               </div>
             ))}
           </Panel>
@@ -122,10 +157,91 @@ function ConfigPage() {
               </div>
             ))}
           </Panel>
-          <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-            <Building2 className="h-3.5 w-3.5" /> CRM próprio
-            <Users className="ml-3 h-3.5 w-3.5" /> Times e permissões — roadmap
-          </div>
+        </TabsContent>
+
+        <TabsContent value="aparencia" className="mt-4 space-y-4">
+          <Panel title="Preferências de interface" bodyClassName="space-y-3">
+            {[
+              ["Densidade compacta nas listas", false],
+              ["Mostrar Health Score nos cards", true],
+              ["Animações de transição", true],
+            ].map(([label, on]) => (
+              <div key={label as string} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-lg border p-3">
+                <span className="min-w-0 truncate text-sm">{label as string}</span>
+                <Switch defaultChecked={on as boolean} />
+              </div>
+            ))}
+          </Panel>
+          <Panel title="Identidade" bodyClassName="grid gap-3 sm:grid-cols-3">
+            {[
+              ["Core", "#3422B5"],
+              ["Flow", "#E56745"],
+              ["Mind", "#4C31A6"],
+            ].map(([name, hex]) => (
+              <div key={name} className="flex items-center gap-3 rounded-xl border p-3.5">
+                <span className="h-8 w-8 rounded-lg" style={{ background: hex }} />
+                <div>
+                  <p className="text-sm font-semibold">{name}</p>
+                  <p className="text-xs text-muted-foreground">{hex}</p>
+                </div>
+              </div>
+            ))}
+          </Panel>
+        </TabsContent>
+
+        <TabsContent value="comercial" className="mt-4 space-y-4">
+          {PIPELINES.map((p) => (
+            <Panel key={p.id} title={p.name} description={p.description} bodyClassName="space-y-4">
+              <div>
+                <p className="mb-2 text-xs font-semibold">Etapas, critérios e playbook</p>
+                <div className="space-y-2">
+                  {p.stages.map((s, i) => (
+                    <div key={s.id} className="rounded-lg border p-3">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="grid h-6 w-6 place-items-center rounded-md bg-secondary text-[11px] font-semibold">{i + 1}</span>
+                        <span className="text-sm font-medium">{s.label}</span>
+                        <Tag tone="info">{s.probability}%</Tag>
+                      </div>
+                      <p className="mt-2 text-xs text-muted-foreground">{s.playbook.objective}</p>
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        {s.criteria.map((c) => (
+                          <Tag key={c} tone="neutral">{c}</Tag>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <p className="mb-2 text-xs font-semibold">Campos exibidos no card</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {p.cardFields.map((f) => (
+                    <Tag key={f} tone="info">{CARD_FIELD_LABELS[f]}</Tag>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <p className="mb-2 text-xs font-semibold">Campos customizados da oportunidade</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {p.customFields.map((f) => (
+                    <Tag key={f.id} tone="neutral">{f.label} · {f.type}</Tag>
+                  ))}
+                </div>
+              </div>
+            </Panel>
+          ))}
+
+          <Panel title="Metas configuradas" bodyClassName="space-y-2">
+            {ALL_GOALS.map((g) => (
+              <div key={g.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-lg border p-3">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium">{g.name}</p>
+                  <p className="truncate text-xs text-muted-foreground">{g.subtitle} · {g.metrics.length} indicadores</p>
+                </div>
+                <Tag tone="info">{g.level}</Tag>
+              </div>
+            ))}
+          </Panel>
         </TabsContent>
       </Tabs>
     </div>

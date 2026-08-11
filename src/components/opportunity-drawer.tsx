@@ -5,6 +5,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { HealthScore, Panel, Tag, TemperatureBadge, Timeline } from "@/components/kit";
 import { AiInsightPanel } from "@/components/ai-panel";
+import { PlaybookPanel, StageCriteria } from "@/components/playbook-panel";
+import { getPipeline, originLabel } from "@/lib/config";
 import { currency, STAGES, type Opportunity } from "@/lib/data";
 import { CalendarDays, FileText, Paperclip, PhoneCall, Users } from "lucide-react";
 
@@ -91,6 +93,7 @@ export function OpportunityDrawer({
                   <TabsTrigger value="propostas">Propostas</TabsTrigger>
                   <TabsTrigger value="arquivos">Arquivos</TabsTrigger>
                   <TabsTrigger value="checklist">Checklist</TabsTrigger>
+                  <TabsTrigger value="playbook">Playbook</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="timeline" className="mt-4">
@@ -196,7 +199,28 @@ export function OpportunityDrawer({
                     ))}
                   </Panel>
                 </TabsContent>
+                <TabsContent value="playbook" className="mt-4 space-y-4">
+                  <StageCriteria
+                    pipelineId={op.pipelineId}
+                    stage={op.stage}
+                    done={op.checklist.filter((c) => c.done).map((c) => c.label)}
+                  />
+                  <PlaybookPanel pipelineId={op.pipelineId} stage={op.stage} />
+                </TabsContent>
               </Tabs>
+
+              <Panel
+                title="Informações do pipeline"
+                description={getPipeline(op.pipelineId).name}
+                bodyClassName="grid gap-2.5 sm:grid-cols-3"
+              >
+                <Field label="Origem" value={originLabel(op.origin)} />
+                <Field label="Parceiro" value={op.partner ?? "—"} />
+                <Field label="Última interação" value={`${op.lastContact} (${op.lastContactDays}d)`} />
+                {getPipeline(op.pipelineId).customFields.map((f) => (
+                  <Field key={f.id} label={f.label} value={op.custom[f.id] ?? "—"} />
+                ))}
+              </Panel>
 
               <AiInsightPanel op={op} />
             </div>
