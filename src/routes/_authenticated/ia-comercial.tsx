@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AlertTriangle, Bot, Brain, ClipboardList, Gauge, Lightbulb, Lock, MessageSquareText, Sparkle, TrendingUp } from "lucide-react";
-import { PageHeader, Panel, Tag } from "@/components/kit";
+import { AiSlot, PageHeader, Panel, Tag } from "@/components/kit";
 import { AiInsightPanel } from "@/components/ai-panel";
 import { Button } from "@/components/ui/button";
 import { opportunities } from "@/lib/data";
@@ -27,6 +27,16 @@ const capabilities = [
   { icon: MessageSquareText, title: "Resumo de reuniões", desc: "Notas, decisões e próximos passos por encontro." },
   { icon: Sparkle, title: "Estratégias de negociação", desc: "Argumentos e contornos de objeção sob medida." },
   { icon: Bot, title: "Assistente comercial", desc: "Copiloto para preparar calls e responder clientes." },
+];
+
+const aiSlots = [
+  { title: "Resumo da negociação", desc: "Síntese executiva do histórico completo da oportunidade." },
+  { title: "Principais dores", desc: "Dores levantadas em reuniões, e-mails e notas." },
+  { title: "Objeções", desc: "Objeções registradas e o contorno recomendado." },
+  { title: "Próximos passos", desc: "Ações sugeridas conforme a etapa e o playbook." },
+  { title: "Riscos", desc: "Sinais de estagnação, concorrência e falta de decisor." },
+  { title: "Argumentos comerciais", desc: "Argumentos sob medida para o segmento e o momento." },
+  { title: "Insights comerciais", desc: "Padrões do funil, origem e comportamento do time." },
 ];
 
 function IaPage() {
@@ -66,6 +76,20 @@ function IaPage() {
           </div>
         ))}
       </div>
+
+      <Panel
+        title="Blocos de IA por oportunidade"
+        description="Estrutura pronta — cada bloco será preenchido quando a integração for ativada"
+        bodyClassName="grid gap-3 md:grid-cols-2 xl:grid-cols-3"
+      >
+        {aiSlots.map((s) => (
+          <AiSlot key={s.title} title={s.title} description={s.desc}>
+            <p className="mt-2 text-[11px] uppercase tracking-wider text-muted-foreground">
+              Aguardando integração
+            </p>
+          </AiSlot>
+        ))}
+      </Panel>
 
       <AiInsightPanel op={op} />
 
