@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { mapCompany, mapContact, mapOpportunity, type CrmSnapshot } from "@/lib/crm-mappers";
+import { pipelineKeyForOrigin } from "@/lib/pipeline-routing";
 
 /** Snapshot completo do CRM (empresas, contatos e oportunidades) sob RLS do usuário. */
 export const listCrm = createServerFn({ method: "GET" })
@@ -103,4 +104,80 @@ export const moveOpportunityStage = createServerFn({ method: "POST" })
       .eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
+  });
+
+/**
+ * Criação enxuta: empresa, contato e origem. O funil vem da lógica comercial
+ * (origem + porte da conta), a etapa é a primeira válida daquele funil e a
+ * probabilidade vem da etapa. Empresa e contato são validados sob RLS.
+ */
+export const createOpportunity = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { companyId: string; contactId?: string; origin: string }) => input)
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+
+    // RLS garante que só empresas acessíveis retornam aqui.
+    const { data: company, error: companyError } = await supabase
+      .from("companies")
+      .select("id, name, employees, segment, owner_id, partner")
+      .eq("id", data.companyId)
+      .maybeSingle();
+    if (companyError) throw new Error(companyError.message);
+    if (!company) throw new Error("Empresa não encontrada ou sem permissão");
+
+    let contactName: string | null = null;
+    if (data.contactId) {
+      const { data: contact, error: contactError } = await supabase
+        .from("contacts")
+        .select("id, name, company_id")
+        .eq("id", data.contactId)
+        .maybeSingle();
+      if (contactError) throw new Error(contactError.message);
+      if (!contact) throw new Error("Contato não encontrado ou sem permissão");
+      if (contact.company_id && contact.company_id !== company.id) {
+        throw new Error("O contato selecionado não pertence a esta empresa");
+      }
+      contactName = contact.name;
+    }
+
+    const pipelineKey = pipelineKeyForOrigin(data.origin, company.employees ?? 0);
+    const { data: pipelines, error: pipelineError } = await supabase
+      .from("pipelines")
+      .select("id, key, position")
+      .order("position");
+    if (pipelineError) throw new Error(pipelineError.message);
+    const pipeline = pipelines?.find((p) => p.key === pipelineKey) ?? pipelines?.[0];
+    if (!pipeline) throw new Error("Nenhum funil configurado");
+
+    const { data: stage, error: stageError } = await supabase
+      .from("stages")
+      .select("id, probability, position")
+      .eq("pipeline_id", pipeline.id)
+      .order("position")
+      .limit(1)
+      .maybeSingle();
+    if (stageError) throw new Error(stageError.message);
+    if (!stage) throw new Error("O funil selecionado não possui etapas");
+
+    const { data: created, error } = await supabase
+      .from("opportunities")
+      .insert({
+        title: contactName ? `${company.name} — ${contactName}` : company.name,
+        company_id: company.id,
+        contact_id: data.contactId ?? null,
+        pipeline_id: pipeline.id,
+        stage_id: stage.id,
+        probability: stage.probability,
+        origin: data.origin,
+        partner: company.partner,
+        segment: company.segment,
+        owner_id: userId,
+        stage_changed_at: new Date().toISOString(),
+      })
+      .select("id")
+      .single();
+    if (error) throw new Error(error.message);
+
+    return { id: created.id, pipelineKey: pipeline.key };
   });
