@@ -54,6 +54,18 @@ export type Opportunity = {
   company: string;
   companyId: string;
   contact: string;
+  contactId?: string | undefined;
+  createdAt?: string | undefined;
+  linkedin?:
+    | {
+        url: string;
+        status: string;
+        step: string;
+        lastActionAt: string | null;
+        nextAction: string | null;
+        nextActionAt: string | null;
+      }
+    | undefined;
   value: number;
   stage: StageId;
   temperature: Temperature;
