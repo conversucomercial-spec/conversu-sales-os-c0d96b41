@@ -54,3 +54,8 @@ Schema preparado para receber a base real (campos de LinkedIn, cadência e disco
 - Novos componentes: `LinkedInPanel`, `DiscoveryPanel`, `NewOpportunityDialog`, `PeriodFilter`; drawer atual estendido com duas abas.
 - `listCrm` passa a trazer os campos de cadência e discovery; tipos do Supabase regenerados após a migração.
 - Validação: build, typecheck, lint dos arquivos tocados, consultas de RLS/ownership e teste no navegador autenticado (criação, cadência, discovery, filtros, drag-and-drop).
+
+## Regras adicionais aprovadas
+
+- **`prospecting_events` é histórico de auditoria**: vendedor só insere; edição e exclusão ficam restritas ao gestor por policy, e um gatilho impede alteração de `occurred_at`, `owner_id` e `opportunity_id` mesmo por gestor.
+- **`createOpportunity` escolhe o funil pela origem comercial** já existente (Outbound -> Outbound, Inbound -> Inbound, Parceiro/Indicação -> Parcerias, contas enterprise/Outros -> funil correspondente), nunca o primeiro funil global. A oportunidade entra na primeira etapa válida daquele funil, herda a probabilidade da etapa, recebe `owner_id` do usuário autenticado, e empresa/contato são validados contra o RLS/ownership.
