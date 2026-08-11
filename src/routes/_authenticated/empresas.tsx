@@ -14,7 +14,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { companies, contacts, currency, opportunities } from "@/lib/data";
+import { currency } from "@/lib/data";
+import { useCrm } from "@/hooks/use-crm";
+import type { CrmCompany } from "@/lib/crm-mappers";
 
 export const Route = createFileRoute("/_authenticated/empresas")({
   head: () => ({
@@ -28,15 +30,15 @@ export const Route = createFileRoute("/_authenticated/empresas")({
   component: EmpresasPage,
 });
 
-type Company = (typeof companies)[number];
-
 function EmpresasPage() {
+  const { data, isLoading } = useCrm();
+  const { companies, contacts, opportunities } = data;
   const [query, setQuery] = useState("");
-  const [selected, setSelected] = useState<Company | null>(null);
+  const [selected, setSelected] = useState<CrmCompany | null>(null);
 
   const rows = useMemo(
     () => companies.filter((c) => c.name.toLowerCase().includes(query.toLowerCase())),
-    [query],
+    [companies, query],
   );
 
   const companyOps = selected ? opportunities.filter((o) => o.companyId === selected.id) : [];
@@ -44,7 +46,10 @@ function EmpresasPage() {
 
   return (
     <div className="space-y-5">
-      <PageHeader title="Empresas" description={`${rows.length} contas na base comercial`} />
+      <PageHeader
+        title="Empresas"
+        description={isLoading ? "Carregando empresas…" : `${rows.length} contas na base comercial`}
+      />
 
       <Panel bodyClassName="p-0">
         <div className="relative border-b p-3">
