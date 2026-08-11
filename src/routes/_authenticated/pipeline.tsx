@@ -4,7 +4,14 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Filter, LayoutGrid, Rows3 } from "lucide-react";
-import { PageHeader, EmptyState, Tag, PriorityBadge, HealthScore, TemperatureBadge } from "@/components/kit";
+import {
+  PageHeader,
+  EmptyState,
+  Tag,
+  PriorityBadge,
+  HealthScore,
+  TemperatureBadge,
+} from "@/components/kit";
 import { OpportunityCard } from "@/components/entity-cards";
 import { SearchField, FilterSelect, Toolbar } from "@/components/toolbar";
 import { OpportunityDrawer } from "@/components/opportunity-drawer";
@@ -17,13 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  compact,
-  currency,
-  STAGES,
-  type Opportunity,
-  type StageId,
-} from "@/lib/data";
+import { compact, currency, STAGES, type Opportunity, type StageId } from "@/lib/data";
 import { useCrm, CRM_QUERY_KEY } from "@/hooks/use-crm";
 import { moveOpportunityStage } from "@/lib/crm.functions";
 
@@ -104,9 +105,7 @@ function PipelinePage() {
         return;
       }
     }
-    setItems((prev) =>
-      prev.map((o) => (o.id === dragId ? { ...o, stage, daysInStage: 0 } : o)),
-    );
+    setItems((prev) => prev.map((o) => (o.id === dragId ? { ...o, stage, daysInStage: 0 } : o)));
     if (current && current.stage !== stage) mutation.mutate({ id: dragId, stageKey: stage });
     setDragId(null);
     setOverStage(null);
@@ -254,19 +253,21 @@ function PipelinePage() {
               </TableHeader>
               <TableBody>
                 {filtered.map((o) => (
-                  <TableRow
-                    key={o.id}
-                    className="cursor-pointer"
-                    onClick={() => setSelected(o)}
-                  >
+                  <TableRow key={o.id} className="cursor-pointer" onClick={() => setSelected(o)}>
                     <TableCell className="font-medium">{o.company}</TableCell>
                     <TableCell>
                       <Tag tone="info">{STAGES.find((s) => s.id === o.stage)?.label}</Tag>
                     </TableCell>
                     <TableCell className="tabular-nums">{currency(o.value)}</TableCell>
-                    <TableCell><PriorityBadge value={o.priority} /></TableCell>
-                    <TableCell><TemperatureBadge value={o.temperature} /></TableCell>
-                    <TableCell className="w-40"><HealthScore value={o.health} /></TableCell>
+                    <TableCell>
+                      <PriorityBadge value={o.priority} />
+                    </TableCell>
+                    <TableCell>
+                      <TemperatureBadge value={o.temperature} />
+                    </TableCell>
+                    <TableCell className="w-40">
+                      <HealthScore value={o.health} />
+                    </TableCell>
                     <TableCell className="tabular-nums">{o.lastContact}</TableCell>
                     <TableCell className="text-muted-foreground">{o.owner}</TableCell>
                   </TableRow>
@@ -275,7 +276,11 @@ function PipelinePage() {
             </Table>
           </div>
           {filtered.length === 0 && (
-            <EmptyState icon={Filter} title="Nenhuma oportunidade encontrada" description="Ajuste a busca ou os filtros aplicados." />
+            <EmptyState
+              icon={Filter}
+              title="Nenhuma oportunidade encontrada"
+              description="Ajuste a busca ou os filtros aplicados."
+            />
           )}
         </div>
       )}
