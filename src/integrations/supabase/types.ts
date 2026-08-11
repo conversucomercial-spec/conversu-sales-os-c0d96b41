@@ -145,6 +145,147 @@ export type Database = {
           },
         ]
       }
+      discoveries: {
+        Row: {
+          bottlenecks: string
+          channels: string
+          conversu_fit: string
+          created_at: string
+          current_scenario: string
+          id: string
+          impacts: string
+          integrations: string
+          journeys: string
+          next_steps: string
+          objective: string
+          opportunities_found: string
+          opportunity_id: string
+          owner_id: string
+          pains: string
+          processes: string
+          status: string
+          systems: string
+          team: string
+          updated_at: string
+          validated_scope: string
+          volume: string
+        }
+        Insert: {
+          bottlenecks?: string
+          channels?: string
+          conversu_fit?: string
+          created_at?: string
+          current_scenario?: string
+          id?: string
+          impacts?: string
+          integrations?: string
+          journeys?: string
+          next_steps?: string
+          objective?: string
+          opportunities_found?: string
+          opportunity_id: string
+          owner_id: string
+          pains?: string
+          processes?: string
+          status?: string
+          systems?: string
+          team?: string
+          updated_at?: string
+          validated_scope?: string
+          volume?: string
+        }
+        Update: {
+          bottlenecks?: string
+          channels?: string
+          conversu_fit?: string
+          created_at?: string
+          current_scenario?: string
+          id?: string
+          impacts?: string
+          integrations?: string
+          journeys?: string
+          next_steps?: string
+          objective?: string
+          opportunities_found?: string
+          opportunity_id?: string
+          owner_id?: string
+          pains?: string
+          processes?: string
+          status?: string
+          systems?: string
+          team?: string
+          updated_at?: string
+          validated_scope?: string
+          volume?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discoveries_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: true
+            referencedRelation: "opportunities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discoveries_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      discovery_documents: {
+        Row: {
+          created_at: string
+          doc_date: string | null
+          id: string
+          kind: string
+          name: string
+          opportunity_id: string
+          owner_id: string
+          updated_at: string
+          url: string | null
+        }
+        Insert: {
+          created_at?: string
+          doc_date?: string | null
+          id?: string
+          kind?: string
+          name: string
+          opportunity_id: string
+          owner_id: string
+          updated_at?: string
+          url?: string | null
+        }
+        Update: {
+          created_at?: string
+          doc_date?: string | null
+          id?: string
+          kind?: string
+          name?: string
+          opportunity_id?: string
+          owner_id?: string
+          updated_at?: string
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discovery_documents_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "opportunities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discovery_documents_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       opportunities: {
         Row: {
           checklist: Json
@@ -159,6 +300,12 @@ export type Database = {
           id: string
           last_contact: string | null
           legacy_key: string | null
+          linkedin_last_action_at: string | null
+          linkedin_next_action: string | null
+          linkedin_next_action_at: string | null
+          linkedin_status: string
+          linkedin_step: string
+          linkedin_url: string | null
           meetings: Json
           next_activity: string | null
           next_activity_date: string | null
@@ -200,6 +347,12 @@ export type Database = {
           id?: string
           last_contact?: string | null
           legacy_key?: string | null
+          linkedin_last_action_at?: string | null
+          linkedin_next_action?: string | null
+          linkedin_next_action_at?: string | null
+          linkedin_status?: string
+          linkedin_step?: string
+          linkedin_url?: string | null
           meetings?: Json
           next_activity?: string | null
           next_activity_date?: string | null
@@ -241,6 +394,12 @@ export type Database = {
           id?: string
           last_contact?: string | null
           legacy_key?: string | null
+          linkedin_last_action_at?: string | null
+          linkedin_next_action?: string | null
+          linkedin_next_action_at?: string | null
+          linkedin_status?: string
+          linkedin_step?: string
+          linkedin_url?: string | null
           meetings?: Json
           next_activity?: string | null
           next_activity_date?: string | null
@@ -369,6 +528,64 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      prospecting_events: {
+        Row: {
+          channel: string
+          company_id: string | null
+          created_at: string
+          id: string
+          note: string | null
+          occurred_at: string
+          opportunity_id: string
+          owner_id: string
+          type: string
+        }
+        Insert: {
+          channel?: string
+          company_id?: string | null
+          created_at?: string
+          id?: string
+          note?: string | null
+          occurred_at?: string
+          opportunity_id: string
+          owner_id: string
+          type: string
+        }
+        Update: {
+          channel?: string
+          company_id?: string | null
+          created_at?: string
+          id?: string
+          note?: string | null
+          occurred_at?: string
+          opportunity_id?: string
+          owner_id?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prospecting_events_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prospecting_events_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "opportunities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prospecting_events_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       stages: {
         Row: {
