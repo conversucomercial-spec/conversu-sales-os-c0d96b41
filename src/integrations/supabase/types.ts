@@ -14,6 +14,332 @@ export type Database = {
   }
   public: {
     Tables: {
+      companies: {
+        Row: {
+          city: string | null
+          created_at: string
+          employees: number | null
+          id: string
+          legacy_key: string | null
+          mrr: number
+          name: string
+          note: string | null
+          origin: string
+          owner_id: string
+          partner: string | null
+          segment: string
+          site: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          city?: string | null
+          created_at?: string
+          employees?: number | null
+          id?: string
+          legacy_key?: string | null
+          mrr?: number
+          name: string
+          note?: string | null
+          origin?: string
+          owner_id: string
+          partner?: string | null
+          segment?: string
+          site?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          city?: string | null
+          created_at?: string
+          employees?: number | null
+          id?: string
+          legacy_key?: string | null
+          mrr?: number
+          name?: string
+          note?: string | null
+          origin?: string
+          owner_id?: string
+          partner?: string | null
+          segment?: string
+          site?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "companies_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contacts: {
+        Row: {
+          company_id: string | null
+          created_at: string
+          email: string | null
+          id: string
+          influence: string
+          last_interaction: string | null
+          legacy_key: string | null
+          linkedin: string | null
+          name: string
+          owner_id: string
+          phone: string | null
+          relationship: string
+          role: string | null
+          updated_at: string
+          whatsapp: string | null
+        }
+        Insert: {
+          company_id?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          influence?: string
+          last_interaction?: string | null
+          legacy_key?: string | null
+          linkedin?: string | null
+          name: string
+          owner_id: string
+          phone?: string | null
+          relationship?: string
+          role?: string | null
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Update: {
+          company_id?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          influence?: string
+          last_interaction?: string | null
+          legacy_key?: string | null
+          linkedin?: string | null
+          name?: string
+          owner_id?: string
+          phone?: string | null
+          relationship?: string
+          role?: string | null
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contacts_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contacts_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      opportunities: {
+        Row: {
+          checklist: Json
+          close_date: string | null
+          company_id: string
+          contact_id: string | null
+          created_at: string
+          custom: Json
+          days_in_stage: number
+          files: Json
+          health: number
+          id: string
+          last_contact: string | null
+          legacy_key: string | null
+          meetings: Json
+          next_activity: string | null
+          next_activity_date: string | null
+          next_step: string | null
+          notes: Json
+          objections: Json
+          origin: string
+          owner_id: string
+          pains: Json
+          partner: string | null
+          pipeline_id: string
+          priority: string
+          probability: number
+          proposals: Json
+          risks: Json
+          sales_arguments: Json
+          segment: string | null
+          source: string | null
+          stage_changed_at: string
+          stage_id: string
+          suggestions: Json
+          summary: string | null
+          temperature: string
+          timeline: Json
+          title: string
+          updated_at: string
+          value: number
+        }
+        Insert: {
+          checklist?: Json
+          close_date?: string | null
+          company_id: string
+          contact_id?: string | null
+          created_at?: string
+          custom?: Json
+          days_in_stage?: number
+          files?: Json
+          health?: number
+          id?: string
+          last_contact?: string | null
+          legacy_key?: string | null
+          meetings?: Json
+          next_activity?: string | null
+          next_activity_date?: string | null
+          next_step?: string | null
+          notes?: Json
+          objections?: Json
+          origin?: string
+          owner_id: string
+          pains?: Json
+          partner?: string | null
+          pipeline_id: string
+          priority?: string
+          probability?: number
+          proposals?: Json
+          risks?: Json
+          sales_arguments?: Json
+          segment?: string | null
+          source?: string | null
+          stage_changed_at?: string
+          stage_id: string
+          suggestions?: Json
+          summary?: string | null
+          temperature?: string
+          timeline?: Json
+          title: string
+          updated_at?: string
+          value?: number
+        }
+        Update: {
+          checklist?: Json
+          close_date?: string | null
+          company_id?: string
+          contact_id?: string | null
+          created_at?: string
+          custom?: Json
+          days_in_stage?: number
+          files?: Json
+          health?: number
+          id?: string
+          last_contact?: string | null
+          legacy_key?: string | null
+          meetings?: Json
+          next_activity?: string | null
+          next_activity_date?: string | null
+          next_step?: string | null
+          notes?: Json
+          objections?: Json
+          origin?: string
+          owner_id?: string
+          pains?: Json
+          partner?: string | null
+          pipeline_id?: string
+          priority?: string
+          probability?: number
+          proposals?: Json
+          risks?: Json
+          sales_arguments?: Json
+          segment?: string | null
+          source?: string | null
+          stage_changed_at?: string
+          stage_id?: string
+          suggestions?: Json
+          summary?: string | null
+          temperature?: string
+          timeline?: Json
+          title?: string
+          updated_at?: string
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "opportunities_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "opportunities_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "opportunities_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "opportunities_pipeline_id_fkey"
+            columns: ["pipeline_id"]
+            isOneToOne: false
+            referencedRelation: "pipelines"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "opportunities_stage_id_fkey"
+            columns: ["stage_id"]
+            isOneToOne: false
+            referencedRelation: "stages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pipelines: {
+        Row: {
+          card_fields: string[]
+          created_at: string
+          description: string
+          id: string
+          key: string
+          name: string
+          position: number
+          updated_at: string
+        }
+        Insert: {
+          card_fields?: string[]
+          created_at?: string
+          description?: string
+          id?: string
+          key: string
+          name: string
+          position?: number
+          updated_at?: string
+        }
+        Update: {
+          card_fields?: string[]
+          created_at?: string
+          description?: string
+          id?: string
+          key?: string
+          name?: string
+          position?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -43,6 +369,47 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      stages: {
+        Row: {
+          created_at: string
+          id: string
+          key: string
+          name: string
+          pipeline_id: string
+          position: number
+          probability: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          key: string
+          name: string
+          pipeline_id: string
+          position?: number
+          probability?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          key?: string
+          name?: string
+          pipeline_id?: string
+          position?: number
+          probability?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stages_pipeline_id_fkey"
+            columns: ["pipeline_id"]
+            isOneToOne: false
+            referencedRelation: "pipelines"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
