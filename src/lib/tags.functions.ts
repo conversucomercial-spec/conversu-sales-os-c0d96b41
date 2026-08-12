@@ -28,14 +28,14 @@ export const updateTag = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { id: string; name?: string; color?: string | null }) => input)
   .handler(async ({ data, context }) => {
-    const patch: Record<string, unknown> = {};
+    const patch: { name?: string; slug?: string; color?: string | null } = {};
     if (data.name !== undefined) {
       const name = data.name.trim();
       if (!name) throw new Error("Informe o nome da tag");
-      patch["name"] = name;
-      patch["slug"] = slugify(name);
+      patch.name = name;
+      patch.slug = slugify(name);
     }
-    if (data.color !== undefined) patch["color"] = data.color;
+    if (data.color !== undefined) patch.color = data.color;
     const { error } = await context.supabase.from("tags").update(patch).eq("id", data.id);
     if (error) {
       if (error.code === "23505") throw new Error("Já existe uma tag com esse nome");
