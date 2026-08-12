@@ -70,7 +70,7 @@ export type Opportunity = {
   stage: StageId;
   temperature: Temperature;
   probability: number;
-  health: number;
+  health: number | null;
   daysInStage: number;
   priority: Priority;
   lastContact: string;
