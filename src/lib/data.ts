@@ -80,7 +80,7 @@ export const STAGES: { id: StageId; label: string }[] = [
   { id: "contato", label: "Contato Inicial" },
   { id: "qualificacao", label: "Qualificação" },
   { id: "diagnostico", label: "Diagnóstico" },
-  { id: "demonstracao", label: "Demonstração" },
+  { id: "demonstracao", label: "Reuniões" },
   { id: "proposta", label: "Proposta" },
   { id: "negociacao", label: "Negociação" },
   { id: "ganho", label: "Fechado Ganho" },
