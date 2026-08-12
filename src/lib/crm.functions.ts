@@ -8,15 +8,25 @@ export const listCrm = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<CrmSnapshot> => {
     const { supabase } = context;
-    const [companiesRes, contactsRes, opsRes, stagesRes, pipelinesRes, profilesRes] =
-      await Promise.all([
-        supabase.from("companies").select("*").order("name"),
-        supabase.from("contacts").select("*").order("name"),
-        supabase.from("opportunities").select("*").order("value", { ascending: false }),
-        supabase.from("stages").select("*").order("position"),
-        supabase.from("pipelines").select("*").order("position"),
-        supabase.from("profiles").select("id, full_name"),
-      ]);
+    const [
+      companiesRes,
+      contactsRes,
+      opsRes,
+      stagesRes,
+      pipelinesRes,
+      profilesRes,
+      tagsRes,
+      opTagsRes,
+    ] = await Promise.all([
+      supabase.from("companies").select("*").order("name"),
+      supabase.from("contacts").select("*").order("name"),
+      supabase.from("opportunities").select("*").order("value", { ascending: false }),
+      supabase.from("stages").select("*").order("position"),
+      supabase.from("pipelines").select("*").order("position"),
+      supabase.from("profiles").select("id, full_name"),
+      supabase.from("tags").select("id, name, slug, color").order("name"),
+      supabase.from("opportunity_tags").select("opportunity_id, tag_id"),
+    ]);
 
     const err =
       companiesRes.error ??
@@ -24,7 +34,9 @@ export const listCrm = createServerFn({ method: "GET" })
       opsRes.error ??
       stagesRes.error ??
       pipelinesRes.error ??
-      profilesRes.error;
+      profilesRes.error ??
+      tagsRes.error ??
+      opTagsRes.error;
     if (err) throw new Error(err.message);
 
     const owners = new Map((profilesRes.data ?? []).map((p) => [p.id, p.full_name]));
@@ -36,6 +48,16 @@ export const listCrm = createServerFn({ method: "GET" })
     const contactById = new Map(contactRows.map((c) => [c.id, c]));
     const stageById = new Map(stageRows.map((s) => [s.id, s]));
     const pipelineById = new Map(pipelineRows.map((p) => [p.id, p]));
+    const tagRows = tagsRes.data ?? [];
+    const tagById = new Map(tagRows.map((t) => [t.id, t]));
+    const tagsByOpportunity = new Map<string, typeof tagRows>();
+    for (const link of opTagsRes.data ?? []) {
+      const tag = tagById.get(link.tag_id);
+      if (!tag) continue;
+      const list = tagsByOpportunity.get(link.opportunity_id) ?? [];
+      list.push(tag);
+      tagsByOpportunity.set(link.opportunity_id, list);
+    }
 
     const opportunities = (opsRes.data ?? []).map((row) =>
       mapOpportunity(row, {
@@ -44,6 +66,7 @@ export const listCrm = createServerFn({ method: "GET" })
         stageKey: stageById.get(row.stage_id)?.key ?? "prospeccao",
         pipelineKey: pipelineById.get(row.pipeline_id)?.key ?? "outbound",
         ownerName: owners.get(row.owner_id) ?? "Sem responsável",
+        tags: tagsByOpportunity.get(row.id) ?? [],
       }),
     );
 
@@ -67,6 +90,7 @@ export const listCrm = createServerFn({ method: "GET" })
         pipelineKey: pipelineById.get(s.pipeline_id)?.key ?? "outbound",
       })),
       owners: [...new Set(opportunities.map((o) => o.owner))].sort(),
+      tags: tagRows,
     };
   });
 
