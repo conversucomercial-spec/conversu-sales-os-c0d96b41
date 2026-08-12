@@ -1,6 +1,8 @@
 import type { Tables } from "@/integrations/supabase/types";
 import {
   TODAY,
+  EMPTY_MEETING,
+  type MeetingInfo,
   type OriginKey,
   type Opportunity,
   type Priority,
@@ -157,5 +159,9 @@ export function mapOpportunity(
     files: asArray<Opportunity["files"][number]>(row.files),
     proposals: asArray<Opportunity["proposals"][number]>(row.proposals),
     meetings: asArray<Opportunity["meetings"][number]>(row.meetings),
+    setupValue: row.setup_value === null ? null : Number(row.setup_value),
+    lossReason: row.loss_reason ?? "",
+    ownerLabel: row.owner_label ?? "",
+    meeting: { ...EMPTY_MEETING, ...((row.meeting ?? {}) as Partial<MeetingInfo>) },
   };
 }
