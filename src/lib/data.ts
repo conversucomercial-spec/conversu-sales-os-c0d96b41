@@ -1,6 +1,45 @@
 export type Temperature = "Quente" | "Morno" | "Frio";
 export type Priority = "Alta" | "Média" | "Baixa";
 
+/** Estados possíveis de uma reunião. Vazio = sem informação registrada. */
+export const MEETING_STATUSES = [
+  "Reunião agendada",
+  "Reunião realizada",
+  "Reunião remarcada",
+  "Reunião cancelada",
+  "Sem comparecimento",
+] as const;
+export type MeetingStatus = (typeof MEETING_STATUSES)[number];
+
+/** Bloco de reunião da oportunidade. Campos vazios = sem dado de origem. */
+export type MeetingInfo = {
+  status: string;
+  date: string;
+  time: string;
+  owner: string;
+  participants: string;
+  link: string;
+  agenda: string;
+  insights: string;
+  pains: string;
+  objections: string;
+  nextSteps: string;
+};
+
+export const EMPTY_MEETING: MeetingInfo = {
+  status: "",
+  date: "",
+  time: "",
+  owner: "",
+  participants: "",
+  link: "",
+  agenda: "",
+  insights: "",
+  pains: "",
+  objections: "",
+  nextSteps: "",
+};
+
 /** Data de referência do ambiente mockado. Trocar por `new Date()` na fase de dados reais. */
 export const TODAY = new Date(2026, 7, 4);
 
