@@ -78,7 +78,9 @@ export function OpportunityCard({
         <TemperatureBadge value={op.temperature} />
         <Tag tone="info">{op.probability}%</Tag>
         <Tag tone={op.daysInStage > 18 ? "danger" : "neutral"}>{op.daysInStage}d na etapa</Tag>
-        <Tag>{op.source}</Tag>
+        {op.source && <Tag>{op.source}</Tag>}
+        {op.meeting?.status && <Tag tone="warning">{op.meeting.status}</Tag>}
+        {op.lossReason && <Tag tone="danger">{op.lossReason}</Tag>}
       </div>
       <div className="mt-2.5">
         <HealthScore value={op.health} />

@@ -155,7 +155,7 @@ const BASE_STAGES: StageConfig[] = [
   },
   {
     id: "demonstracao",
-    label: "Demonstração",
+    label: "Reuniões",
     probability: 60,
     criteria: ["Demo realizada com o decisor", "Objeções registradas"],
     playbook: playbook(

@@ -1,6 +1,45 @@
 export type Temperature = "Quente" | "Morno" | "Frio";
 export type Priority = "Alta" | "Média" | "Baixa";
 
+/** Estados possíveis de uma reunião. Vazio = sem informação registrada. */
+export const MEETING_STATUSES = [
+  "Reunião agendada",
+  "Reunião realizada",
+  "Reunião remarcada",
+  "Reunião cancelada",
+  "Sem comparecimento",
+] as const;
+export type MeetingStatus = (typeof MEETING_STATUSES)[number];
+
+/** Bloco de reunião da oportunidade. Campos vazios = sem dado de origem. */
+export type MeetingInfo = {
+  status: string;
+  date: string;
+  time: string;
+  owner: string;
+  participants: string;
+  link: string;
+  agenda: string;
+  insights: string;
+  pains: string;
+  objections: string;
+  nextSteps: string;
+};
+
+export const EMPTY_MEETING: MeetingInfo = {
+  status: "",
+  date: "",
+  time: "",
+  owner: "",
+  participants: "",
+  link: "",
+  agenda: "",
+  insights: "",
+  pains: "",
+  objections: "",
+  nextSteps: "",
+};
+
 /** Data de referência do ambiente mockado. Trocar por `new Date()` na fase de dados reais. */
 export const TODAY = new Date(2026, 7, 4);
 
@@ -41,7 +80,7 @@ export const STAGES: { id: StageId; label: string }[] = [
   { id: "contato", label: "Contato Inicial" },
   { id: "qualificacao", label: "Qualificação" },
   { id: "diagnostico", label: "Diagnóstico" },
-  { id: "demonstracao", label: "Demonstração" },
+  { id: "demonstracao", label: "Reuniões" },
   { id: "proposta", label: "Proposta" },
   { id: "negociacao", label: "Negociação" },
   { id: "ganho", label: "Fechado Ganho" },
@@ -68,9 +107,9 @@ export type Opportunity = {
     | undefined;
   value: number;
   stage: StageId;
-  temperature: Temperature;
+  temperature: Temperature | "";
   probability: number;
-  health: number;
+  health: number | null;
   daysInStage: number;
   priority: Priority;
   lastContact: string;
@@ -98,6 +137,14 @@ export type Opportunity = {
   files: { name: string; size: string; date: string }[];
   proposals: { id: string; value: number; status: string; sent: string; expires: string }[];
   meetings: { date: string; title: string; participants: string; summary: string }[];
+  /** Valor de setup (R$) — nulo quando não informado na origem. */
+  setupValue?: number | null;
+  /** Motivo de perda, quando existir. */
+  lossReason?: string;
+  /** Nome original do responsável na base de origem. */
+  ownerLabel?: string;
+  /** Bloco estruturado da reunião atual. */
+  meeting?: MeetingInfo;
 };
 
 export const OWNERS = [
@@ -520,7 +567,7 @@ export const metrics = {
     opportunities.reduce((s, o) => s + o.value, 0) / opportunities.length,
   ),
   winRate: Math.round((won.length / (won.length + lost.length)) * 100),
-  atRisk: open.filter((o) => o.health < 55 || o.daysInStage > 18).length,
+  atRisk: open.filter((o) => (o.health !== null && o.health < 55) || o.daysInStage > 18).length,
   nextClosings: open.filter((o) => o.probability >= 72).length,
   pendingActivities: activities.filter((a) => a.status !== "Concluída").length,
   meetingsToday: meetings.filter((m) => m.status === "Hoje").length,

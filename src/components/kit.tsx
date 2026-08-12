@@ -104,8 +104,10 @@ const tempMap: Record<Temperature, { cls: string; icon: LucideIcon }> = {
   Frio: { cls: "bg-info/10 text-info border-info/20", icon: Snowflake },
 };
 
-export function TemperatureBadge({ value }: { value: Temperature }) {
-  const { cls, icon: Icon } = tempMap[value];
+export function TemperatureBadge({ value }: { value: Temperature | "" }) {
+  const entry = value ? tempMap[value] : undefined;
+  if (!entry) return <span className="text-[11px] text-muted-foreground">—</span>;
+  const { cls, icon: Icon } = entry;
   return (
     <span
       className={cn(
@@ -148,7 +150,18 @@ export function Tag({
   );
 }
 
-export function HealthScore({ value, compact = false }: { value: number; compact?: boolean }) {
+export function HealthScore({
+  value,
+  compact = false,
+}: {
+  value: number | null;
+  compact?: boolean;
+}) {
+  if (value === null) {
+    return (
+      <span className={cn("text-[11px] text-muted-foreground", compact && "w-20")}>—</span>
+    );
+  }
   const tone = value >= 75 ? "bg-success" : value >= 50 ? "bg-warning" : "bg-danger";
   return (
     <div className={cn("flex items-center gap-2", compact ? "w-20" : "w-full")}>

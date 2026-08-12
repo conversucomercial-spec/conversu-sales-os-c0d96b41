@@ -23,7 +23,7 @@ export function buildCrmMetrics(opportunities: Opportunity[]) {
       closedRevenue: sum(won),
       ticket: opportunities.length ? Math.round(sum(opportunities) / opportunities.length) : 0,
       winRate: won.length + lost.length ? Math.round((won.length / (won.length + lost.length)) * 100) : 0,
-      atRisk: open.filter((o) => o.health < 55 || o.daysInStage > 18).length,
+      atRisk: open.filter((o) => (o.health !== null && o.health < 55) || o.daysInStage > 18).length,
       nextClosings: open.filter((o) => o.probability >= 72).length,
     },
     valueByStage: openStages.map((s) => {

@@ -8,6 +8,7 @@ import { AiInsightPanel } from "@/components/ai-panel";
 import { PlaybookPanel, StageCriteria } from "@/components/playbook-panel";
 import { LinkedInPanel } from "@/components/linkedin-panel";
 import { DiscoveryPanel } from "@/components/discovery-panel";
+import { MeetingPanel } from "@/components/meeting-panel";
 import { getPipeline, originLabel } from "@/lib/config";
 import { currency, STAGES, type Opportunity } from "@/lib/data";
 import { CalendarDays, FileText, Paperclip, PhoneCall, Users } from "lucide-react";
@@ -48,6 +49,8 @@ export function OpportunityDrawer({
                     <Tag tone={op.daysInStage > 18 ? "danger" : "neutral"}>
                       {op.daysInStage} dias na etapa
                     </Tag>
+                    {op.meeting?.status && <Tag tone="warning">{op.meeting.status}</Tag>}
+                    {op.lossReason && <Tag tone="danger">Perda: {op.lossReason}</Tag>}
                   </div>
                 </div>
                 <div className="shrink-0 text-right">
@@ -76,6 +79,12 @@ export function OpportunityDrawer({
                 <Field label="Valor" value={currency(op.value)} />
                 <Field label="Previsão de fechamento" value={op.closeDate} />
                 <Field label="Próximo passo" value={op.nextStep} />
+                <Field
+                  label="Setup (R$)"
+                  value={op.setupValue === null || op.setupValue === undefined ? "—" : currency(op.setupValue)}
+                />
+                <Field label="Motivo de perda" value={op.lossReason || "—"} />
+                <Field label="Responsável (origem)" value={op.ownerLabel || "—"} />
               </div>
 
               <Panel title="Resumo executivo" bodyClassName="space-y-4">
@@ -152,6 +161,8 @@ export function OpportunityDrawer({
                 </TabsContent>
 
                 <TabsContent value="reunioes" className="mt-4">
+                  <div className="space-y-4">
+                  <MeetingPanel op={op} />
                   <Panel bodyClassName="space-y-3">
                     {op.meetings.map((m, i) => (
                       <div key={i} className="rounded-lg border p-3">
@@ -165,6 +176,7 @@ export function OpportunityDrawer({
                       </div>
                     ))}
                   </Panel>
+                  </div>
                 </TabsContent>
 
                 <TabsContent value="propostas" className="mt-4">
