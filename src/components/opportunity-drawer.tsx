@@ -6,6 +6,8 @@ import { Separator } from "@/components/ui/separator";
 import { HealthScore, Panel, Tag, TemperatureBadge, Timeline } from "@/components/kit";
 import { AiInsightPanel } from "@/components/ai-panel";
 import { PlaybookPanel, StageCriteria } from "@/components/playbook-panel";
+import { LinkedInPanel } from "@/components/linkedin-panel";
+import { DiscoveryPanel } from "@/components/discovery-panel";
 import { getPipeline, originLabel } from "@/lib/config";
 import { currency, STAGES, type Opportunity } from "@/lib/data";
 import { CalendarDays, FileText, Paperclip, PhoneCall, Users } from "lucide-react";
@@ -87,6 +89,8 @@ export function OpportunityDrawer({
               <Tabs defaultValue="timeline">
                 <TabsList className="flex w-full flex-wrap justify-start">
                   <TabsTrigger value="timeline">Timeline</TabsTrigger>
+                  <TabsTrigger value="prospeccao">Prospecção / LinkedIn</TabsTrigger>
+                  <TabsTrigger value="discovery">Discovery</TabsTrigger>
                   <TabsTrigger value="notas">Notas</TabsTrigger>
                   <TabsTrigger value="atividades">Atividades</TabsTrigger>
                   <TabsTrigger value="reunioes">Reuniões</TabsTrigger>
@@ -100,6 +104,14 @@ export function OpportunityDrawer({
                   <Panel>
                     <Timeline items={op.timeline} />
                   </Panel>
+                </TabsContent>
+
+                <TabsContent value="prospeccao" className="mt-4">
+                  <LinkedInPanel op={op} />
+                </TabsContent>
+
+                <TabsContent value="discovery" className="mt-4">
+                  <DiscoveryPanel op={op} />
                 </TabsContent>
 
                 <TabsContent value="notas" className="mt-4">
