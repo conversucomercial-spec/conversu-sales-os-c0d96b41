@@ -15,6 +15,7 @@ import {
 import { OpportunityCard } from "@/components/entity-cards";
 import { SearchField, FilterSelect, Toolbar } from "@/components/toolbar";
 import { OpportunityDrawer } from "@/components/opportunity-drawer";
+import { NewOpportunityDialog } from "@/components/new-opportunity-dialog";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -123,6 +124,8 @@ function PipelinePage() {
               )} em jogo`
         }
         actions={
+          <div className="flex flex-wrap items-center gap-2">
+          <NewOpportunityDialog />
           <div className="flex rounded-lg border p-0.5">
             <Button
               size="sm"
@@ -138,6 +141,7 @@ function PipelinePage() {
             >
               <Rows3 className="h-3.5 w-3.5" /> Lista
             </Button>
+          </div>
           </div>
         }
       />
