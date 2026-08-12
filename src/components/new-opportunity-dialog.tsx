@@ -24,26 +24,27 @@ export function NewOpportunityDialog() {
   const queryClient = useQueryClient();
   const create = useServerFn(createOpportunity);
   const [open, setOpen] = useState(false);
-  const [companyId, setCompanyId] = useState("");
-  const [contactId, setContactId] = useState("");
+  const [companyId, setCompanyId] = useState("__none");
+  const [contactId, setContactId] = useState("__none");
   const [origin, setOrigin] = useState<string>("outbound");
 
+  const hasCompany = companyId !== "__none";
   const contacts = useMemo(
-    () => data.contacts.filter((c) => !companyId || c.companyId === companyId),
-    [data.contacts, companyId],
+    () => data.contacts.filter((c) => !hasCompany || c.companyId === companyId),
+    [data.contacts, companyId, hasCompany],
   );
 
   const mutation = useMutation({
     mutationFn: () =>
       create({
-        data: { companyId, ...(contactId ? { contactId } : {}), origin },
+        data: { companyId, ...(contactId !== "__none" ? { contactId } : {}), origin },
       }),
     onSuccess: () => {
       toast.success("Oportunidade criada");
       void queryClient.invalidateQueries({ queryKey: CRM_QUERY_KEY });
       setOpen(false);
-      setCompanyId("");
-      setContactId("");
+      setCompanyId("__none");
+      setContactId("__none");
     },
     onError: (e: Error) => toast.error("Não foi possível criar", { description: e.message }),
   });
@@ -68,11 +69,11 @@ export function NewOpportunityDialog() {
             value={companyId}
             onChange={(v) => {
               setCompanyId(v);
-              setContactId("");
+              setContactId("__none");
             }}
             className="w-full"
             options={[
-              { value: "", label: "Selecione a empresa" },
+              { value: "__none", label: "Selecione a empresa" },
               ...data.companies.map((c) => ({ value: c.id, label: c.name })),
             ]}
           />
@@ -81,7 +82,7 @@ export function NewOpportunityDialog() {
             onChange={setContactId}
             className="w-full"
             options={[
-              { value: "", label: "Sem contato definido" },
+              { value: "__none", label: "Sem contato definido" },
               ...contacts.map((c) => ({ value: c.id, label: c.name })),
             ]}
           />
@@ -95,7 +96,7 @@ export function NewOpportunityDialog() {
         <DialogFooter>
           <Button
             onClick={() => mutation.mutate()}
-            disabled={!companyId || mutation.isPending}
+            disabled={!hasCompany || mutation.isPending}
           >
             Criar oportunidade
           </Button>
