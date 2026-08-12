@@ -1,5 +1,6 @@
 import { Building2, CalendarClock, Clock3, Mail, Phone, User } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { TagBadge } from "@/components/tag-badge";
 import {
   HealthScore,
   PriorityBadge,
