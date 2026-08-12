@@ -148,7 +148,18 @@ export function Tag({
   );
 }
 
-export function HealthScore({ value, compact = false }: { value: number; compact?: boolean }) {
+export function HealthScore({
+  value,
+  compact = false,
+}: {
+  value: number | null;
+  compact?: boolean;
+}) {
+  if (value === null) {
+    return (
+      <span className={cn("text-[11px] text-muted-foreground", compact && "w-20")}>—</span>
+    );
+  }
   const tone = value >= 75 ? "bg-success" : value >= 50 ? "bg-warning" : "bg-danger";
   return (
     <div className={cn("flex items-center gap-2", compact ? "w-20" : "w-full")}>
