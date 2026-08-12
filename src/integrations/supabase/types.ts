@@ -296,7 +296,7 @@ export type Database = {
           custom: Json
           days_in_stage: number
           files: Json
-          health: number
+          health: number | null
           id: string
           last_contact: string | null
           legacy_key: string | null
@@ -306,6 +306,8 @@ export type Database = {
           linkedin_status: string
           linkedin_step: string
           linkedin_url: string | null
+          loss_reason: string | null
+          meeting: Json
           meetings: Json
           next_activity: string | null
           next_activity_date: string | null
@@ -314,6 +316,7 @@ export type Database = {
           objections: Json
           origin: string
           owner_id: string
+          owner_label: string | null
           pains: Json
           partner: string | null
           pipeline_id: string
@@ -323,6 +326,7 @@ export type Database = {
           risks: Json
           sales_arguments: Json
           segment: string | null
+          setup_value: number | null
           source: string | null
           stage_changed_at: string
           stage_id: string
@@ -343,7 +347,7 @@ export type Database = {
           custom?: Json
           days_in_stage?: number
           files?: Json
-          health?: number
+          health?: number | null
           id?: string
           last_contact?: string | null
           legacy_key?: string | null
@@ -353,6 +357,8 @@ export type Database = {
           linkedin_status?: string
           linkedin_step?: string
           linkedin_url?: string | null
+          loss_reason?: string | null
+          meeting?: Json
           meetings?: Json
           next_activity?: string | null
           next_activity_date?: string | null
@@ -361,6 +367,7 @@ export type Database = {
           objections?: Json
           origin?: string
           owner_id: string
+          owner_label?: string | null
           pains?: Json
           partner?: string | null
           pipeline_id: string
@@ -370,6 +377,7 @@ export type Database = {
           risks?: Json
           sales_arguments?: Json
           segment?: string | null
+          setup_value?: number | null
           source?: string | null
           stage_changed_at?: string
           stage_id: string
@@ -390,7 +398,7 @@ export type Database = {
           custom?: Json
           days_in_stage?: number
           files?: Json
-          health?: number
+          health?: number | null
           id?: string
           last_contact?: string | null
           legacy_key?: string | null
@@ -400,6 +408,8 @@ export type Database = {
           linkedin_status?: string
           linkedin_step?: string
           linkedin_url?: string | null
+          loss_reason?: string | null
+          meeting?: Json
           meetings?: Json
           next_activity?: string | null
           next_activity_date?: string | null
@@ -408,6 +418,7 @@ export type Database = {
           objections?: Json
           origin?: string
           owner_id?: string
+          owner_label?: string | null
           pains?: Json
           partner?: string | null
           pipeline_id?: string
@@ -417,6 +428,7 @@ export type Database = {
           risks?: Json
           sales_arguments?: Json
           segment?: string | null
+          setup_value?: number | null
           source?: string | null
           stage_changed_at?: string
           stage_id?: string
