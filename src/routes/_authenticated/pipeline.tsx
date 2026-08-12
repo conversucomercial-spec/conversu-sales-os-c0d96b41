@@ -55,7 +55,8 @@ function PipelinePage() {
   /** Cópia local para feedback imediato no arraste; sincronizada com o banco. */
   const [items, setItems] = useState<Opportunity[]>([]);
   useEffect(() => setItems(data.opportunities), [data.opportunities]);
-  const [selected, setSelected] = useState<Opportunity | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const selected = items.find((o) => o.id === selectedId) ?? null;
   const [query, setQuery] = useState("");
   const [owner, setOwner] = useState("todos");
   const [temp, setTemp] = useState("todas");
@@ -242,7 +243,7 @@ function PipelinePage() {
                           setDragId(null);
                           setOverStage(null);
                         }}
-                        onClick={() => setSelected(op)}
+                        onClick={() => setSelectedId(op.id)}
                       />
                     ))}
                     {stageItems.length === 0 && (
@@ -274,7 +275,7 @@ function PipelinePage() {
               </TableHeader>
               <TableBody>
                 {filtered.map((o) => (
-                  <TableRow key={o.id} className="cursor-pointer" onClick={() => setSelected(o)}>
+                  <TableRow key={o.id} className="cursor-pointer" onClick={() => setSelectedId(o.id)}>
                     <TableCell className="font-medium">{o.company}</TableCell>
                     <TableCell>
                       <Tag tone="info">{STAGES.find((s) => s.id === o.stage)?.label}</Tag>
@@ -306,7 +307,7 @@ function PipelinePage() {
         </div>
       )}
 
-      <OpportunityDrawer op={selected} onOpenChange={(o) => !o && setSelected(null)} />
+      <OpportunityDrawer op={selected} onOpenChange={(o) => !o && setSelectedId(null)} />
     </div>
   );
 }
