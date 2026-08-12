@@ -137,6 +137,14 @@ export type Opportunity = {
   files: { name: string; size: string; date: string }[];
   proposals: { id: string; value: number; status: string; sent: string; expires: string }[];
   meetings: { date: string; title: string; participants: string; summary: string }[];
+  /** Valor de setup (R$) — nulo quando não informado na origem. */
+  setupValue?: number | null;
+  /** Motivo de perda, quando existir. */
+  lossReason?: string;
+  /** Nome original do responsável na base de origem. */
+  ownerLabel?: string;
+  /** Bloco estruturado da reunião atual. */
+  meeting?: MeetingInfo;
 };
 
 export const OWNERS = [
