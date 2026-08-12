@@ -13,7 +13,7 @@ import {
   TemperatureBadge,
 } from "@/components/kit";
 import { OpportunityCard } from "@/components/entity-cards";
-import { SearchField, FilterSelect, Toolbar } from "@/components/toolbar";
+import { SearchField, FilterSelect, TagFilter, Toolbar } from "@/components/toolbar";
 import { OpportunityDrawer } from "@/components/opportunity-drawer";
 import { NewOpportunityDialog } from "@/components/new-opportunity-dialog";
 import { Button } from "@/components/ui/button";
@@ -55,11 +55,14 @@ function PipelinePage() {
   /** Cópia local para feedback imediato no arraste; sincronizada com o banco. */
   const [items, setItems] = useState<Opportunity[]>([]);
   useEffect(() => setItems(data.opportunities), [data.opportunities]);
-  const [selected, setSelected] = useState<Opportunity | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const selected = items.find((o) => o.id === selectedId) ?? null;
   const [query, setQuery] = useState("");
   const [owner, setOwner] = useState("todos");
   const [temp, setTemp] = useState("todas");
   const [priority, setPriority] = useState("todas");
+  const [tagIds, setTagIds] = useState<string[]>([]);
+  const [tagMode, setTagMode] = useState<"any" | "all">("any");
   const [view, setView] = useState<"kanban" | "lista">("kanban");
   const [dragId, setDragId] = useState<string | null>(null);
   const [overStage, setOverStage] = useState<StageId | null>(null);
@@ -78,16 +81,24 @@ function PipelinePage() {
 
   const filtered = useMemo(
     () =>
-      items.filter(
-        (o) =>
+      items.filter((o) => {
+        const opTagIds = (o.tags ?? []).map((t) => t.id);
+        const tagOk =
+          tagIds.length === 0 ||
+          (tagMode === "all"
+            ? tagIds.every((id) => opTagIds.includes(id))
+            : tagIds.some((id) => opTagIds.includes(id)));
+        return (
+          tagOk &&
           (owner === "todos" || o.owner === owner) &&
           (temp === "todas" || o.temperature === temp) &&
           (priority === "todas" || o.priority === priority) &&
           (o.company.toLowerCase().includes(query.toLowerCase()) ||
             o.contact.toLowerCase().includes(query.toLowerCase()) ||
-            o.title.toLowerCase().includes(query.toLowerCase())),
-      ),
-    [items, query, owner, temp, priority],
+            o.title.toLowerCase().includes(query.toLowerCase()))
+        );
+      }),
+    [items, query, owner, temp, priority, tagIds, tagMode],
   );
 
   const moveTo = (stage: StageId) => {
@@ -183,6 +194,13 @@ function PipelinePage() {
             { value: "Baixa", label: "Baixa" },
           ]}
         />
+        <TagFilter
+          tags={data.tags}
+          selected={tagIds}
+          onSelectedChange={setTagIds}
+          mode={tagMode}
+          onModeChange={setTagMode}
+        />
       </Toolbar>
 
       {view === "kanban" ? (
@@ -225,7 +243,7 @@ function PipelinePage() {
                           setDragId(null);
                           setOverStage(null);
                         }}
-                        onClick={() => setSelected(op)}
+                        onClick={() => setSelectedId(op.id)}
                       />
                     ))}
                     {stageItems.length === 0 && (
@@ -257,7 +275,7 @@ function PipelinePage() {
               </TableHeader>
               <TableBody>
                 {filtered.map((o) => (
-                  <TableRow key={o.id} className="cursor-pointer" onClick={() => setSelected(o)}>
+                  <TableRow key={o.id} className="cursor-pointer" onClick={() => setSelectedId(o.id)}>
                     <TableCell className="font-medium">{o.company}</TableCell>
                     <TableCell>
                       <Tag tone="info">{STAGES.find((s) => s.id === o.stage)?.label}</Tag>
@@ -289,7 +307,7 @@ function PipelinePage() {
         </div>
       )}
 
-      <OpportunityDrawer op={selected} onOpenChange={(o) => !o && setSelected(null)} />
+      <OpportunityDrawer op={selected} onOpenChange={(o) => !o && setSelectedId(null)} />
     </div>
   );
 }

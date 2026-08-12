@@ -75,6 +75,9 @@ export type StageId =
   | "ganho"
   | "perdido";
 
+/** Tag personalizada aplicada a uma oportunidade. */
+export type TagRef = { id: string; name: string; slug: string; color: string | null };
+
 export const STAGES: { id: StageId; label: string }[] = [
   { id: "prospeccao", label: "Prospecção" },
   { id: "contato", label: "Contato Inicial" },
@@ -92,6 +95,8 @@ export type Opportunity = {
   title: string;
   company: string;
   companyId: string;
+  /** Tags personalizadas associadas à oportunidade. */
+  tags?: TagRef[];
   contact: string;
   contactId?: string | undefined;
   createdAt?: string | undefined;

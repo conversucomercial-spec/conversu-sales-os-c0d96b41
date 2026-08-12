@@ -9,6 +9,7 @@ import { PlaybookPanel, StageCriteria } from "@/components/playbook-panel";
 import { LinkedInPanel } from "@/components/linkedin-panel";
 import { DiscoveryPanel } from "@/components/discovery-panel";
 import { MeetingPanel } from "@/components/meeting-panel";
+import { TagPicker } from "@/components/tag-picker";
 import { getPipeline, originLabel } from "@/lib/config";
 import { currency, STAGES, type Opportunity } from "@/lib/data";
 import { CalendarDays, FileText, Paperclip, PhoneCall, Users } from "lucide-react";
@@ -86,6 +87,10 @@ export function OpportunityDrawer({
                 <Field label="Motivo de perda" value={op.lossReason || "—"} />
                 <Field label="Responsável (origem)" value={op.ownerLabel || "—"} />
               </div>
+
+              <Panel title="Tags" description="Marcadores personalizados desta oportunidade">
+                <TagPicker opportunityId={op.id} tags={op.tags ?? []} />
+              </Panel>
 
               <Panel title="Resumo executivo" bodyClassName="space-y-4">
                 <p className="text-sm leading-relaxed text-muted-foreground">{op.summary}</p>

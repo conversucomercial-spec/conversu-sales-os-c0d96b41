@@ -11,6 +11,7 @@ const EMPTY: CrmSnapshot = {
   opportunities: [],
   stages: [],
   owners: [],
+  tags: [],
 };
 
 /** Dados comerciais reais (empresas, contatos e oportunidades) vindos do banco. */
