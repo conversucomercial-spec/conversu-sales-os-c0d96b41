@@ -92,6 +92,8 @@ export type Opportunity = {
   title: string;
   company: string;
   companyId: string;
+  /** Tags personalizadas associadas à oportunidade. */
+  tags?: TagRef[];
   contact: string;
   contactId?: string | undefined;
   createdAt?: string | undefined;
