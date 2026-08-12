@@ -13,7 +13,7 @@ import {
   TemperatureBadge,
 } from "@/components/kit";
 import { OpportunityCard } from "@/components/entity-cards";
-import { SearchField, FilterSelect, Toolbar } from "@/components/toolbar";
+import { SearchField, FilterSelect, TagFilter, Toolbar } from "@/components/toolbar";
 import { OpportunityDrawer } from "@/components/opportunity-drawer";
 import { NewOpportunityDialog } from "@/components/new-opportunity-dialog";
 import { Button } from "@/components/ui/button";
@@ -60,6 +60,8 @@ function PipelinePage() {
   const [owner, setOwner] = useState("todos");
   const [temp, setTemp] = useState("todas");
   const [priority, setPriority] = useState("todas");
+  const [tagIds, setTagIds] = useState<string[]>([]);
+  const [tagMode, setTagMode] = useState<"any" | "all">("any");
   const [view, setView] = useState<"kanban" | "lista">("kanban");
   const [dragId, setDragId] = useState<string | null>(null);
   const [overStage, setOverStage] = useState<StageId | null>(null);
@@ -78,16 +80,24 @@ function PipelinePage() {
 
   const filtered = useMemo(
     () =>
-      items.filter(
-        (o) =>
+      items.filter((o) => {
+        const opTagIds = (o.tags ?? []).map((t) => t.id);
+        const tagOk =
+          tagIds.length === 0 ||
+          (tagMode === "all"
+            ? tagIds.every((id) => opTagIds.includes(id))
+            : tagIds.some((id) => opTagIds.includes(id)));
+        return (
+          tagOk &&
           (owner === "todos" || o.owner === owner) &&
           (temp === "todas" || o.temperature === temp) &&
           (priority === "todas" || o.priority === priority) &&
           (o.company.toLowerCase().includes(query.toLowerCase()) ||
             o.contact.toLowerCase().includes(query.toLowerCase()) ||
-            o.title.toLowerCase().includes(query.toLowerCase())),
-      ),
-    [items, query, owner, temp, priority],
+            o.title.toLowerCase().includes(query.toLowerCase()))
+        );
+      }),
+    [items, query, owner, temp, priority, tagIds, tagMode],
   );
 
   const moveTo = (stage: StageId) => {
@@ -182,6 +192,13 @@ function PipelinePage() {
             { value: "Média", label: "Média" },
             { value: "Baixa", label: "Baixa" },
           ]}
+        />
+        <TagFilter
+          tags={data.tags}
+          selected={tagIds}
+          onSelectedChange={setTagIds}
+          mode={tagMode}
+          onModeChange={setTagMode}
         />
       </Toolbar>
 
