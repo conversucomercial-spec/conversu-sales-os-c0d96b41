@@ -75,6 +75,20 @@ export type StageId =
   | "ganho"
   | "perdido";
 
+/** Tag personalizada aplicada a uma oportunidade. */
+export type TagRef = { id: string; name: string; slug: string; color: string | null };
+
+type LegacyStageId =
+  | "prospeccao"
+  | "contato"
+  | "qualificacao"
+  | "diagnostico"
+  | "demonstracao"
+  | "proposta"
+  | "negociacao"
+  | "ganho"
+  | "perdido";
+
 export const STAGES: { id: StageId; label: string }[] = [
   { id: "prospeccao", label: "Prospecção" },
   { id: "contato", label: "Contato Inicial" },
