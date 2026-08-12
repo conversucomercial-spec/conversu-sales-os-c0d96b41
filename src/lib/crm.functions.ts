@@ -125,7 +125,9 @@ export const saveMeeting = createServerFn({ method: "POST" })
 
     const previous = (op.meeting ?? {}) as Record<string, string>;
     const meeting = { ...previous, ...data.meeting };
-    const timeline = Array.isArray(op.timeline) ? [...(op.timeline as unknown[])] : [];
+    const timeline: Record<string, string>[] = Array.isArray(op.timeline)
+      ? (op.timeline as Record<string, string>[])
+      : [];
 
     const becameDone =
       meeting["status"] === "Reunião realizada" && previous["status"] !== "Reunião realizada";
