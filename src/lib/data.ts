@@ -107,7 +107,7 @@ export type Opportunity = {
     | undefined;
   value: number;
   stage: StageId;
-  temperature: Temperature;
+  temperature: Temperature | "";
   probability: number;
   health: number | null;
   daysInStage: number;
