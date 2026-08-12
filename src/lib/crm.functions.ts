@@ -107,6 +107,54 @@ export const moveOpportunityStage = createServerFn({ method: "POST" })
   });
 
 /**
+ * Salva o bloco de reunião da oportunidade. Ao marcar como realizada, registra
+ * um evento na timeline com data/hora, insights, dores, objeções e próximos passos.
+ */
+export const saveMeeting = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { id: string; meeting: Record<string, string> }) => input)
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { data: op, error: opError } = await supabase
+      .from("opportunities")
+      .select("id, meeting, timeline")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (opError) throw new Error(opError.message);
+    if (!op) throw new Error("Oportunidade não encontrada");
+
+    const previous = (op.meeting ?? {}) as Record<string, string>;
+    const meeting = { ...previous, ...data.meeting };
+    const timeline = Array.isArray(op.timeline) ? [...(op.timeline as unknown[])] : [];
+
+    const becameDone =
+      meeting["status"] === "Reunião realizada" && previous["status"] !== "Reunião realizada";
+    if (becameDone) {
+      const detail = [
+        meeting["insights"] ? `Insights: ${meeting["insights"]}` : "",
+        meeting["pains"] ? `Dores: ${meeting["pains"]}` : "",
+        meeting["objections"] ? `Objeções: ${meeting["objections"]}` : "",
+        meeting["nextSteps"] ? `Próximos passos: ${meeting["nextSteps"]}` : "",
+      ]
+        .filter(Boolean)
+        .join(" · ");
+      timeline.unshift({
+        date: [meeting["date"], meeting["time"]].filter(Boolean).join(" ") || new Date().toISOString(),
+        title: "Reunião realizada",
+        detail,
+        type: "reuniao",
+      });
+    }
+
+    const { error } = await supabase
+      .from("opportunities")
+      .update({ meeting, timeline })
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+/**
  * Criação enxuta: empresa, contato e origem. O funil vem da lógica comercial
  * (origem + porte da conta), a etapa é a primeira válida daquele funil e a
  * probabilidade vem da etapa. Empresa e contato são validados sob RLS.
