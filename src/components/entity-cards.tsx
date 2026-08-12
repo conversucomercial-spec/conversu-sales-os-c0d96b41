@@ -82,6 +82,13 @@ export function OpportunityCard({
         {op.meeting?.status && <Tag tone="warning">{op.meeting.status}</Tag>}
         {op.lossReason && <Tag tone="danger">{op.lossReason}</Tag>}
       </div>
+      {op.tags && op.tags.length > 0 && (
+        <div className="mt-2 flex flex-wrap items-center gap-1.5">
+          {op.tags.map((tag) => (
+            <TagBadge key={tag.id} tag={tag} />
+          ))}
+        </div>
+      )}
       <div className="mt-2.5">
         <HealthScore value={op.health} />
       </div>
