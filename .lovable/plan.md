@@ -1,57 +1,46 @@
-# Importação da base real do Notion (fonte primária)
+# Importação da base real do Notion + etapa Reuniões
 
-Arquivo analisado: `ExportBlock-...Part-1.zip` — 1 base "CRM de Vendas" com **27 registros** (CSV completo) + 27 páginas `.md` que repetem as mesmas propriedades (sem conteúdo extra, exceto "Assurant", que traz uma linha de contato no corpo). Não há bases separadas de Empresas, Contatos, Prospecção LinkedIn ou Discovery.
+Fonte primária: CSV completo do export ("CRM de Vendas ..._all.csv") — 27 registros. As 27 páginas `.md` repetem as mesmas propriedades (sem conteúdo extra; só "Assurant" tem uma linha de contato no corpo). Não há bases separadas de Empresas, Contatos, Prospecção LinkedIn, Discovery ou Reuniões.
 
-## Relatório de mapeamento (antes de importar)
+## Um ponto a alinhar antes de executar
 
-### Campos com destino direto
+Não existe hoje uma etapa chamada **Reuniões** no banco. As etapas atuais são: Prospecção, Contato Inicial, Qualificação, Diagnóstico, **Demonstração**, Proposta, Negociação, Fechado Ganho, Fechado Perdido.
 
-| Notion | Destino no CRM |
-|---|---|
-| Empresa/Negócio | Empresa (nome) + título da oportunidade |
-| Contato, Email, Telefone | Contato (nome, e-mail, telefone) |
-| Etapa | Etapa do funil |
-| Origem do lead | Origem + escolha do funil |
-| Temperatura | Temperatura (Fria/Morna) |
-| Criado em | Data de criação |
-| Última interação | Último contato |
-| Próximo follow-up | Próxima atividade (data) |
-| Próxima ação | Próximo passo |
-| Observações | Resumo/notas |
-| Responsável | Dono do registro |
-| Motivo de perda | Campo próprio nas perdidas |
-| Valor Setup (R$) | Novo campo "Setup" (decisão sua) |
+Como você pediu para NÃO criar uma nova etapa, o plano **renomeia a etapa existente "Demonstração" para "Reuniões"** (mesma coluna, mesma posição, mesma probabilidade — nenhuma etapa nova é criada) e usa ela como o momento de reunião do funil. Os 7 registros do Notion em "Reunião agendada" entram nessa etapa com o **status de reunião = Reunião agendada**.
 
-### Conversões necessárias
+## Mapeamento (revalidado no arquivo)
 
-- **Etapas**: Qualificação → Qualificação; Diagnóstico realizado → Diagnóstico; **Reunião agendada → nova etapa "Reunião agendada"**; Proposta enviada → Proposta; Negociação → Negociação; Fechado perdido → Fechado Perdido.
-- **Funil pela origem**: Outbound (14) → Outbound; Inbound (2) → Inbound; Indicação (4) e Parceria (5) → Parcerias; **Evento (2) → Inbound** (não existe funil de eventos hoje).
-- **Datas em português** ("2 de março de 2026 12:15", "(BRT)") convertidas para data real no fuso de São Paulo.
-- **Emojis** removidos: "❄️ Fria" → Fria, "🔴 Crítica" → saúde crítica, "⚪ Concluído" → concluído.
-- **Valor**: o campo "Valor" é texto ("Setup 10k"); o número real está em "Valor Setup (R$)". Vai para o novo campo Setup. Em "Sancor" e "Portilho" o número está ausente — extraído do texto (10k / 5k) e sinalizado no relatório final.
-- **Banco Fibra** e **99/Ezze**: texto diz 15k, número diz 10.000 → prevalece o número, divergência registrada.
-- **Responsável**: 26 "Conversu comercial" + 1 "Conversu Tecnologia" — ambos atribuídos à sua conta (único usuário), com o nome original preservado.
+**Empresas** — do Notion só existem: nome, origem do lead, responsável e observações (que trazem canal + segmento, ex.: "Linkedin, Seguradora"). Segmento é extraído das observações quando presente; MRR, site, cidade, funcionários, parceiro e LinkedIn **não existem** no arquivo e ficam nulos/zerados. 27 empresas, sem duplicidade de nome.
 
-### Campos vazios em 100% dos registros (não importados)
-Prioridade, Status/arquivo da proposta, Status/arquivo do contrato, Concorrente, Lugar, Validade e prazos de proposta/contrato, Previsão de fechamento, Probabilidade, Valor Mensal (MRR).
+**Contatos** — nome, e-mail, telefone e última interação existem. Cargo, WhatsApp, LinkedIn, relacionamento e influência **não existem**; ficam nulos/padrão. Um registro sem nome de contato não gera contato.
 
-Consequência: a **probabilidade** vem da etapa do funil e a **previsão de fechamento** fica em branco — Forecast só terá valor após o time preencher. MRR fica zerado.
+**Oportunidades** — título/empresa, contato, etapa, origem, temperatura, criado em, última interação, próximo follow-up, próxima ação, observações, responsável, motivo de perda, valor de setup e saúde. Previsão de fechamento, probabilidade, MRR, prioridade, concorrente, validade/prazos e status de proposta/contrato estão vazios em 100% dos registros e ficam NULL.
 
-### Não vem do Notion
-Nenhum dado de cadência de LinkedIn, Discovery, reuniões, atividades ou metas existe no export. Essas abas continuam vazias/mock, prontas para preenchimento manual.
+**Etapas**: Qualificação → Qualificação (4); Diagnóstico realizado → Diagnóstico (5); Reunião agendada → **Reuniões** (7, com status de reunião); Proposta enviada → Proposta (1); Negociação → Negociação (5); Fechado perdido → Fechado Perdido (5). Probabilidade herdada da etapa.
 
-## O que será feito
+**Funis pela origem**: Outbound 14 → Outbound; Inbound 2 → Inbound; Evento 2 → Inbound; Indicação 4 e Parceria 5 → Parcerias. Enterprise não é tocado. Etapas faltantes nos funis Inbound/Parcerias (Diagnóstico, Reuniões) são adicionadas àqueles funis para que os registros reais caibam sem trocar de pipeline.
 
-1. **Ajuste de estrutura**: nova etapa "Reunião agendada" nos funis Outbound, Inbound e Parcerias; novo campo de **valor de setup** na oportunidade; campo de **motivo de perda**.
-2. **Limpeza**: remover as 18 empresas, 18 contatos e 24 oportunidades de exemplo (dados fictícios), conforme sua decisão. Nada de Auth, perfis ou papéis é tocado.
-3. **Importação idempotente**: 27 empresas, 27 contatos (os que têm nome) e 27 oportunidades, cada uma com chave de origem do Notion para permitir reimportação sem duplicar.
-4. **Ajuste de tela**: exibir setup e motivo de perda no card/drawer; garantir que Dashboard/Forecast lidem com valor e previsão vazios sem quebrar.
-5. **Relatório final**: linha a linha do que entrou, o que foi convertido e o que ficou em branco.
+**Normalizações**: datas pt-BR com "(BRT)" convertidas no fuso de São Paulo; "❄️ Fria" → Fria, "🟡 Morna" → Morna; "🔴 Crítica - follow-up atrasado" → saúde crítica, "⚪ Concluído" → concluído; nomes com espaço sobrando aparados.
+
+**Setup**: campo numérico "Valor Setup (R$)" prevalece. Banco Fibra e 99/Ezze ficam com R$ 10.000 (texto dizia 15k). Sancor (10k) e Portilho (5k) só têm o texto — valor inferido e sinalizado no relatório. `value` continua 0; setup vai em campo próprio.
+
+**Responsáveis**: 26 "Conversu comercial" + 1 "Conversu Tecnologia" → todos com owner do seu usuário, nome original preservado em campo textual.
+
+**LinkedIn/Discovery/Reuniões passadas**: sem dados no arquivo — nada é inventado; estrutura fica pronta para preenchimento manual.
+
+## Execução
+
+1. **Migração**: renomear a etapa Demonstração → Reuniões; completar etapas faltantes em Inbound/Parcerias; adicionar `opportunities.setup_value numeric`, `loss_reason text`, `owner_label text`, `meeting jsonb` (status, data, hora, responsável, participantes, link, pauta, insights, dores, objeções, próximos passos); índices únicos em `legacy_key` de companies/contacts/opportunities.
+2. **Importar** as 27 empresas, contatos e oportunidades com `ON CONFLICT (legacy_key) DO UPDATE` (reimportável sem duplicar), empresa deduplicada por nome.
+3. **Validar** antes de remover: contagens por funil/etapa/status de reunião, órfãos, duplicidades, FKs, owner, datas, setup, motivo de perda, e conferência nominal de Sancor, Portilho, Banco Fibra e 99/Ezze.
+4. **Só então remover** os 18 companies, 18 contacts e 24 opportunities de exemplo (identificados por não possuírem `legacy_key` do Notion).
+5. **Interface**: bloco de Reunião no drawer (status, data/hora, responsável, participantes, link, pauta, insights, dores, objeções, próximos passos), editável e gravando evento na timeline ao marcar como realizada, com botão para levar insights/dores/próximos passos ao Discovery; badge de status de reunião no card quando a oportunidade estiver em Reuniões; setup e motivo de perda exibidos no card/drawer. Sem página nova; layout preservado.
+6. **Validação técnica**: build, typecheck, lint dos arquivos tocados, RLS/ownership e teste no navegador autenticado (Empresas, Contatos, Pipeline, Dashboard, Forecast, criação de oportunidade, drag-and-drop, Reuniões, Discovery).
+7. **Relatório final** com todos os itens pedidos. Sem deploy, sem mexer em Auth/profiles/user_roles/GitHub.
 
 ## Detalhes técnicos
 
-- Migração: `stages` (+`reuniao`, reposicionando as demais), `opportunities.setup_value numeric default 0`, `opportunities.loss_reason text`; `legacy_key` = ID da página Notion em companies/contacts/opportunities, com índice único.
-- Carga via inserts SQL gerados a partir do CSV `_all` (fonte primária), `ON CONFLICT (legacy_key) DO UPDATE`.
-- Parser de datas pt-BR e normalização de emoji feitos na geração do SQL, não em runtime.
-- `crm-mappers`/`crm.functions` estendidos com `setupValue` e `lossReason`; `pipeline-routing` ganha `evento -> inbound`.
-- Validação: contagens por etapa/funil conferidas contra o CSV, build, typecheck e conferência no navegador autenticado.
+- SQL de carga gerado a partir do CSV com parser pt-BR e normalização de emoji na geração, não em runtime; `legacy_key` = ID da página Notion (sufixo do nome do arquivo).
+- `crm-mappers`/`crm.functions` estendidos com `setupValue`, `lossReason`, `ownerLabel` e `meeting`; nova server fn `saveMeeting` com `requireSupabaseAuth`.
+- `pipeline-routing` ganha `evento -> inbound`; nenhum fallback entre funis é reintroduzido.
+- RLS atual (dono/gestor) reaproveitada tal como está; nenhuma policy nova além das dos campos já cobertos pela tabela `opportunities`.
