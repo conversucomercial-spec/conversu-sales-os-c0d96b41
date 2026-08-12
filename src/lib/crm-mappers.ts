@@ -8,6 +8,7 @@ import {
   type Priority,
   type StageId,
   type Temperature,
+  type TagRef,
 } from "@/lib/data";
 
 export type CrmCompany = {
@@ -47,6 +48,7 @@ export type CrmSnapshot = {
   opportunities: Opportunity[];
   stages: CrmStage[];
   owners: string[];
+  tags: TagRef[];
 };
 
 /** Converte "yyyy-mm-dd" (banco) para "dd/mm/yyyy" (formato usado na interface). */
@@ -109,11 +111,13 @@ export function mapOpportunity(
     stageKey: string;
     pipelineKey: string;
     ownerName: string;
+    tags?: TagRef[];
   },
 ): Opportunity {
   return {
     id: row.id,
     title: row.title,
+    tags: extra.tags ?? [],
     company: extra.company?.name ?? "—",
     companyId: row.company_id,
     contact: extra.contact?.name ?? "—",
