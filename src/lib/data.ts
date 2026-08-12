@@ -520,7 +520,7 @@ export const metrics = {
     opportunities.reduce((s, o) => s + o.value, 0) / opportunities.length,
   ),
   winRate: Math.round((won.length / (won.length + lost.length)) * 100),
-  atRisk: open.filter((o) => o.health < 55 || o.daysInStage > 18).length,
+  atRisk: open.filter((o) => (o.health !== null && o.health < 55) || o.daysInStage > 18).length,
   nextClosings: open.filter((o) => o.probability >= 72).length,
   pendingActivities: activities.filter((a) => a.status !== "Concluída").length,
   meetingsToday: meetings.filter((m) => m.status === "Hoje").length,
