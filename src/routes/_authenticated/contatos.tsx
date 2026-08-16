@@ -1,8 +1,11 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Linkedin, Mail, MessageCircle, Phone, Search } from "lucide-react";
+import { Linkedin, Mail, MessageCircle, Pencil, Phone, Plus, Search, Trash2 } from "lucide-react";
 import { PageHeader, Panel, Tag, Timeline } from "@/components/kit";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ContactDialog } from "@/components/contact-dialog";
+import { useCrmMutations } from "@/hooks/use-accounts";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import {
   Table,
@@ -32,6 +35,15 @@ function ContatosPage() {
   const contacts = data.contacts;
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<CrmContact | null>(null);
+  const [formOpen, setFormOpen] = useState(false);
+  const [editing, setEditing] = useState<CrmContact | null>(null);
+  const { contact: contactMutations } = useCrmMutations();
+
+  const removeContact = async (contact: CrmContact) => {
+    if (!window.confirm(`Excluir o contato ${contact.name}?`)) return;
+    await contactMutations.remove.mutateAsync({ id: contact.id });
+    setSelected(null);
+  };
 
   const rows = useMemo(
     () =>
@@ -48,6 +60,16 @@ function ContatosPage() {
       <PageHeader
         title="Contatos"
         description={isLoading ? "Carregando contatos…" : `${rows.length} pessoas mapeadas nas contas`}
+        actions={
+          <Button
+            onClick={() => {
+              setEditing(null);
+              setFormOpen(true);
+            }}
+          >
+            <Plus className="h-4 w-4" /> Novo contato
+          </Button>
+        }
       />
 
       <Panel bodyClassName="p-0">
@@ -95,6 +117,21 @@ function ContatosPage() {
                 <p className="text-xs text-muted-foreground">{selected.company}</p>
                 <h2 className="font-display text-xl font-bold">{selected.name}</h2>
                 <p className="text-sm text-muted-foreground">{selected.role}</p>
+                <div className="mt-3 flex items-center gap-1.5">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      setEditing(selected);
+                      setFormOpen(true);
+                    }}
+                  >
+                    <Pencil className="h-4 w-4" /> Editar
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => void removeContact(selected)}>
+                    <Trash2 className="h-4 w-4" /> Excluir
+                  </Button>
+                </div>
               </div>
               <Panel title="Canais" bodyClassName="space-y-2.5">
                 {[
@@ -132,6 +169,8 @@ function ContatosPage() {
           )}
         </SheetContent>
       </Sheet>
+
+      <ContactDialog open={formOpen} onOpenChange={setFormOpen} contact={editing} />
     </div>
   );
 }
