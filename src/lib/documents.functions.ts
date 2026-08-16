@@ -6,18 +6,25 @@ const BUCKET = "documents";
 export type DocumentRecord = {
   id: string;
   name: string;
-  storagePath: string;
+  storagePath: string | null;
+  externalUrl: string | null;
   mimeType: string;
   sizeBytes: number;
   category: string;
   companyId: string | null;
   opportunityId: string | null;
   meetingId: string | null;
+  proposalId: string | null;
   ownerName: string;
   createdAt: string;
 };
 
-type Scope = { companyId?: string; opportunityId?: string; meetingId?: string };
+type Scope = {
+  companyId?: string;
+  opportunityId?: string;
+  meetingId?: string;
+  proposalId?: string;
+};
 
 /** Documentos vinculados a uma empresa, oportunidade ou reunião. */
 export const listDocuments = createServerFn({ method: "GET" })
@@ -31,7 +38,8 @@ export const listDocuments = createServerFn({ method: "GET" })
     if (data.companyId) q = q.eq("company_id", data.companyId);
     if (data.opportunityId) q = q.eq("opportunity_id", data.opportunityId);
     if (data.meetingId) q = q.eq("meeting_id", data.meetingId);
-    if (!data.companyId && !data.opportunityId && !data.meetingId) return [];
+    if (data.proposalId) q = q.eq("proposal_id", data.proposalId);
+    if (!data.companyId && !data.opportunityId && !data.meetingId && !data.proposalId) return [];
 
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
@@ -39,12 +47,14 @@ export const listDocuments = createServerFn({ method: "GET" })
       id: r.id,
       name: r.name,
       storagePath: r.storage_path,
+      externalUrl: r.external_url,
       mimeType: r.mime_type,
       sizeBytes: Number(r.size_bytes ?? 0),
       category: r.category,
       companyId: r.company_id,
       opportunityId: r.opportunity_id,
       meetingId: r.meeting_id,
+      proposalId: r.proposal_id,
       ownerName: (r as { owner?: { full_name?: string } | null }).owner?.full_name ?? "Responsável",
       createdAt: r.created_at,
     }));
@@ -71,43 +81,52 @@ export const registerDocument = createServerFn({ method: "POST" })
   .inputValidator(
     (input: {
       name: string;
-      storagePath: string;
-      mimeType: string;
-      sizeBytes: number;
+      storagePath?: string | null;
+      externalUrl?: string | null;
+      mimeType?: string;
+      sizeBytes?: number;
       category: string;
       companyId?: string | null;
       opportunityId?: string | null;
       meetingId?: string | null;
+      proposalId?: string | null;
     }) => input,
   )
   .handler(async ({ data, context }) => {
+    if (!data.storagePath && !data.externalUrl?.trim()) {
+      throw new Error("Envie um arquivo ou informe um link");
+    }
     const { error } = await context.supabase.from("documents").insert({
       name: data.name,
-      storage_path: data.storagePath,
+      storage_path: data.storagePath ?? null,
+      external_url: data.externalUrl?.trim() || null,
       mime_type: data.mimeType || "application/octet-stream",
-      size_bytes: data.sizeBytes,
+      size_bytes: data.sizeBytes ?? 0,
       category: data.category,
       company_id: data.companyId ?? null,
       opportunity_id: data.opportunityId ?? null,
       meeting_id: data.meetingId ?? null,
+      proposal_id: data.proposalId ?? null,
       owner_id: context.userId,
     });
     if (error) throw new Error(error.message);
     return { ok: true };
   });
 
-/** URL assinada temporária para visualizar/baixar o documento. */
+/** Link direto (externo) ou URL assinada temporária para o arquivo armazenado. */
 export const getDocumentUrl = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { id: string }) => input)
   .handler(async ({ data, context }) => {
     const { data: row, error } = await context.supabase
       .from("documents")
-      .select("storage_path")
+      .select("storage_path, external_url")
       .eq("id", data.id)
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!row) throw new Error("Documento não encontrado ou sem permissão");
+    if (row.external_url) return { url: row.external_url };
+    if (!row.storage_path) throw new Error("Documento sem arquivo ou link");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: signed, error: signError } = await supabaseAdmin.storage
       .from(BUCKET)
@@ -130,7 +149,9 @@ export const deleteDocument = createServerFn({ method: "POST" })
     if (!row) throw new Error("Documento não encontrado ou sem permissão");
     const { error } = await context.supabase.from("documents").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    await supabaseAdmin.storage.from(BUCKET).remove([row.storage_path]);
+    if (row.storage_path) {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      await supabaseAdmin.storage.from(BUCKET).remove([row.storage_path]);
+    }
     return { ok: true };
   });

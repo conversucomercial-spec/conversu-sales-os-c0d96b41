@@ -94,6 +94,48 @@ export type Database = {
           },
         ]
       }
+      automation_rules: {
+        Row: {
+          action_config: Json
+          action_type: string
+          active: boolean
+          created_at: string
+          description: string
+          id: string
+          name: string
+          trigger_config: Json
+          trigger_type: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          action_config?: Json
+          action_type: string
+          active?: boolean
+          created_at?: string
+          description?: string
+          id?: string
+          name: string
+          trigger_config?: Json
+          trigger_type: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          action_config?: Json
+          action_type?: string
+          active?: boolean
+          created_at?: string
+          description?: string
+          id?: string
+          name?: string
+          trigger_config?: Json
+          trigger_type?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       companies: {
         Row: {
           city: string | null
@@ -317,6 +359,54 @@ export type Database = {
           },
         ]
       }
+      custom_fields: {
+        Row: {
+          active: boolean
+          created_at: string
+          entity: string
+          id: string
+          key: string
+          label: string
+          options: string[]
+          pipeline_keys: string[]
+          position: number
+          required: boolean
+          type: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          entity: string
+          id?: string
+          key: string
+          label: string
+          options?: string[]
+          pipeline_keys?: string[]
+          position?: number
+          required?: boolean
+          type?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          entity?: string
+          id?: string
+          key?: string
+          label?: string
+          options?: string[]
+          pipeline_keys?: string[]
+          position?: number
+          required?: boolean
+          type?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       discoveries: {
         Row: {
           bottlenecks: string
@@ -463,42 +553,48 @@ export type Database = {
           category: string
           company_id: string | null
           created_at: string
+          external_url: string | null
           id: string
           meeting_id: string | null
           mime_type: string
           name: string
           opportunity_id: string | null
           owner_id: string
+          proposal_id: string | null
           size_bytes: number
-          storage_path: string
+          storage_path: string | null
           updated_at: string
         }
         Insert: {
           category?: string
           company_id?: string | null
           created_at?: string
+          external_url?: string | null
           id?: string
           meeting_id?: string | null
           mime_type?: string
           name: string
           opportunity_id?: string | null
           owner_id: string
+          proposal_id?: string | null
           size_bytes?: number
-          storage_path: string
+          storage_path?: string | null
           updated_at?: string
         }
         Update: {
           category?: string
           company_id?: string | null
           created_at?: string
+          external_url?: string | null
           id?: string
           meeting_id?: string | null
           mime_type?: string
           name?: string
           opportunity_id?: string | null
           owner_id?: string
+          proposal_id?: string | null
           size_bytes?: number
-          storage_path?: string
+          storage_path?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -528,6 +624,13 @@ export type Database = {
             columns: ["owner_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_proposal_id_fkey"
+            columns: ["proposal_id"]
+            isOneToOne: false
+            referencedRelation: "proposals"
             referencedColumns: ["id"]
           },
         ]
@@ -1012,8 +1115,45 @@ export type Database = {
           },
         ]
       }
+      option_lists: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          label: string
+          list_key: string
+          position: number
+          updated_at: string
+          updated_by: string | null
+          value: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          label: string
+          list_key: string
+          position?: number
+          updated_at?: string
+          updated_by?: string | null
+          value: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          label?: string
+          list_key?: string
+          position?: number
+          updated_at?: string
+          updated_by?: string | null
+          value?: string
+        }
+        Relationships: []
+      }
       pipelines: {
         Row: {
+          active: boolean
           card_fields: string[]
           created_at: string
           description: string
@@ -1022,8 +1162,10 @@ export type Database = {
           name: string
           position: number
           updated_at: string
+          updated_by: string | null
         }
         Insert: {
+          active?: boolean
           card_fields?: string[]
           created_at?: string
           description?: string
@@ -1032,8 +1174,10 @@ export type Database = {
           name: string
           position?: number
           updated_at?: string
+          updated_by?: string | null
         }
         Update: {
+          active?: boolean
           card_fields?: string[]
           created_at?: string
           description?: string
@@ -1042,6 +1186,7 @@ export type Database = {
           name?: string
           position?: number
           updated_at?: string
+          updated_by?: string | null
         }
         Relationships: []
       }
@@ -1208,33 +1353,42 @@ export type Database = {
       stages: {
         Row: {
           created_at: string
+          criteria: string[]
           id: string
           key: string
           name: string
           pipeline_id: string
+          playbook: Json
           position: number
           probability: number
           updated_at: string
+          updated_by: string | null
         }
         Insert: {
           created_at?: string
+          criteria?: string[]
           id?: string
           key: string
           name: string
           pipeline_id: string
+          playbook?: Json
           position?: number
           probability?: number
           updated_at?: string
+          updated_by?: string | null
         }
         Update: {
           created_at?: string
+          criteria?: string[]
           id?: string
           key?: string
           name?: string
           pipeline_id?: string
+          playbook?: Json
           position?: number
           probability?: number
           updated_at?: string
+          updated_by?: string | null
         }
         Relationships: [
           {

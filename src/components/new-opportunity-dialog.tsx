@@ -20,6 +20,7 @@ import { ORIGINS } from "@/lib/config";
 import { PARTNERS } from "@/lib/data";
 import { createOpportunity } from "@/lib/crm.functions";
 import { CRM_QUERY_KEY, useCrm } from "@/hooks/use-crm";
+import { useSettings } from "@/hooks/use-settings";
 
 const NONE = "__none";
 
@@ -50,6 +51,7 @@ export function NewOpportunityDialog({
   withTrigger?: boolean;
 } = {}) {
   const { data } = useCrm();
+  const { data: settings } = useSettings();
   const queryClient = useQueryClient();
   const create = useServerFn(createOpportunity);
   const [internalOpen, setInternalOpen] = useState(false);
@@ -65,6 +67,19 @@ export function NewOpportunityDialog({
   useEffect(() => {
     if (open) setForm(EMPTY);
   }, [open]);
+
+  /** Origens e parceiros vêm das listas editáveis em Configurações. */
+  const originOptions = useMemo(() => {
+    const fromDb = settings.options.filter((o) => o.listKey === "origem" && o.active);
+    return fromDb.length
+      ? fromDb.map((o) => ({ value: o.value, label: o.label }))
+      : ORIGINS.map((o) => ({ value: o.id, label: o.label }));
+  }, [settings.options]);
+
+  const partnerOptions = useMemo(() => {
+    const fromDb = settings.options.filter((o) => o.listKey === "parceiro" && o.active);
+    return fromDb.length ? fromDb.map((o) => o.label) : PARTNERS;
+  }, [settings.options]);
 
   const hasCompany = form.companyId !== NONE;
   const contacts = useMemo(
@@ -182,7 +197,7 @@ export function NewOpportunityDialog({
               value={form.origin}
               onChange={set("origin")}
               className="w-full"
-              options={ORIGINS.map((o) => ({ value: o.id, label: o.label }))}
+              options={originOptions}
             />
           </Field>
           <Field label="Parceiro">
@@ -192,7 +207,7 @@ export function NewOpportunityDialog({
               className="w-full"
               options={[
                 { value: NONE, label: "Nenhum parceiro" },
-                ...PARTNERS.map((p) => ({ value: p, label: p })),
+                ...partnerOptions.map((p) => ({ value: p, label: p })),
               ]}
             />
           </Field>

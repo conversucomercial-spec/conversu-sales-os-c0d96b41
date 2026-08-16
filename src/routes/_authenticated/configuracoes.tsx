@@ -10,8 +10,8 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { initials, useSession } from "@/hooks/use-session";
-import { ALL_GOALS, CARD_FIELD_LABELS, PIPELINES } from "@/lib/config";
-import { OWNERS } from "@/lib/data";
+import { CommercialSettings } from "@/components/commercial-settings";
+import { TeamPanel } from "@/components/team-panel";
 
 export const Route = createFileRoute("/_authenticated/configuracoes")({
   head: () => ({
@@ -124,22 +124,7 @@ function ConfigPage() {
         </TabsContent>
 
         <TabsContent value="equipe" className="mt-4">
-          <Panel title="Time comercial" description="Gestão de convites e papéis chega na próxima fase" bodyClassName="space-y-2.5">
-            {OWNERS.map((o, i) => (
-              <div key={o} className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-lg border p-3">
-                <span className="grid h-8 w-8 place-items-center rounded-lg bg-accent text-xs font-semibold text-accent-foreground">
-                  {initials(o)}
-                </span>
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-medium">{o}</p>
-                  <p className="truncate text-xs text-muted-foreground">
-                    {i === 0 ? "Head de Vendas" : "Executivo(a) comercial"}
-                  </p>
-                </div>
-                <Tag tone={i === 0 ? "success" : "neutral"}>{i === 0 ? "Gestor" : "Vendedor"}</Tag>
-              </div>
-            ))}
-          </Panel>
+          <TeamPanel />
         </TabsContent>
 
         <TabsContent value="integracoes" className="mt-4">
@@ -190,58 +175,7 @@ function ConfigPage() {
         </TabsContent>
 
         <TabsContent value="comercial" className="mt-4 space-y-4">
-          {PIPELINES.map((p) => (
-            <Panel key={p.id} title={p.name} description={p.description} bodyClassName="space-y-4">
-              <div>
-                <p className="mb-2 text-xs font-semibold">Etapas, critérios e playbook</p>
-                <div className="space-y-2">
-                  {p.stages.map((s, i) => (
-                    <div key={s.id} className="rounded-lg border p-3">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="grid h-6 w-6 place-items-center rounded-md bg-secondary text-[11px] font-semibold">{i + 1}</span>
-                        <span className="text-sm font-medium">{s.label}</span>
-                        <Tag tone="info">{s.probability}%</Tag>
-                      </div>
-                      <p className="mt-2 text-xs text-muted-foreground">{s.playbook.objective}</p>
-                      <div className="mt-2 flex flex-wrap gap-1.5">
-                        {s.criteria.map((c) => (
-                          <Tag key={c} tone="neutral">{c}</Tag>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <p className="mb-2 text-xs font-semibold">Campos exibidos no card</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {p.cardFields.map((f) => (
-                    <Tag key={f} tone="info">{CARD_FIELD_LABELS[f]}</Tag>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <p className="mb-2 text-xs font-semibold">Campos customizados da oportunidade</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {p.customFields.map((f) => (
-                    <Tag key={f.id} tone="neutral">{f.label} · {f.type}</Tag>
-                  ))}
-                </div>
-              </div>
-            </Panel>
-          ))}
-
-          <Panel title="Metas configuradas" bodyClassName="space-y-2">
-            {ALL_GOALS.map((g) => (
-              <div key={g.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-lg border p-3">
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-medium">{g.name}</p>
-                  <p className="truncate text-xs text-muted-foreground">{g.subtitle} · {g.metrics.length} indicadores</p>
-                </div>
-                <Tag tone="info">{g.level}</Tag>
-              </div>
-            ))}
-          </Panel>
+          <CommercialSettings />
         </TabsContent>
       </Tabs>
     </div>
