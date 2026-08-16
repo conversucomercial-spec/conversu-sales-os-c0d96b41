@@ -47,7 +47,10 @@ export function useCrmMutations() {
 
   return {
     company: {
-      create: useRun<Parameters<typeof createCompany>[0]["data"]>(fns.createCompany, "Empresa criada"),
+      create: useRun<Parameters<typeof createCompany>[0]["data"]>(
+        fns.createCompany,
+        "Empresa criada",
+      ),
       update: useRun<Parameters<typeof updateCompany>[0]["data"]>(
         fns.updateCompany,
         "Empresa atualizada",
@@ -58,7 +61,10 @@ export function useCrmMutations() {
       ),
     },
     contact: {
-      create: useRun<Parameters<typeof createContact>[0]["data"]>(fns.createContact, "Contato criado"),
+      create: useRun<Parameters<typeof createContact>[0]["data"]>(
+        fns.createContact,
+        "Contato criado",
+      ),
       update: useRun<Parameters<typeof updateContact>[0]["data"]>(
         fns.updateContact,
         "Contato atualizado",
