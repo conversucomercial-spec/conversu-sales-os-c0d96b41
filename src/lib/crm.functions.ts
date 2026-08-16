@@ -17,6 +17,8 @@ export const listCrm = createServerFn({ method: "GET" })
       profilesRes,
       tagsRes,
       opTagsRes,
+      companyTagsRes,
+      contactTagsRes,
     ] = await Promise.all([
       supabase.from("companies").select("*").order("name"),
       supabase.from("contacts").select("*").order("name"),
@@ -26,6 +28,8 @@ export const listCrm = createServerFn({ method: "GET" })
       supabase.from("profiles").select("id, full_name"),
       supabase.from("tags").select("id, name, slug, color").order("name"),
       supabase.from("opportunity_tags").select("opportunity_id, tag_id"),
+      supabase.from("company_tags").select("company_id, tag_id"),
+      supabase.from("contact_tags").select("contact_id, tag_id"),
     ]);
 
     const err =
@@ -58,6 +62,22 @@ export const listCrm = createServerFn({ method: "GET" })
       list.push(tag);
       tagsByOpportunity.set(link.opportunity_id, list);
     }
+    const tagsByCompany = new Map<string, typeof tagRows>();
+    for (const link of companyTagsRes.data ?? []) {
+      const tag = tagById.get(link.tag_id);
+      if (!tag) continue;
+      const list = tagsByCompany.get(link.company_id) ?? [];
+      list.push(tag);
+      tagsByCompany.set(link.company_id, list);
+    }
+    const tagsByContact = new Map<string, typeof tagRows>();
+    for (const link of contactTagsRes.data ?? []) {
+      const tag = tagById.get(link.tag_id);
+      if (!tag) continue;
+      const list = tagsByContact.get(link.contact_id) ?? [];
+      list.push(tag);
+      tagsByContact.set(link.contact_id, list);
+    }
 
     const opportunities = (opsRes.data ?? []).map((row) =>
       mapOpportunity(row, {
@@ -75,11 +95,13 @@ export const listCrm = createServerFn({ method: "GET" })
         mapCompany(row, {
           ownerName: owners.get(row.owner_id) ?? "Sem responsável",
           opportunities: opportunities.filter((o) => o.companyId === row.id).length,
+          tags: tagsByCompany.get(row.id) ?? [],
         }),
       ),
       contacts: contactRows.map((row) =>
         mapContact(row, {
           companyName: (row.company_id ? companyById.get(row.company_id)?.name : undefined) ?? "—",
+          tags: tagsByContact.get(row.id) ?? [],
         }),
       ),
       opportunities,
@@ -198,7 +220,20 @@ export const saveMeeting = createServerFn({ method: "POST" })
  */
 export const createOpportunity = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { companyId: string; contactId?: string; origin: string }) => input)
+  .inputValidator(
+    (input: {
+      companyId: string;
+      contactId?: string;
+      origin: string;
+      title?: string;
+      value?: number;
+      stageId?: string;
+      ownerId?: string;
+      partner?: string | null;
+      probability?: number;
+      closeDate?: string | null;
+    }) => input,
+  )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
@@ -226,6 +261,42 @@ export const createOpportunity = createServerFn({ method: "POST" })
       contactName = contact.name;
     }
 
+    // Etapa escolhida manualmente define o funil; senão, roteamento automático.
+    if (data.stageId) {
+      const { data: chosen, error: chosenError } = await supabase
+        .from("stages")
+        .select("id, pipeline_id, probability, pipelines(key)")
+        .eq("id", data.stageId)
+        .maybeSingle();
+      if (chosenError) throw new Error(chosenError.message);
+      if (!chosen) throw new Error("Etapa não encontrada");
+      const { data: made, error: madeError } = await supabase
+        .from("opportunities")
+        .insert({
+          title: data.title?.trim() || (contactName ? `${company.name} — ${contactName}` : company.name),
+          company_id: company.id,
+          contact_id: data.contactId ?? null,
+          pipeline_id: chosen.pipeline_id,
+          stage_id: chosen.id,
+          value: data.value ?? 0,
+          probability: data.probability ?? chosen.probability,
+          origin: data.origin,
+          partner: data.partner ?? company.partner,
+          segment: company.segment,
+          close_date: data.closeDate || null,
+          owner_id: data.ownerId ?? userId,
+          stage_changed_at: new Date().toISOString(),
+        })
+        .select("id")
+        .single();
+      if (madeError) throw new Error(madeError.message);
+      return {
+        id: made.id,
+        pipelineKey:
+          (chosen as { pipelines?: { key?: string } | null }).pipelines?.key ?? "outbound",
+      };
+    }
+
     const pipelineKey = pipelineKeyForOrigin(data.origin, company.employees ?? 0);
     const { data: pipelines, error: pipelineError } = await supabase
       .from("pipelines")
@@ -248,16 +319,19 @@ export const createOpportunity = createServerFn({ method: "POST" })
     const { data: created, error } = await supabase
       .from("opportunities")
       .insert({
-        title: contactName ? `${company.name} — ${contactName}` : company.name,
+        title:
+          data.title?.trim() || (contactName ? `${company.name} — ${contactName}` : company.name),
         company_id: company.id,
         contact_id: data.contactId ?? null,
         pipeline_id: pipeline.id,
         stage_id: stage.id,
-        probability: stage.probability,
+        value: data.value ?? 0,
+        probability: data.probability ?? stage.probability,
         origin: data.origin,
-        partner: company.partner,
+        partner: data.partner ?? company.partner,
         segment: company.segment,
-        owner_id: userId,
+        close_date: data.closeDate || null,
+        owner_id: data.ownerId ?? userId,
         stage_changed_at: new Date().toISOString(),
       })
       .select("id")

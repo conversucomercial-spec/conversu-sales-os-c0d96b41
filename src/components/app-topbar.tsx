@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { Bell, Plus, Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,11 +11,15 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { companies, contacts, opportunities } from "@/lib/data";
+import { NotificationsBell } from "@/components/notifications-bell";
+import { NewOpportunityDialog } from "@/components/new-opportunity-dialog";
+import { useCrm } from "@/hooks/use-crm";
 
 export function AppTopbar() {
   const [open, setOpen] = useState(false);
+  const [newOpportunity, setNewOpportunity] = useState(false);
   const navigate = useNavigate();
+  const { data } = useCrm();
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -49,13 +53,17 @@ export function AppTopbar() {
         </button>
       </div>
       <div className="flex shrink-0 items-center gap-2">
-        <Button variant="ghost" size="icon" className="rounded-xl">
-          <Bell className="h-4 w-4" />
-        </Button>
-        <Button size="sm" className="rounded-xl">
+        <NotificationsBell />
+        <Button size="sm" className="rounded-xl" onClick={() => setNewOpportunity(true)}>
           <Plus className="h-4 w-4" /> <span className="hidden sm:inline">Nova oportunidade</span>
         </Button>
       </div>
+
+      <NewOpportunityDialog
+        open={newOpportunity}
+        onOpenChange={setNewOpportunity}
+        withTrigger={false}
+      />
 
       <CommandDialog open={open} onOpenChange={setOpen}>
         <CommandInput placeholder="Pesquisar em todo o Conversu…" />
@@ -83,22 +91,22 @@ export function AppTopbar() {
             ))}
           </CommandGroup>
           <CommandGroup heading="Oportunidades">
-            {opportunities.slice(0, 6).map((o) => (
-              <CommandItem key={o.id} onSelect={() => go("/pipeline")}>
+            {data.opportunities.slice(0, 8).map((o) => (
+              <CommandItem key={o.id} value={`${o.title} ${o.company}`} onSelect={() => go("/pipeline")}>
                 {o.title}
               </CommandItem>
             ))}
           </CommandGroup>
           <CommandGroup heading="Empresas">
-            {companies.slice(0, 6).map((c) => (
-              <CommandItem key={c.id} onSelect={() => go("/empresas")}>
+            {data.companies.slice(0, 8).map((c) => (
+              <CommandItem key={c.id} value={c.name} onSelect={() => go("/empresas")}>
                 {c.name}
               </CommandItem>
             ))}
           </CommandGroup>
           <CommandGroup heading="Contatos">
-            {contacts.slice(0, 6).map((c) => (
-              <CommandItem key={c.id} onSelect={() => go("/contatos")}>
+            {data.contacts.slice(0, 8).map((c) => (
+              <CommandItem key={c.id} value={`${c.name} ${c.company}`} onSelect={() => go("/contatos")}>
                 {c.name} — {c.company}
               </CommandItem>
             ))}

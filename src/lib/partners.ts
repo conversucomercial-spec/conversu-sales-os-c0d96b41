@@ -70,6 +70,7 @@ export const originBreakdown: { id: OriginId; label: string; count: number; valu
 
 export const PARTNER_OPTIONS = [
   { value: "todos", label: "Todos os parceiros" },
+  { value: "sem", label: "Nenhum parceiro" },
   ...PARTNERS.map((p) => ({ value: p, label: p })),
 ];
 

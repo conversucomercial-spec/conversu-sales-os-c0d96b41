@@ -81,3 +81,43 @@ export const removeOpportunityTag = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+/** Associa/remove tag de empresa ou contato (mesma regra das oportunidades). */
+export const setEntityTag = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    (input: { entity: "company" | "contact"; entityId: string; tagId: string; on: boolean }) =>
+      input,
+  )
+  .handler(async ({ data, context }) => {
+    if (data.entity === "company") {
+      if (data.on) {
+        const { error } = await context.supabase
+          .from("company_tags")
+          .insert({ company_id: data.entityId, tag_id: data.tagId, owner_id: context.userId });
+        if (error && error.code !== "23505") throw new Error(error.message);
+        return { ok: true };
+      }
+      const { error } = await context.supabase
+        .from("company_tags")
+        .delete()
+        .eq("company_id", data.entityId)
+        .eq("tag_id", data.tagId);
+      if (error) throw new Error(error.message);
+      return { ok: true };
+    }
+    if (data.on) {
+      const { error } = await context.supabase
+        .from("contact_tags")
+        .insert({ contact_id: data.entityId, tag_id: data.tagId, owner_id: context.userId });
+      if (error && error.code !== "23505") throw new Error(error.message);
+      return { ok: true };
+    }
+    const { error } = await context.supabase
+      .from("contact_tags")
+      .delete()
+      .eq("contact_id", data.entityId)
+      .eq("tag_id", data.tagId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });

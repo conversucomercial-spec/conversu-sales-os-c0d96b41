@@ -28,6 +28,9 @@ import {
 import { compact, currency, STAGES, type Opportunity, type StageId } from "@/lib/data";
 import { useCrm, CRM_QUERY_KEY } from "@/hooks/use-crm";
 import { moveOpportunityStage } from "@/lib/crm.functions";
+import { DEFAULT_PERIOD, PeriodFilter, usePeriodRange, type PeriodValue } from "@/components/period-filter";
+import { inPeriodOrUndated, parseBRDate } from "@/lib/period";
+import { PARTNER_OPTIONS } from "@/lib/partners";
 
 export const Route = createFileRoute("/_authenticated/pipeline")({
   head: () => ({
@@ -63,6 +66,9 @@ function PipelinePage() {
   const [priority, setPriority] = useState("todas");
   const [tagIds, setTagIds] = useState<string[]>([]);
   const [tagMode, setTagMode] = useState<"any" | "all">("any");
+  const [partner, setPartner] = useState("todos");
+  const [period, setPeriod] = useState<PeriodValue>({ id: "ano" });
+  const range = usePeriodRange(period);
   const [view, setView] = useState<"kanban" | "lista">("kanban");
   const [dragId, setDragId] = useState<string | null>(null);
   const [overStage, setOverStage] = useState<StageId | null>(null);
@@ -93,12 +99,15 @@ function PipelinePage() {
           (owner === "todos" || o.owner === owner) &&
           (temp === "todas" || o.temperature === temp) &&
           (priority === "todas" || o.priority === priority) &&
+          (partner === "todos" ||
+            (partner === "sem" ? !o.partner : o.partner === partner)) &&
+          inPeriodOrUndated(parseBRDate(o.closeDate), range) &&
           (o.company.toLowerCase().includes(query.toLowerCase()) ||
             o.contact.toLowerCase().includes(query.toLowerCase()) ||
             o.title.toLowerCase().includes(query.toLowerCase()))
         );
       }),
-    [items, query, owner, temp, priority, tagIds, tagMode],
+    [items, query, owner, temp, priority, tagIds, tagMode, partner, range],
   );
 
   const moveTo = (stage: StageId) => {
@@ -194,6 +203,12 @@ function PipelinePage() {
             { value: "Baixa", label: "Baixa" },
           ]}
         />
+        <FilterSelect
+          value={partner}
+          onChange={setPartner}
+          className="sm:w-48"
+          options={PARTNER_OPTIONS}
+        />
         <TagFilter
           tags={data.tags}
           selected={tagIds}
@@ -201,6 +216,13 @@ function PipelinePage() {
           mode={tagMode}
           onModeChange={setTagMode}
         />
+      </Toolbar>
+
+      <Toolbar>
+        <PeriodFilter value={period} onChange={setPeriod} />
+        <span className="text-xs text-muted-foreground sm:ml-auto">
+          Filtro por previsão de fechamento (negociações sem data continuam visíveis)
+        </span>
       </Toolbar>
 
       {view === "kanban" ? (

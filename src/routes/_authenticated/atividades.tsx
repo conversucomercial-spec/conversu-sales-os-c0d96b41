@@ -9,6 +9,8 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ActivityDialog } from "@/components/activity-dialog";
 import { useActivities } from "@/hooks/use-activities";
 import { useCrm } from "@/hooks/use-crm";
+import { DEFAULT_PERIOD, PeriodFilter, usePeriodRange, type PeriodValue } from "@/components/period-filter";
+import { inPeriodOrUndated } from "@/lib/period";
 import {
   ACTIVITY_BUCKET_LIST,
   ACTIVITY_PRIORITY_LABEL,
@@ -97,6 +99,8 @@ function AtividadesPage() {
   const [priority, setPriority] = useState("todas");
   const [type, setType] = useState("todos");
   const [query, setQuery] = useState("");
+  const [period, setPeriod] = useState<PeriodValue>({ id: "ano" });
+  const range = usePeriodRange(period);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<ActivityRecord | null>(null);
 
@@ -116,6 +120,7 @@ function AtividadesPage() {
       .filter((a) => owner === "todos" || a.ownerName === owner)
       .filter((a) => priority === "todas" || a.priority === priority)
       .filter((a) => type === "todos" || a.type === type)
+      .filter((a) => inPeriodOrUndated(a.dueAt ? new Date(a.dueAt) : null, range))
       .filter(
         (a) =>
           !q ||
@@ -125,7 +130,7 @@ function AtividadesPage() {
             .includes(q),
       )
       .sort((a, b) => (a.dueAt ?? "").localeCompare(b.dueAt ?? ""));
-  }, [items, bucket, owner, priority, type, query]);
+  }, [items, bucket, owner, priority, type, query, range]);
 
   const grouped = ACTIVITY_TYPES.map((t) => ({
     type: t,
@@ -165,6 +170,10 @@ function AtividadesPage() {
           ))}
         </TabsList>
       </Tabs>
+
+      <Toolbar>
+        <PeriodFilter value={period} onChange={setPeriod} />
+      </Toolbar>
 
       <Toolbar>
         <SearchField

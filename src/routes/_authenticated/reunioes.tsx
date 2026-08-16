@@ -7,6 +7,8 @@ import { MeetingDrawer } from "@/components/meeting-drawer";
 import { FilterSelect, SearchField, Toolbar } from "@/components/toolbar";
 import { useCollection } from "@/hooks/use-collection";
 import { meetings, OWNERS, type Meeting } from "@/lib/data";
+import { PeriodFilter, usePeriodRange, type PeriodValue } from "@/components/period-filter";
+import { inPeriodOrUndated, parseBRDate } from "@/lib/period";
 
 export const Route = createFileRoute("/_authenticated/reunioes")({
   head: () => ({
@@ -26,6 +28,8 @@ function ReunioesPage() {
   const [owner, setOwner] = useState("todos");
   const [status, setStatus] = useState("todos");
   const [selected, setSelected] = useState<Meeting | null>(null);
+  const [period, setPeriod] = useState<PeriodValue>({ id: "ano" });
+  const range = usePeriodRange(period);
 
   const { query, setQuery, items } = useCollection({
     items: meetings,
@@ -38,7 +42,8 @@ function ReunioesPage() {
     direction: "asc",
   });
 
-  const days = [...new Set(items.map((m) => m.date))];
+  const inRange = items.filter((m) => inPeriodOrUndated(parseBRDate(m.date), range));
+  const days = [...new Set(inRange.map((m) => m.date))];
 
   return (
     <div className="space-y-5">
@@ -49,6 +54,10 @@ function ReunioesPage() {
         <KpiCard label="Agendadas" value={meetings.filter((m) => m.status === "Agendada").length} icon={Clock} />
         <KpiCard label="Realizadas" value={meetings.filter((m) => m.status === "Realizada").length} icon={Users} tone="success" />
       </div>
+
+      <Toolbar>
+        <PeriodFilter value={period} onChange={setPeriod} />
+      </Toolbar>
 
       <Toolbar>
         <SearchField value={query} onChange={setQuery} placeholder="Buscar reunião, empresa ou contato…" className="flex-1" />
@@ -74,8 +83,8 @@ function ReunioesPage() {
       ) : (
         <div className="space-y-5">
           {days.map((day) => (
-            <Panel key={day} title={day} description={`${items.filter((m) => m.date === day).length} reunião(ões)`} bodyClassName="divide-y p-0">
-              {items
+            <Panel key={day} title={day} description={`${inRange.filter((m) => m.date === day).length} reunião(ões)`} bodyClassName="divide-y p-0">
+              {inRange
                 .filter((m) => m.date === day)
                 .map((m) => (
                   <button

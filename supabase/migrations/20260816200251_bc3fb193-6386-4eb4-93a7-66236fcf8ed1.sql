@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.notify_opportunity_event() FROM PUBLIC, anon, authenticated;

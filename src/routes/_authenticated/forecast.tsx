@@ -6,6 +6,8 @@ import { BarValueChart, ConversionChart, RevenueChart } from "@/components/chart
 import { FilterSelect, Toolbar } from "@/components/toolbar";
 import { ForecastScenarios, scenarioLabel, scenarioOf } from "@/components/forecast-scenarios";
 import { PARTNER_OPTIONS, ORIGIN_OPTIONS } from "@/lib/partners";
+import { DEFAULT_PERIOD, PeriodFilter, usePeriodRange, type PeriodValue } from "@/components/period-filter";
+import { inPeriodOrUndated, parseBRDate } from "@/lib/period";
 import {
   compact,
   currency,
@@ -41,6 +43,8 @@ function ForecastPage() {
   const metrics = useMemo(() => buildCrmMetrics(opportunities).metrics, [opportunities]);
   const [partner, setPartner] = useState("todos");
   const [origin, setOrigin] = useState("todas");
+  const [period, setPeriod] = useState<PeriodValue>(DEFAULT_PERIOD);
+  const range = usePeriodRange(period);
 
   const open = useMemo(
     () =>
@@ -48,10 +52,12 @@ function ForecastPage() {
         (o) =>
           o.stage !== "ganho" &&
           o.stage !== "perdido" &&
-          (partner === "todos" || o.partner === partner) &&
-          (origin === "todas" || o.origin === origin),
+          (partner === "todos" ||
+            (partner === "sem" ? !o.partner : o.partner === partner)) &&
+          (origin === "todas" || o.origin === origin) &&
+          inPeriodOrUndated(parseBRDate(o.closeDate), range),
       ),
-    [opportunities, partner, origin],
+    [opportunities, partner, origin, range],
   );
 
   const byOwner = useMemo(() => {
@@ -73,6 +79,7 @@ function ForecastPage() {
       <PageHeader title="Forecast" description="Projeção de receita ponderada por cenário, responsável e origem" />
 
       <Toolbar>
+        <PeriodFilter value={period} onChange={setPeriod} />
         <FilterSelect value={partner} onChange={setPartner} options={PARTNER_OPTIONS} />
         <FilterSelect value={origin} onChange={setOrigin} options={ORIGIN_OPTIONS} />
         <span className="text-xs text-muted-foreground sm:ml-auto">
