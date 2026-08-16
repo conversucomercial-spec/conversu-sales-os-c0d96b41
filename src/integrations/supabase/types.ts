@@ -14,6 +14,86 @@ export type Database = {
   }
   public: {
     Tables: {
+      activities: {
+        Row: {
+          company_id: string | null
+          completed_at: string | null
+          contact_id: string | null
+          created_at: string
+          description: string
+          due_at: string | null
+          id: string
+          opportunity_id: string | null
+          owner_id: string
+          priority: string
+          status: string
+          title: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          company_id?: string | null
+          completed_at?: string | null
+          contact_id?: string | null
+          created_at?: string
+          description?: string
+          due_at?: string | null
+          id?: string
+          opportunity_id?: string | null
+          owner_id: string
+          priority?: string
+          status?: string
+          title: string
+          type?: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string | null
+          completed_at?: string | null
+          contact_id?: string | null
+          created_at?: string
+          description?: string
+          due_at?: string | null
+          id?: string
+          opportunity_id?: string | null
+          owner_id?: string
+          priority?: string
+          status?: string
+          title?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activities_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activities_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activities_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "opportunities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activities_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       companies: {
         Row: {
           city: string | null
@@ -286,6 +366,158 @@ export type Database = {
           },
         ]
       }
+      goals: {
+        Row: {
+          created_at: string
+          id: string
+          level: string
+          metric: string
+          owner_id: string
+          period_end: string
+          period_start: string
+          subject_id: string | null
+          target: number
+          team: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          level?: string
+          metric: string
+          owner_id: string
+          period_end: string
+          period_start: string
+          subject_id?: string | null
+          target?: number
+          team?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          level?: string
+          metric?: string
+          owner_id?: string
+          period_end?: string
+          period_start?: string
+          subject_id?: string | null
+          target?: number
+          team?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "goals_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "goals_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meetings: {
+        Row: {
+          agenda: string
+          attendees: Json
+          company_id: string | null
+          contact_id: string | null
+          created_at: string
+          ends_at: string | null
+          id: string
+          location: string
+          next_steps: string
+          opportunity_id: string | null
+          owner_id: string
+          recording_url: string | null
+          source: string
+          starts_at: string
+          status: string
+          summary: string
+          title: string
+          transcript_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          agenda?: string
+          attendees?: Json
+          company_id?: string | null
+          contact_id?: string | null
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          location?: string
+          next_steps?: string
+          opportunity_id?: string | null
+          owner_id: string
+          recording_url?: string | null
+          source?: string
+          starts_at: string
+          status?: string
+          summary?: string
+          title: string
+          transcript_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          agenda?: string
+          attendees?: Json
+          company_id?: string | null
+          contact_id?: string | null
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          location?: string
+          next_steps?: string
+          opportunity_id?: string | null
+          owner_id?: string
+          recording_url?: string | null
+          source?: string
+          starts_at?: string
+          status?: string
+          summary?: string
+          title?: string
+          transcript_url?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meetings_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "meetings_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "meetings_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "opportunities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "meetings_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       opportunities: {
         Row: {
           checklist: Json
@@ -478,6 +710,57 @@ export type Database = {
           },
         ]
       }
+      opportunity_events: {
+        Row: {
+          created_at: string
+          detail: string
+          id: string
+          kind: string
+          occurred_at: string
+          opportunity_id: string
+          owner_id: string
+          payload: Json
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          detail?: string
+          id?: string
+          kind: string
+          occurred_at?: string
+          opportunity_id: string
+          owner_id: string
+          payload?: Json
+          title: string
+        }
+        Update: {
+          created_at?: string
+          detail?: string
+          id?: string
+          kind?: string
+          occurred_at?: string
+          opportunity_id?: string
+          owner_id?: string
+          payload?: Json
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "opportunity_events_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "opportunities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "opportunity_events_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       opportunity_tags: {
         Row: {
           created_at: string
@@ -586,6 +869,78 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      proposals: {
+        Row: {
+          created_at: string
+          decided_at: string | null
+          discount: number
+          id: string
+          items: Json
+          notes: string
+          number: string
+          opportunity_id: string
+          owner_id: string
+          sent_at: string | null
+          setup_value: number
+          status: string
+          terms: string
+          updated_at: string
+          valid_until: string | null
+          value: number
+        }
+        Insert: {
+          created_at?: string
+          decided_at?: string | null
+          discount?: number
+          id?: string
+          items?: Json
+          notes?: string
+          number?: string
+          opportunity_id: string
+          owner_id: string
+          sent_at?: string | null
+          setup_value?: number
+          status?: string
+          terms?: string
+          updated_at?: string
+          valid_until?: string | null
+          value?: number
+        }
+        Update: {
+          created_at?: string
+          decided_at?: string | null
+          discount?: number
+          id?: string
+          items?: Json
+          notes?: string
+          number?: string
+          opportunity_id?: string
+          owner_id?: string
+          sent_at?: string | null
+          setup_value?: number
+          status?: string
+          terms?: string
+          updated_at?: string
+          valid_until?: string | null
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proposals_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "opportunities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "proposals_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       prospecting_events: {
         Row: {
@@ -756,6 +1111,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      opportunity_days_in_stage: {
+        Args: { _stage_changed_at: string }
+        Returns: number
       }
     }
     Enums: {

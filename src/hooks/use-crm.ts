@@ -11,6 +11,7 @@ const EMPTY: CrmSnapshot = {
   opportunities: [],
   stages: [],
   owners: [],
+  people: [],
   tags: [],
 };
 
