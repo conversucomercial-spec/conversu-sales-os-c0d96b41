@@ -1,8 +1,12 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Search } from "lucide-react";
+import { Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { PageHeader, Panel, Tag } from "@/components/kit";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CompanyDialog } from "@/components/company-dialog";
+import { ContactDialog } from "@/components/contact-dialog";
+import { useCrmMutations } from "@/hooks/use-accounts";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Timeline } from "@/components/kit";
@@ -35,6 +39,21 @@ function EmpresasPage() {
   const { companies, contacts, opportunities } = data;
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<CrmCompany | null>(null);
+  const [formOpen, setFormOpen] = useState(false);
+  const [editing, setEditing] = useState<CrmCompany | null>(null);
+  const [contactOpen, setContactOpen] = useState(false);
+  const { company: companyMutations } = useCrmMutations();
+
+  const openNew = () => {
+    setEditing(null);
+    setFormOpen(true);
+  };
+
+  const removeCompany = async (company: CrmCompany) => {
+    if (!window.confirm(`Excluir ${company.name}? Oportunidades e contatos vinculados impedem a exclusão.`)) return;
+    await companyMutations.remove.mutateAsync(company.id);
+    setSelected(null);
+  };
 
   const rows = useMemo(
     () => companies.filter((c) => c.name.toLowerCase().includes(query.toLowerCase())),
@@ -49,6 +68,11 @@ function EmpresasPage() {
       <PageHeader
         title="Empresas"
         description={isLoading ? "Carregando empresas…" : `${rows.length} contas na base comercial`}
+        actions={
+          <Button onClick={openNew}>
+            <Plus className="h-4 w-4" /> Nova empresa
+          </Button>
+        }
       />
 
       <Panel bodyClassName="p-0">
@@ -103,7 +127,24 @@ function EmpresasPage() {
             <div className="space-y-5 p-6">
               <div>
                 <p className="text-xs text-muted-foreground">{selected.segment} · {selected.city}</p>
-                <h2 className="font-display text-xl font-bold">{selected.name}</h2>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <h2 className="font-display text-xl font-bold">{selected.name}</h2>
+                  <div className="flex items-center gap-1.5">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setEditing(selected);
+                        setFormOpen(true);
+                      }}
+                    >
+                      <Pencil className="h-4 w-4" /> Editar
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={() => void removeCompany(selected)}>
+                      <Trash2 className="h-4 w-4" /> Excluir
+                    </Button>
+                  </div>
+                </div>
                 <div className="mt-2 flex flex-wrap gap-2">
                   <Tag tone="info">{selected.status}</Tag>
                   <Tag>{selected.employees} colaboradores</Tag>
@@ -138,7 +179,17 @@ function EmpresasPage() {
                 </TabsContent>
 
                 <TabsContent value="contatos" className="mt-4">
-                  <Panel bodyClassName="space-y-2.5">
+                  <Panel
+                    actions={
+                      <Button size="sm" variant="outline" onClick={() => setContactOpen(true)}>
+                        <Plus className="h-4 w-4" /> Novo contato
+                      </Button>
+                    }
+                    bodyClassName="space-y-2.5"
+                  >
+                    {companyContacts.length === 0 && (
+                      <p className="text-xs text-muted-foreground">Nenhum contato cadastrado para esta empresa.</p>
+                    )}
                     {companyContacts.map((c) => (
                       <div key={c.id} className="rounded-lg border p-3">
                         <p className="text-sm font-medium">{c.name}</p>
@@ -194,6 +245,13 @@ function EmpresasPage() {
           )}
         </SheetContent>
       </Sheet>
+
+      <CompanyDialog open={formOpen} onOpenChange={setFormOpen} company={editing} />
+      <ContactDialog
+        open={contactOpen}
+        onOpenChange={setContactOpen}
+        defaultCompanyId={selected?.id ?? ""}
+      />
     </div>
   );
 }
