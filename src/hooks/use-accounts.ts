@@ -34,7 +34,7 @@ export function useCrmMutations() {
     void qc.invalidateQueries({ queryKey: ACTIVITIES_QUERY_KEY });
   };
 
-  const run = <T>(fn: Fn<{ data: T }>, success: string) =>
+  const useRun = <T>(fn: Fn<{ data: T }>, success: string) =>
     useMutation({
       mutationFn: (data: T) => fn({ data }),
       onSuccess: () => {
@@ -47,33 +47,33 @@ export function useCrmMutations() {
 
   return {
     company: {
-      create: run<Parameters<typeof createCompany>[0]["data"]>(fns.createCompany, "Empresa criada"),
-      update: run<Parameters<typeof updateCompany>[0]["data"]>(
+      create: useRun<Parameters<typeof createCompany>[0]["data"]>(fns.createCompany, "Empresa criada"),
+      update: useRun<Parameters<typeof updateCompany>[0]["data"]>(
         fns.updateCompany,
         "Empresa atualizada",
       ),
-      remove: run<Parameters<typeof deleteCompany>[0]["data"]>(
+      remove: useRun<Parameters<typeof deleteCompany>[0]["data"]>(
         fns.deleteCompany,
         "Empresa excluída",
       ),
     },
     contact: {
-      create: run<Parameters<typeof createContact>[0]["data"]>(fns.createContact, "Contato criado"),
-      update: run<Parameters<typeof updateContact>[0]["data"]>(
+      create: useRun<Parameters<typeof createContact>[0]["data"]>(fns.createContact, "Contato criado"),
+      update: useRun<Parameters<typeof updateContact>[0]["data"]>(
         fns.updateContact,
         "Contato atualizado",
       ),
-      remove: run<Parameters<typeof deleteContact>[0]["data"]>(
+      remove: useRun<Parameters<typeof deleteContact>[0]["data"]>(
         fns.deleteContact,
         "Contato excluído",
       ),
     },
     opportunity: {
-      update: run<Parameters<typeof updateOpportunity>[0]["data"]>(
+      update: useRun<Parameters<typeof updateOpportunity>[0]["data"]>(
         fns.updateOpportunity,
         "Oportunidade atualizada",
       ),
-      remove: run<Parameters<typeof deleteOpportunity>[0]["data"]>(
+      remove: useRun<Parameters<typeof deleteOpportunity>[0]["data"]>(
         fns.deleteOpportunity,
         "Oportunidade excluída",
       ),
