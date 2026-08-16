@@ -24,7 +24,7 @@ export function useSettings() {
   const fetchSettings = useServerFn(listSettings);
   const query = useQuery<CrmSettings>({
     queryKey: SETTINGS_QUERY_KEY,
-    queryFn: () => fetchSettings(),
+    queryFn: () => fetchSettings() as Promise<CrmSettings>,
     staleTime: 30_000,
   });
   return { ...query, data: query.data ?? EMPTY_SETTINGS };

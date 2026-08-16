@@ -1,3 +1,5 @@
+import type { Json } from "@/integrations/supabase/types";
+
 /** Tipos e rótulos da configuração comercial editável dentro do CRM. */
 export type StageSetting = {
   id: string;
@@ -7,7 +9,7 @@ export type StageSetting = {
   position: number;
   probability: number;
   criteria: string[];
-  playbook: Record<string, unknown>;
+  playbook: Json;
 };
 
 export type PipelineSetting = {
@@ -48,9 +50,9 @@ export type AutomationSetting = {
   name: string;
   description: string;
   triggerType: string;
-  triggerConfig: Record<string, unknown>;
+  triggerConfig: Json;
   actionType: string;
-  actionConfig: Record<string, unknown>;
+  actionConfig: Json;
   active: boolean;
 };
 

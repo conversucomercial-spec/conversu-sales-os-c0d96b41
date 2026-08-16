@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { TablesInsert, TablesUpdate } from "@/integrations/supabase/types";
 import type { ProposalRecord } from "@/lib/proposals";
 
 /** Propostas comerciais reais, com empresa e oportunidade vinculadas. */
@@ -61,17 +62,17 @@ export const saveProposal = createServerFn({ method: "POST" })
     }) => input,
   )
   .handler(async ({ data, context }) => {
-    const payload: Record<string, unknown> = {};
-    if (data.number !== undefined) payload["number"] = data.number;
-    if (data.status !== undefined) payload["status"] = data.status;
-    if (data.value !== undefined) payload["value"] = data.value;
-    if (data.setupValue !== undefined) payload["setup_value"] = data.setupValue;
-    if (data.discount !== undefined) payload["discount"] = data.discount;
-    if (data.validUntil !== undefined) payload["valid_until"] = data.validUntil || null;
-    if (data.sentAt !== undefined) payload["sent_at"] = data.sentAt || null;
-    if (data.decidedAt !== undefined) payload["decided_at"] = data.decidedAt || null;
-    if (data.terms !== undefined) payload["terms"] = data.terms;
-    if (data.notes !== undefined) payload["notes"] = data.notes;
+    const payload: TablesUpdate<"proposals"> = {};
+    if (data.number !== undefined) payload.number = data.number;
+    if (data.status !== undefined) payload.status = data.status;
+    if (data.value !== undefined) payload.value = data.value;
+    if (data.setupValue !== undefined) payload.setup_value = data.setupValue;
+    if (data.discount !== undefined) payload.discount = data.discount;
+    if (data.validUntil !== undefined) payload.valid_until = data.validUntil || null;
+    if (data.sentAt !== undefined) payload.sent_at = data.sentAt || null;
+    if (data.decidedAt !== undefined) payload.decided_at = data.decidedAt || null;
+    if (data.terms !== undefined) payload.terms = data.terms;
+    if (data.notes !== undefined) payload.notes = data.notes;
 
     if (data.id) {
       const { error } = await context.supabase.from("proposals").update(payload).eq("id", data.id);
@@ -86,7 +87,7 @@ export const saveProposal = createServerFn({ method: "POST" })
     const { data: created, error } = await context.supabase
       .from("proposals")
       .insert({
-        ...payload,
+        ...(payload as TablesInsert<"proposals">),
         number,
         opportunity_id: data.opportunityId,
         status: data.status ?? "Enviada",

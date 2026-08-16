@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Json, TablesUpdate } from "@/integrations/supabase/types";
 import type { CrmSettings, PipelineSetting } from "@/lib/settings";
 
 /** Configuração comercial completa: funis, etapas, campos, listas e automações. */
@@ -39,7 +40,7 @@ export const listSettings = createServerFn({ method: "GET" })
           position: s.position,
           probability: s.probability,
           criteria: s.criteria ?? [],
-          playbook: (s.playbook ?? {}) as Record<string, unknown>,
+          playbook: s.playbook ?? {},
         })),
     }));
 
@@ -71,9 +72,9 @@ export const listSettings = createServerFn({ method: "GET" })
         name: r.name,
         description: r.description ?? "",
         triggerType: r.trigger_type,
-        triggerConfig: (r.trigger_config ?? {}) as Record<string, unknown>,
+        triggerConfig: r.trigger_config ?? {},
         actionType: r.action_type,
-        actionConfig: (r.action_config ?? {}) as Record<string, unknown>,
+        actionConfig: r.action_config ?? {},
         active: r.active,
       })),
     };
@@ -100,11 +101,11 @@ export const savePipeline = createServerFn({ method: "POST" })
     if (!name) throw new Error("Informe o nome do funil");
 
     if (data.id) {
-      const patch: Record<string, unknown> = { name, updated_by: context.userId };
-      if (data.description !== undefined) patch["description"] = data.description;
-      if (data.position !== undefined) patch["position"] = data.position;
-      if (data.active !== undefined) patch["active"] = data.active;
-      if (data.cardFields !== undefined) patch["card_fields"] = data.cardFields;
+      const patch: TablesUpdate<"pipelines"> = { name, updated_by: context.userId };
+      if (data.description !== undefined) patch.description = data.description;
+      if (data.position !== undefined) patch.position = data.position;
+      if (data.active !== undefined) patch.active = data.active;
+      if (data.cardFields !== undefined) patch.card_fields = data.cardFields;
       const { error } = await context.supabase.from("pipelines").update(patch).eq("id", data.id);
       if (error) throw new Error(error.message);
       return { id: data.id };
@@ -165,7 +166,7 @@ export const saveStage = createServerFn({ method: "POST" })
       position?: number;
       probability?: number;
       criteria?: string[];
-      playbook?: Record<string, unknown>;
+      playbook?: Json;
     }) => input,
   )
   .handler(async ({ data, context }) => {
@@ -176,10 +177,10 @@ export const saveStage = createServerFn({ method: "POST" })
     const probability = Math.max(0, Math.min(100, data.probability ?? 0));
 
     if (data.id) {
-      const patch: Record<string, unknown> = { name, probability, updated_by: context.userId };
-      if (data.position !== undefined) patch["position"] = data.position;
-      if (data.criteria !== undefined) patch["criteria"] = data.criteria;
-      if (data.playbook !== undefined) patch["playbook"] = data.playbook;
+      const patch: TablesUpdate<"stages"> = { name, probability, updated_by: context.userId };
+      if (data.position !== undefined) patch.position = data.position;
+      if (data.criteria !== undefined) patch.criteria = data.criteria;
+      if (data.playbook !== undefined) patch.playbook = data.playbook;
       const { error } = await context.supabase.from("stages").update(patch).eq("id", data.id);
       if (error) throw new Error(error.message);
       return { id: data.id };
@@ -377,9 +378,9 @@ export const saveAutomation = createServerFn({ method: "POST" })
       name: string;
       description?: string;
       triggerType: string;
-      triggerConfig?: Record<string, unknown>;
+      triggerConfig?: Json;
       actionType: string;
-      actionConfig?: Record<string, unknown>;
+      actionConfig?: Json;
       active?: boolean;
     }) => input,
   )
