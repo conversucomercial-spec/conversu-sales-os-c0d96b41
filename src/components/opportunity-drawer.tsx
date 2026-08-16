@@ -296,7 +296,6 @@ export function OpportunityDrawer({
               defaultOpportunityId={op.id}
             />
           </div>
-          </div>
         )}
       </SheetContent>
     </Sheet>
