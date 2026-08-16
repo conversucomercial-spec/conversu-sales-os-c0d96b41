@@ -53,3 +53,18 @@ Corrigir os recursos que existem parcialmente, mas não funcionam de ponta a pon
 - Testar upload de PDF, inclusão de link, abertura e exclusão nos quatro vínculos.
 - Confirmar que cadastro público não existe e que somente `matheus@useconversu.com` consegue criar vendedores.
 - Validar as rotas autenticadas em desktop e mobile, erros de console e respostas de rede.
+
+## 6. Tudo editável dentro do CRM após publicar
+Nada de configuração fica preso no código: depois que o sistema estiver no ar, o administrador ajusta a operação pela própria interface, sem nova publicação.
+
+- **Funis**: criar, renomear, descrever, reordenar, ativar/desativar e definir quais campos aparecem no card.
+- **Etapas**: criar, renomear, reordenar, ajustar probabilidade, critérios de avanço e playbook de cada etapa.
+- **Campos**: catálogo editável de campos de oportunidade, empresa e contato — nome, tipo (texto, número, valor, data, lista, sim/não), obrigatoriedade, valores de lista e em quais funis aparecem.
+- **Listas de apoio**: origens, parceiros, temperaturas, prioridades, motivos de perda, status de reunião, categorias de documento e etapas de cadência LinkedIn.
+- **Metas**: criar e editar metas por empresa, equipe e vendedor, com período, indicador e valor-alvo.
+- **Automações**: regras editáveis do tipo “quando acontecer X, faça Y” — mudança de etapa, oportunidade parada há N dias, reunião marcada como realizada, proposta vencendo — gerando notificação, atividade automática ou ajuste de campo.
+- **Equipe e permissões**: administrador libera contas, define papel e responsável padrão.
+- Toda edição é versionada com autor e data, e as telas passam a ler essas configurações do banco em vez de valores fixos.
+- Registros já existentes continuam válidos quando uma configuração muda; nada é apagado silenciosamente.
+
+Isso substitui os valores atualmente fixos no código (funis, etapas, listas e metas), que passam a viver no banco e a ser administrados pela tela de Configurações.
