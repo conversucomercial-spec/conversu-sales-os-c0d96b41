@@ -20,6 +20,9 @@ import {
 } from "@/components/ui/table";
 import { currency } from "@/lib/data";
 import { useCrm } from "@/hooks/use-crm";
+import { FilterSelect, TagFilter, Toolbar } from "@/components/toolbar";
+import { TagPicker } from "@/components/tag-picker";
+import { DocumentsPanel } from "@/components/documents-panel";
 import type { CrmCompany } from "@/lib/crm-mappers";
 
 export const Route = createFileRoute("/_authenticated/empresas")({
@@ -48,6 +51,9 @@ function EmpresasPage() {
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<CrmCompany | null>(null);
   const [contactOpen, setContactOpen] = useState(false);
+  const [sort, setSort] = useState("az");
+  const [tagIds, setTagIds] = useState<string[]>([]);
+  const [tagMode, setTagMode] = useState<"any" | "all">("any");
   const { company: companyMutations } = useCrmMutations();
 
   const openNew = () => {
@@ -66,10 +72,24 @@ function EmpresasPage() {
     setSelected(null);
   };
 
-  const rows = useMemo(
-    () => companies.filter((c) => c.name.toLowerCase().includes(query.toLowerCase())),
-    [companies, query],
-  );
+  const rows = useMemo(() => {
+    const q = query.toLowerCase();
+    return companies
+      .filter((c) => {
+        const ids = (c.tags ?? []).map((t) => t.id);
+        const tagOk =
+          tagIds.length === 0 ||
+          (tagMode === "all" ? tagIds.every((id) => ids.includes(id)) : tagIds.some((id) => ids.includes(id)));
+        return tagOk && (c.name.toLowerCase().includes(q) || c.segment.toLowerCase().includes(q));
+      })
+      .sort((a, b) =>
+        sort === "az"
+          ? a.name.localeCompare(b.name, "pt-BR")
+          : sort === "za"
+            ? b.name.localeCompare(a.name, "pt-BR")
+            : b.mrr - a.mrr,
+      );
+  }, [companies, query, sort, tagIds, tagMode]);
 
   const companyOps = selected ? opportunities.filter((o) => o.companyId === selected.id) : [];
   const companyContacts = selected ? contacts.filter((c) => c.companyId === selected.id) : [];
@@ -85,6 +105,26 @@ function EmpresasPage() {
           </Button>
         }
       />
+
+      <Toolbar>
+        <FilterSelect
+          value={sort}
+          onChange={setSort}
+          className="sm:w-48"
+          options={[
+            { value: "az", label: "Nome A → Z" },
+            { value: "za", label: "Nome Z → A" },
+            { value: "mrr", label: "Maior MRR" },
+          ]}
+        />
+        <TagFilter
+          tags={data.tags}
+          selected={tagIds}
+          onSelectedChange={setTagIds}
+          mode={tagMode}
+          onModeChange={setTagMode}
+        />
+      </Toolbar>
 
       <Panel bodyClassName="p-0">
         <div className="relative border-b p-3">
@@ -172,6 +212,9 @@ function EmpresasPage() {
                   <Tag>{selected.employees} colaboradores</Tag>
                   <Tag tone="success">MRR {currency(selected.mrr)}</Tag>
                 </div>
+                <div className="mt-3">
+                  <TagPicker entity="company" entityId={selected.id} tags={selected.tags ?? []} />
+                </div>
               </div>
 
               <Tabs defaultValue="resumo">
@@ -181,7 +224,7 @@ function EmpresasPage() {
                   <TabsTrigger value="oportunidades">Oportunidades</TabsTrigger>
                   <TabsTrigger value="historico">Histórico</TabsTrigger>
                   <TabsTrigger value="reunioes">Reuniões</TabsTrigger>
-                  <TabsTrigger value="arquivos">Arquivos</TabsTrigger>
+                  <TabsTrigger value="documentos">Documentos</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="resumo" className="mt-4">
@@ -260,17 +303,8 @@ function EmpresasPage() {
                   </Panel>
                 </TabsContent>
 
-                <TabsContent value="arquivos" className="mt-4">
-                  <Panel bodyClassName="space-y-2.5">
-                    {(companyOps[0]?.files ?? []).map((f) => (
-                      <div key={f.name} className="rounded-lg border p-3">
-                        <p className="text-sm font-medium">{f.name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {f.size} · {f.date}
-                        </p>
-                      </div>
-                    ))}
-                  </Panel>
+                <TabsContent value="documentos" className="mt-4">
+                  <DocumentsPanel scope={{ companyId: selected.id }} />
                 </TabsContent>
               </Tabs>
             </div>

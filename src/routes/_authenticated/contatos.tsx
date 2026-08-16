@@ -16,6 +16,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useCrm } from "@/hooks/use-crm";
+import { FilterSelect, TagFilter, Toolbar } from "@/components/toolbar";
+import { TagPicker } from "@/components/tag-picker";
 import type { CrmContact } from "@/lib/crm-mappers";
 
 export const Route = createFileRoute("/_authenticated/contatos")({
@@ -43,6 +45,9 @@ function ContatosPage() {
   const [selected, setSelected] = useState<CrmContact | null>(null);
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<CrmContact | null>(null);
+  const [sort, setSort] = useState("az");
+  const [tagIds, setTagIds] = useState<string[]>([]);
+  const [tagMode, setTagMode] = useState<"any" | "all">("any");
   const { contact: contactMutations } = useCrmMutations();
 
   const removeContact = async (contact: CrmContact) => {
@@ -51,15 +56,27 @@ function ContatosPage() {
     setSelected(null);
   };
 
-  const rows = useMemo(
-    () =>
-      contacts.filter(
-        (c) =>
-          c.name.toLowerCase().includes(query.toLowerCase()) ||
-          c.company.toLowerCase().includes(query.toLowerCase()),
-      ),
-    [contacts, query],
-  );
+  const rows = useMemo(() => {
+    const q = query.toLowerCase();
+    return contacts
+      .filter((c) => {
+        const ids = (c.tags ?? []).map((t) => t.id);
+        const tagOk =
+          tagIds.length === 0 ||
+          (tagMode === "all" ? tagIds.every((id) => ids.includes(id)) : tagIds.some((id) => ids.includes(id)));
+        return (
+          tagOk &&
+          (c.name.toLowerCase().includes(q) ||
+            c.company.toLowerCase().includes(q) ||
+            c.email.toLowerCase().includes(q))
+        );
+      })
+      .sort((a, b) =>
+        sort === "az"
+          ? a.name.localeCompare(b.name, "pt-BR")
+          : b.name.localeCompare(a.name, "pt-BR"),
+      );
+  }, [contacts, query, sort, tagIds, tagMode]);
 
   return (
     <div className="space-y-5">
@@ -79,6 +96,25 @@ function ContatosPage() {
           </Button>
         }
       />
+
+      <Toolbar>
+        <FilterSelect
+          value={sort}
+          onChange={setSort}
+          className="sm:w-48"
+          options={[
+            { value: "az", label: "Nome A → Z" },
+            { value: "za", label: "Nome Z → A" },
+          ]}
+        />
+        <TagFilter
+          tags={data.tags}
+          selected={tagIds}
+          onSelectedChange={setTagIds}
+          mode={tagMode}
+          onModeChange={setTagMode}
+        />
+      </Toolbar>
 
       <Panel bodyClassName="p-0">
         <div className="relative border-b p-3">
@@ -141,6 +177,9 @@ function ContatosPage() {
                 <p className="text-xs text-muted-foreground">{selected.company}</p>
                 <h2 className="font-display text-xl font-bold">{selected.name}</h2>
                 <p className="text-sm text-muted-foreground">{selected.role}</p>
+                <div className="mt-3">
+                  <TagPicker entity="contact" entityId={selected.id} tags={selected.tags ?? []} />
+                </div>
                 <div className="mt-3 flex items-center gap-1.5">
                   <Button
                     size="sm"
