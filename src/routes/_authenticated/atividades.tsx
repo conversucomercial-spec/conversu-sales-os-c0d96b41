@@ -135,11 +135,12 @@ function AtividadesPage() {
             ? "Carregando atividades…"
             : `${countByBucket["atrasadas"] ?? 0} atrasadas · ${countByBucket["hoje"] ?? 0} para hoje`
         }
-      >
-        <Button onClick={openNew}>
-          <Plus className="h-4 w-4" /> Nova atividade
-        </Button>
-      </PageHeader>
+        actions={
+          <Button onClick={openNew}>
+            <Plus className="h-4 w-4" /> Nova atividade
+          </Button>
+        }
+      />
 
       <Tabs value={bucket} onValueChange={(v) => setBucket(v as ActivityBucketId)}>
         <TabsList className="flex w-full flex-wrap justify-start">
