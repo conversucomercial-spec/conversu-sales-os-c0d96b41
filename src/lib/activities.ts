@@ -62,7 +62,7 @@ const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDat
 /** Classifica a atividade em atrasada / hoje / semana / futura / concluída. */
 export function activityBucket(a: ActivityRecord, now = new Date()): ActivityBucketId {
   if (a.status !== "pendente") return "concluidas";
-  if (!a.dueAt) return "futuras";
+  if (!a.dueAt) return "hoje";
   const due = startOfDay(new Date(a.dueAt));
   const today = startOfDay(now);
   const diff = Math.round((due.getTime() - today.getTime()) / 86400000);
