@@ -48,6 +48,7 @@ export type CrmSnapshot = {
   opportunities: Opportunity[];
   stages: CrmStage[];
   owners: string[];
+  people: { id: string; name: string }[];
   tags: TagRef[];
 };
 

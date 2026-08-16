@@ -1,8 +1,12 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Search } from "lucide-react";
+import { Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { PageHeader, Panel, Tag } from "@/components/kit";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CompanyDialog } from "@/components/company-dialog";
+import { ContactDialog } from "@/components/contact-dialog";
+import { useCrmMutations } from "@/hooks/use-accounts";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Timeline } from "@/components/kit";
@@ -22,9 +26,15 @@ export const Route = createFileRoute("/_authenticated/empresas")({
   head: () => ({
     meta: [
       { title: "Empresas | Conversu Sales OS" },
-      { name: "description", content: "Base de empresas com segmento, MRR potencial, responsável e oportunidades." },
+      {
+        name: "description",
+        content: "Base de empresas com segmento, MRR potencial, responsável e oportunidades.",
+      },
       { property: "og:title", content: "Empresas | Conversu Sales OS" },
-      { property: "og:description", content: "Base de empresas com segmento, MRR potencial e oportunidades." },
+      {
+        property: "og:description",
+        content: "Base de empresas com segmento, MRR potencial e oportunidades.",
+      },
     ],
   }),
   component: EmpresasPage,
@@ -35,6 +45,26 @@ function EmpresasPage() {
   const { companies, contacts, opportunities } = data;
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<CrmCompany | null>(null);
+  const [formOpen, setFormOpen] = useState(false);
+  const [editing, setEditing] = useState<CrmCompany | null>(null);
+  const [contactOpen, setContactOpen] = useState(false);
+  const { company: companyMutations } = useCrmMutations();
+
+  const openNew = () => {
+    setEditing(null);
+    setFormOpen(true);
+  };
+
+  const removeCompany = async (company: CrmCompany) => {
+    if (
+      !window.confirm(
+        `Excluir ${company.name}? Oportunidades e contatos vinculados impedem a exclusão.`,
+      )
+    )
+      return;
+    await companyMutations.remove.mutateAsync({ id: company.id });
+    setSelected(null);
+  };
 
   const rows = useMemo(
     () => companies.filter((c) => c.name.toLowerCase().includes(query.toLowerCase())),
@@ -49,6 +79,11 @@ function EmpresasPage() {
       <PageHeader
         title="Empresas"
         description={isLoading ? "Carregando empresas…" : `${rows.length} contas na base comercial`}
+        actions={
+          <Button onClick={openNew}>
+            <Plus className="h-4 w-4" /> Nova empresa
+          </Button>
+        }
       />
 
       <Panel bodyClassName="p-0">
@@ -75,18 +110,24 @@ function EmpresasPage() {
             </TableHeader>
             <TableBody>
               {rows.map((c) => (
-                <TableRow
-                  key={c.id}
-                  onClick={() => setSelected(c)}
-                  className="cursor-pointer"
-                >
+                <TableRow key={c.id} onClick={() => setSelected(c)} className="cursor-pointer">
                   <TableCell className="font-medium">{c.name}</TableCell>
-                  <TableCell><Tag>{c.segment}</Tag></TableCell>
+                  <TableCell>
+                    <Tag>{c.segment}</Tag>
+                  </TableCell>
                   <TableCell className="tabular-nums">{currency(c.mrr)}</TableCell>
                   <TableCell className="text-muted-foreground">{c.owner}</TableCell>
                   <TableCell className="tabular-nums">{c.opportunities}</TableCell>
                   <TableCell>
-                    <Tag tone={c.status === "Cliente" ? "success" : c.status === "Em negociação" ? "warning" : "info"}>
+                    <Tag
+                      tone={
+                        c.status === "Cliente"
+                          ? "success"
+                          : c.status === "Em negociação"
+                            ? "warning"
+                            : "info"
+                      }
+                    >
                       {c.status}
                     </Tag>
                   </TableCell>
@@ -98,12 +139,34 @@ function EmpresasPage() {
       </Panel>
 
       <Sheet open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
-        <SheetContent side="right" className="scroll-slim w-full overflow-y-auto p-0 sm:max-w-[620px]">
+        <SheetContent
+          side="right"
+          className="scroll-slim w-full overflow-y-auto p-0 sm:max-w-[620px]"
+        >
           {selected && (
             <div className="space-y-5 p-6">
               <div>
-                <p className="text-xs text-muted-foreground">{selected.segment} · {selected.city}</p>
-                <h2 className="font-display text-xl font-bold">{selected.name}</h2>
+                <p className="text-xs text-muted-foreground">
+                  {selected.segment} · {selected.city}
+                </p>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <h2 className="font-display text-xl font-bold">{selected.name}</h2>
+                  <div className="flex items-center gap-1.5">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setEditing(selected);
+                        setFormOpen(true);
+                      }}
+                    >
+                      <Pencil className="h-4 w-4" /> Editar
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={() => void removeCompany(selected)}>
+                      <Trash2 className="h-4 w-4" /> Excluir
+                    </Button>
+                  </div>
+                </div>
                 <div className="mt-2 flex flex-wrap gap-2">
                   <Tag tone="info">{selected.status}</Tag>
                   <Tag>{selected.employees} colaboradores</Tag>
@@ -138,11 +201,25 @@ function EmpresasPage() {
                 </TabsContent>
 
                 <TabsContent value="contatos" className="mt-4">
-                  <Panel bodyClassName="space-y-2.5">
+                  <Panel
+                    actions={
+                      <Button size="sm" variant="outline" onClick={() => setContactOpen(true)}>
+                        <Plus className="h-4 w-4" /> Novo contato
+                      </Button>
+                    }
+                    bodyClassName="space-y-2.5"
+                  >
+                    {companyContacts.length === 0 && (
+                      <p className="text-xs text-muted-foreground">
+                        Nenhum contato cadastrado para esta empresa.
+                      </p>
+                    )}
                     {companyContacts.map((c) => (
                       <div key={c.id} className="rounded-lg border p-3">
                         <p className="text-sm font-medium">{c.name}</p>
-                        <p className="text-xs text-muted-foreground">{c.role} · {c.email}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {c.role} · {c.email}
+                        </p>
                       </div>
                     ))}
                   </Panel>
@@ -154,7 +231,9 @@ function EmpresasPage() {
                       <div key={o.id} className="flex items-center gap-3 rounded-lg border p-3">
                         <div className="min-w-0 flex-1">
                           <p className="truncate text-sm font-medium">{o.title}</p>
-                          <p className="text-xs text-muted-foreground">{o.owner} · {o.probability}%</p>
+                          <p className="text-xs text-muted-foreground">
+                            {o.owner} · {o.probability}%
+                          </p>
                         </div>
                         <span className="text-sm font-semibold">{currency(o.value)}</span>
                       </div>
@@ -173,7 +252,9 @@ function EmpresasPage() {
                     {(companyOps[0]?.meetings ?? []).map((m, i) => (
                       <div key={i} className="rounded-lg border p-3">
                         <p className="text-sm font-medium">{m.title}</p>
-                        <p className="text-xs text-muted-foreground">{m.date} · {m.participants}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {m.date} · {m.participants}
+                        </p>
                       </div>
                     ))}
                   </Panel>
@@ -184,7 +265,9 @@ function EmpresasPage() {
                     {(companyOps[0]?.files ?? []).map((f) => (
                       <div key={f.name} className="rounded-lg border p-3">
                         <p className="text-sm font-medium">{f.name}</p>
-                        <p className="text-xs text-muted-foreground">{f.size} · {f.date}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {f.size} · {f.date}
+                        </p>
                       </div>
                     ))}
                   </Panel>
@@ -194,6 +277,13 @@ function EmpresasPage() {
           )}
         </SheetContent>
       </Sheet>
+
+      <CompanyDialog open={formOpen} onOpenChange={setFormOpen} company={editing} />
+      <ContactDialog
+        open={contactOpen}
+        onOpenChange={setContactOpen}
+        defaultCompanyId={selected?.id ?? ""}
+      />
     </div>
   );
 }

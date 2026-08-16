@@ -90,6 +90,9 @@ export const listCrm = createServerFn({ method: "GET" })
         pipelineKey: pipelineById.get(s.pipeline_id)?.key ?? "outbound",
       })),
       owners: [...new Set(opportunities.map((o) => o.owner))].sort(),
+      people: (profilesRes.data ?? [])
+        .map((p) => ({ id: p.id, name: p.full_name }))
+        .sort((a, b) => a.name.localeCompare(b.name, "pt-BR")),
       tags: tagRows,
     };
   });
@@ -110,7 +113,7 @@ export const moveOpportunityStage = createServerFn({ method: "POST" })
 
     const { data: stage, error: stageError } = await supabase
       .from("stages")
-      .select("id, pipeline_id, probability")
+      .select("id, pipeline_id, probability, name")
       .eq("pipeline_id", op.pipeline_id)
       .eq("key", data.stageKey)
       .maybeSingle();
@@ -127,6 +130,14 @@ export const moveOpportunityStage = createServerFn({ method: "POST" })
       })
       .eq("id", data.id);
     if (error) throw new Error(error.message);
+
+    await supabase.from("opportunity_events").insert({
+      opportunity_id: data.id,
+      kind: "etapa",
+      title: `Etapa alterada para ${stage.name}`,
+      detail: `Probabilidade ajustada para ${stage.probability}%`,
+      owner_id: context.userId,
+    });
     return { ok: true };
   });
 
