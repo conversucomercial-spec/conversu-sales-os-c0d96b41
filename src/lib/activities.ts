@@ -20,7 +20,7 @@ export const ACTIVITY_TYPE_LABEL: Record<ActivityType, string> = {
 
 export const ACTIVITY_PRIORITIES = ["alta", "media", "baixa"] as const;
 export type ActivityPriority = (typeof ACTIVITY_PRIORITIES)[number];
-export const ACTIVITY_PRIORITY_LABEL: Record<ActivityPriority, string> = {
+export const ACTIVITY_PRIORITY_LABEL: Record<ActivityPriority, "Alta" | "Média" | "Baixa"> = {
   alta: "Alta",
   media: "Média",
   baixa: "Baixa",
