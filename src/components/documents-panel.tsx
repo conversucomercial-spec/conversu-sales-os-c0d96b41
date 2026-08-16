@@ -2,9 +2,10 @@ import { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Download, Paperclip, Trash2, Upload } from "lucide-react";
+import { Download, Link as LinkIcon, Paperclip, Trash2, Upload } from "lucide-react";
 import { Panel } from "@/components/kit";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { FilterSelect } from "@/components/toolbar";
 import { Tag } from "@/components/kit";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,7 +22,12 @@ import {
   formatBytes,
 } from "@/lib/documents";
 
-type Scope = { companyId?: string; opportunityId?: string; meetingId?: string };
+type Scope = {
+  companyId?: string;
+  opportunityId?: string;
+  meetingId?: string;
+  proposalId?: string;
+};
 
 /** Anexos/documentos comerciais de uma empresa, oportunidade ou reunião. */
 export function DocumentsPanel({
@@ -35,6 +41,8 @@ export function DocumentsPanel({
   const fileRef = useRef<HTMLInputElement>(null);
   const [category, setCategory] = useState<string>("outro");
   const [filter, setFilter] = useState<string>("todas");
+  const [linkName, setLinkName] = useState("");
+  const [linkUrl, setLinkUrl] = useState("");
 
   const fetchDocs = useServerFn(listDocuments);
   const prepare = useServerFn(createDocumentUpload);
@@ -66,6 +74,7 @@ export function DocumentsPanel({
           companyId: scope.companyId ?? null,
           opportunityId: scope.opportunityId ?? null,
           meetingId: scope.meetingId ?? null,
+          proposalId: scope.proposalId ?? null,
         },
       });
     },
@@ -74,6 +83,28 @@ export function DocumentsPanel({
       void refresh();
     },
     onError: (e: Error) => toast.error("Falha no upload", { description: e.message }),
+  });
+
+  const addLink = useMutation({
+    mutationFn: () =>
+      register({
+        data: {
+          name: linkName.trim() || linkUrl.trim(),
+          externalUrl: linkUrl.trim(),
+          category,
+          companyId: scope.companyId ?? null,
+          opportunityId: scope.opportunityId ?? null,
+          meetingId: scope.meetingId ?? null,
+          proposalId: scope.proposalId ?? null,
+        },
+      }),
+    onSuccess: () => {
+      toast.success("Link anexado");
+      setLinkName("");
+      setLinkUrl("");
+      void refresh();
+    },
+    onError: (e: Error) => toast.error("Não foi possível anexar", { description: e.message }),
   });
 
   const open = useMutation({
@@ -122,6 +153,29 @@ export function DocumentsPanel({
       }
       bodyClassName="space-y-2.5"
     >
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <Input
+          value={linkName}
+          onChange={(e) => setLinkName(e.target.value)}
+          placeholder="Nome do anexo (opcional)"
+          className="sm:w-56"
+        />
+        <Input
+          value={linkUrl}
+          onChange={(e) => setLinkUrl(e.target.value)}
+          placeholder="Cole um link (Drive, Notion, PDF…)"
+          className="flex-1"
+        />
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => addLink.mutate()}
+          disabled={!linkUrl.trim() || addLink.isPending}
+        >
+          <LinkIcon className="h-3.5 w-3.5" /> Anexar link
+        </Button>
+      </div>
+
       <FilterSelect
         value={filter}
         onChange={setFilter}
@@ -143,7 +197,8 @@ export function DocumentsPanel({
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-medium">{d.name}</p>
             <p className="truncate text-[11px] text-muted-foreground">
-              {formatBytes(d.sizeBytes)} · {new Date(d.createdAt).toLocaleDateString("pt-BR")} ·{" "}
+              {d.externalUrl ? "Link externo" : formatBytes(d.sizeBytes)} ·{" "}
+              {new Date(d.createdAt).toLocaleDateString("pt-BR")} ·{" "}
               {d.ownerName}
             </p>
           </div>

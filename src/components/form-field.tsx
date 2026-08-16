@@ -5,11 +5,13 @@ import { cn } from "@/lib/utils";
 /** Campo padrão dos formulários do CRM: rótulo + controle. */
 export function Field({
   label,
+  hint,
   htmlFor,
   className,
   children,
 }: {
   label: string;
+  hint?: string;
   htmlFor?: string;
   className?: string;
   children: ReactNode;
@@ -20,6 +22,7 @@ export function Field({
         {label}
       </Label>
       {children}
+      {hint ? <p className="text-[11px] text-muted-foreground">{hint}</p> : null}
     </div>
   );
 }
