@@ -9,7 +9,12 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ActivityDialog } from "@/components/activity-dialog";
 import { useActivities } from "@/hooks/use-activities";
 import { useCrm } from "@/hooks/use-crm";
-import { DEFAULT_PERIOD, PeriodFilter, usePeriodRange, type PeriodValue } from "@/components/period-filter";
+import {
+  DEFAULT_PERIOD,
+  PeriodFilter,
+  usePeriodRange,
+  type PeriodValue,
+} from "@/components/period-filter";
 import { inPeriodOrUndated } from "@/lib/period";
 import {
   ACTIVITY_BUCKET_LIST,

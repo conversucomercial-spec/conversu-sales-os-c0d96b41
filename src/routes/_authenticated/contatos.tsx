@@ -63,7 +63,9 @@ function ContatosPage() {
         const ids = (c.tags ?? []).map((t) => t.id);
         const tagOk =
           tagIds.length === 0 ||
-          (tagMode === "all" ? tagIds.every((id) => ids.includes(id)) : tagIds.some((id) => ids.includes(id)));
+          (tagMode === "all"
+            ? tagIds.every((id) => ids.includes(id))
+            : tagIds.some((id) => ids.includes(id)));
         return (
           tagOk &&
           (c.name.toLowerCase().includes(q) ||

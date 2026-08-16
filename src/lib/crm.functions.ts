@@ -198,7 +198,8 @@ export const saveMeeting = createServerFn({ method: "POST" })
         .filter(Boolean)
         .join(" · ");
       timeline.unshift({
-        date: [meeting["date"], meeting["time"]].filter(Boolean).join(" ") || new Date().toISOString(),
+        date:
+          [meeting["date"], meeting["time"]].filter(Boolean).join(" ") || new Date().toISOString(),
         title: "Reunião realizada",
         detail,
         type: "reuniao",
@@ -273,7 +274,8 @@ export const createOpportunity = createServerFn({ method: "POST" })
       const { data: made, error: madeError } = await supabase
         .from("opportunities")
         .insert({
-          title: data.title?.trim() || (contactName ? `${company.name} — ${contactName}` : company.name),
+          title:
+            data.title?.trim() || (contactName ? `${company.name} — ${contactName}` : company.name),
           company_id: company.id,
           contact_id: data.contactId ?? null,
           pipeline_id: chosen.pipeline_id,

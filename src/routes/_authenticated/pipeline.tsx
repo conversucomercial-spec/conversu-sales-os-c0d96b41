@@ -28,7 +28,12 @@ import {
 import { compact, currency, STAGES, type Opportunity, type StageId } from "@/lib/data";
 import { useCrm, CRM_QUERY_KEY } from "@/hooks/use-crm";
 import { moveOpportunityStage } from "@/lib/crm.functions";
-import { DEFAULT_PERIOD, PeriodFilter, usePeriodRange, type PeriodValue } from "@/components/period-filter";
+import {
+  DEFAULT_PERIOD,
+  PeriodFilter,
+  usePeriodRange,
+  type PeriodValue,
+} from "@/components/period-filter";
 import { inPeriodOrUndated, parseBRDate } from "@/lib/period";
 import { PARTNER_OPTIONS } from "@/lib/partners";
 
@@ -99,8 +104,7 @@ function PipelinePage() {
           (owner === "todos" || o.owner === owner) &&
           (temp === "todas" || o.temperature === temp) &&
           (priority === "todas" || o.priority === priority) &&
-          (partner === "todos" ||
-            (partner === "sem" ? !o.partner : o.partner === partner)) &&
+          (partner === "todos" || (partner === "sem" ? !o.partner : o.partner === partner)) &&
           inPeriodOrUndated(parseBRDate(o.closeDate), range) &&
           (o.company.toLowerCase().includes(query.toLowerCase()) ||
             o.contact.toLowerCase().includes(query.toLowerCase()) ||
@@ -145,23 +149,23 @@ function PipelinePage() {
         }
         actions={
           <div className="flex flex-wrap items-center gap-2">
-          <NewOpportunityDialog />
-          <div className="flex rounded-lg border p-0.5">
-            <Button
-              size="sm"
-              variant={view === "kanban" ? "secondary" : "ghost"}
-              onClick={() => setView("kanban")}
-            >
-              <LayoutGrid className="h-3.5 w-3.5" /> Kanban
-            </Button>
-            <Button
-              size="sm"
-              variant={view === "lista" ? "secondary" : "ghost"}
-              onClick={() => setView("lista")}
-            >
-              <Rows3 className="h-3.5 w-3.5" /> Lista
-            </Button>
-          </div>
+            <NewOpportunityDialog />
+            <div className="flex rounded-lg border p-0.5">
+              <Button
+                size="sm"
+                variant={view === "kanban" ? "secondary" : "ghost"}
+                onClick={() => setView("kanban")}
+              >
+                <LayoutGrid className="h-3.5 w-3.5" /> Kanban
+              </Button>
+              <Button
+                size="sm"
+                variant={view === "lista" ? "secondary" : "ghost"}
+                onClick={() => setView("lista")}
+              >
+                <Rows3 className="h-3.5 w-3.5" /> Lista
+              </Button>
+            </div>
           </div>
         }
       />
@@ -297,7 +301,11 @@ function PipelinePage() {
               </TableHeader>
               <TableBody>
                 {filtered.map((o) => (
-                  <TableRow key={o.id} className="cursor-pointer" onClick={() => setSelectedId(o.id)}>
+                  <TableRow
+                    key={o.id}
+                    className="cursor-pointer"
+                    onClick={() => setSelectedId(o.id)}
+                  >
                     <TableCell className="font-medium">{o.company}</TableCell>
                     <TableCell>
                       <Tag tone="info">{STAGES.find((s) => s.id === o.stage)?.label}</Tag>

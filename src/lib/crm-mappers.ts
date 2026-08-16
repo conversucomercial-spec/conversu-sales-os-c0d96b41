@@ -62,7 +62,9 @@ export const toBR = (date: string | null): string => {
 };
 
 const daysSince = (date: string | null) =>
-  date ? Math.max(0, Math.round((TODAY.getTime() - new Date(`${date}T00:00:00`).getTime()) / 86400000)) : 0;
+  date
+    ? Math.max(0, Math.round((TODAY.getTime() - new Date(`${date}T00:00:00`).getTime()) / 86400000))
+    : 0;
 
 const asArray = <T>(value: unknown, fallback: T[] = []): T[] =>
   Array.isArray(value) ? (value as T[]) : fallback;

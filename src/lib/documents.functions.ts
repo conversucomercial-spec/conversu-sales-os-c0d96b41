@@ -45,8 +45,7 @@ export const listDocuments = createServerFn({ method: "GET" })
       companyId: r.company_id,
       opportunityId: r.opportunity_id,
       meetingId: r.meeting_id,
-      ownerName:
-        (r as { owner?: { full_name?: string } | null }).owner?.full_name ?? "Responsável",
+      ownerName: (r as { owner?: { full_name?: string } | null }).owner?.full_name ?? "Responsável",
       createdAt: r.created_at,
     }));
   });
@@ -56,7 +55,7 @@ export const createDocumentUpload = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { name: string }) => input)
   .handler(async ({ data, context }) => {
-    const safe = data.name.replace(/[^\w.\-]+/g, "-").slice(-80);
+    const safe = data.name.replace(/[^\w.-]+/g, "-").slice(-80);
     const path = `${context.userId}/${crypto.randomUUID()}-${safe}`;
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: signed, error } = await supabaseAdmin.storage
