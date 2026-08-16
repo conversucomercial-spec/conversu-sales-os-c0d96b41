@@ -24,9 +24,15 @@ export const Route = createFileRoute("/_authenticated/atividades")({
   head: () => ({
     meta: [
       { title: "Atividades | Conversu Sales OS" },
-      { name: "description", content: "Ligações, WhatsApp, e-mails, follow-ups, tarefas e reuniões em uma lista única." },
+      {
+        name: "description",
+        content: "Ligações, WhatsApp, e-mails, follow-ups, tarefas e reuniões em uma lista única.",
+      },
       { property: "og:title", content: "Atividades | Conversu Sales OS" },
-      { property: "og:description", content: "Todas as atividades comerciais com filtros por responsável, status e prioridade." },
+      {
+        property: "og:description",
+        content: "Todas as atividades comerciais com filtros por responsável, status e prioridade.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -64,7 +70,12 @@ function ActivityRow({
         <PriorityBadge value={ACTIVITY_PRIORITY_LABEL[activity.priority]} />
       </div>
       <div className="flex items-center gap-1">
-        <Button size="icon" variant="ghost" aria-label={done ? "Reabrir" : "Concluir"} onClick={onToggle}>
+        <Button
+          size="icon"
+          variant="ghost"
+          aria-label={done ? "Reabrir" : "Concluir"}
+          onClick={onToggle}
+        >
           {done ? <Undo2 className="h-4 w-4" /> : <Check className="h-4 w-4" />}
         </Button>
         <Button size="icon" variant="ghost" aria-label="Editar" onClick={onEdit}>
@@ -156,7 +167,12 @@ function AtividadesPage() {
       </Tabs>
 
       <Toolbar>
-        <SearchField value={query} onChange={setQuery} placeholder="Buscar atividade, empresa ou contato…" className="flex-1" />
+        <SearchField
+          value={query}
+          onChange={setQuery}
+          placeholder="Buscar atividade, empresa ou contato…"
+          className="flex-1"
+        />
         <FilterSelect
           value={type}
           onChange={setType}
@@ -188,13 +204,19 @@ function AtividadesPage() {
       {grouped.length === 0 ? (
         <EmptyState
           icon={ListChecks}
-          title={items.length === 0 ? "Nenhuma atividade registrada" : "Nenhuma atividade neste filtro"}
+          title={
+            items.length === 0 ? "Nenhuma atividade registrada" : "Nenhuma atividade neste filtro"
+          }
           description={
             items.length === 0
               ? "Crie a primeira atividade e vincule à empresa, ao contato ou à oportunidade."
               : "Ajuste os filtros ou selecione outro período."
           }
-          action={<Button onClick={openNew}><Plus className="h-4 w-4" /> Nova atividade</Button>}
+          action={
+            <Button onClick={openNew}>
+              <Plus className="h-4 w-4" /> Nova atividade
+            </Button>
+          }
         />
       ) : (
         <div className="space-y-6">

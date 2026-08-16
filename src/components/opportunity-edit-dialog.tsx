@@ -64,7 +64,8 @@ export function OpportunityEditDialog({
     setForm({
       title: op.title,
       value: String(op.value ?? 0),
-      setupValue: op.setupValue === null || op.setupValue === undefined ? "" : String(op.setupValue),
+      setupValue:
+        op.setupValue === null || op.setupValue === undefined ? "" : String(op.setupValue),
       probability: String(op.probability ?? 0),
       health: op.health === null || op.health === undefined ? "" : String(op.health),
       temperature: op.temperature,
@@ -113,42 +114,82 @@ export function OpportunityEditDialog({
             <Input value={form.title} onChange={(e) => set("title")(e.target.value)} />
           </Field>
           <Field label="Valor (R$)">
-            <Input type="number" value={form.value} onChange={(e) => set("value")(e.target.value)} />
+            <Input
+              type="number"
+              value={form.value}
+              onChange={(e) => set("value")(e.target.value)}
+            />
           </Field>
           <Field label="Setup (R$)">
-            <Input type="number" value={form.setupValue} onChange={(e) => set("setupValue")(e.target.value)} placeholder="—" />
+            <Input
+              type="number"
+              value={form.setupValue}
+              onChange={(e) => set("setupValue")(e.target.value)}
+              placeholder="—"
+            />
           </Field>
           <Field label="Probabilidade (%)">
-            <Input type="number" value={form.probability} onChange={(e) => set("probability")(e.target.value)} />
+            <Input
+              type="number"
+              value={form.probability}
+              onChange={(e) => set("probability")(e.target.value)}
+            />
           </Field>
           <Field label="Health score (0-100)">
-            <Input type="number" value={form.health} onChange={(e) => set("health")(e.target.value)} placeholder="—" />
+            <Input
+              type="number"
+              value={form.health}
+              onChange={(e) => set("health")(e.target.value)}
+              placeholder="—"
+            />
           </Field>
           <Field label="Temperatura">
             <Select value={form.temperature} onValueChange={set("temperature")}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
-                {TEMPERATURES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                {TEMPERATURES.map((t) => (
+                  <SelectItem key={t} value={t}>
+                    {t}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </Field>
           <Field label="Prioridade">
             <Select value={form.priority} onValueChange={set("priority")}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
-                {PRIORITIES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                {PRIORITIES.map((t) => (
+                  <SelectItem key={t} value={t}>
+                    {t}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </Field>
           <Field label="Previsão de fechamento">
-            <Input type="date" value={form.closeDate} onChange={(e) => set("closeDate")(e.target.value)} />
+            <Input
+              type="date"
+              value={form.closeDate}
+              onChange={(e) => set("closeDate")(e.target.value)}
+            />
           </Field>
           <Field label="Contato principal">
             <Select value={form.contactId} onValueChange={set("contactId")}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="nenhum">Sem contato</SelectItem>
-                {contacts.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+                {contacts.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>
+                    {c.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </Field>
@@ -156,15 +197,27 @@ export function OpportunityEditDialog({
             <Input value={form.nextStep} onChange={(e) => set("nextStep")(e.target.value)} />
           </Field>
           <Field label="Motivo de perda" className="sm:col-span-2">
-            <Input value={form.lossReason} onChange={(e) => set("lossReason")(e.target.value)} placeholder="Preencher apenas em caso de perda" />
+            <Input
+              value={form.lossReason}
+              onChange={(e) => set("lossReason")(e.target.value)}
+              placeholder="Preencher apenas em caso de perda"
+            />
           </Field>
           <Field label="Resumo executivo" className="sm:col-span-2">
-            <Textarea rows={3} value={form.summary} onChange={(e) => set("summary")(e.target.value)} />
+            <Textarea
+              rows={3}
+              value={form.summary}
+              onChange={(e) => set("summary")(e.target.value)}
+            />
           </Field>
         </div>
         <DialogFooter>
-          <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancelar</Button>
-          <Button onClick={() => void submit()} disabled={opportunity.update.isPending}>Salvar</Button>
+          <Button variant="ghost" onClick={() => onOpenChange(false)}>
+            Cancelar
+          </Button>
+          <Button onClick={() => void submit()} disabled={opportunity.update.isPending}>
+            Salvar
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

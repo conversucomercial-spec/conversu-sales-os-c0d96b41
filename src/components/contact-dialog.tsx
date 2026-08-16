@@ -100,11 +100,15 @@ export function ContactDialog({
           </Field>
           <Field label="Empresa">
             <Select value={form.companyId} onValueChange={set("companyId")}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="nenhuma">Sem empresa</SelectItem>
                 {data.companies.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                  <SelectItem key={c.id} value={c.id}>
+                    {c.name}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -126,23 +130,37 @@ export function ContactDialog({
           </Field>
           <Field label="Relacionamento">
             <Select value={form.relationship} onValueChange={set("relationship")}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
-                {RELATIONSHIPS.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}
+                {RELATIONSHIPS.map((r) => (
+                  <SelectItem key={r} value={r}>
+                    {r}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </Field>
           <Field label="Influência">
             <Select value={form.influence} onValueChange={set("influence")}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
-                {INFLUENCES.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}
+                {INFLUENCES.map((r) => (
+                  <SelectItem key={r} value={r}>
+                    {r}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </Field>
         </div>
         <DialogFooter>
-          <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancelar</Button>
+          <Button variant="ghost" onClick={() => onOpenChange(false)}>
+            Cancelar
+          </Button>
           <Button onClick={() => void submit()} disabled={saving || !form.name.trim()}>
             {contact ? "Salvar" : "Criar contato"}
           </Button>

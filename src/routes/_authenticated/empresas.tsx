@@ -26,9 +26,15 @@ export const Route = createFileRoute("/_authenticated/empresas")({
   head: () => ({
     meta: [
       { title: "Empresas | Conversu Sales OS" },
-      { name: "description", content: "Base de empresas com segmento, MRR potencial, responsável e oportunidades." },
+      {
+        name: "description",
+        content: "Base de empresas com segmento, MRR potencial, responsável e oportunidades.",
+      },
       { property: "og:title", content: "Empresas | Conversu Sales OS" },
-      { property: "og:description", content: "Base de empresas com segmento, MRR potencial e oportunidades." },
+      {
+        property: "og:description",
+        content: "Base de empresas com segmento, MRR potencial e oportunidades.",
+      },
     ],
   }),
   component: EmpresasPage,
@@ -50,7 +56,12 @@ function EmpresasPage() {
   };
 
   const removeCompany = async (company: CrmCompany) => {
-    if (!window.confirm(`Excluir ${company.name}? Oportunidades e contatos vinculados impedem a exclusão.`)) return;
+    if (
+      !window.confirm(
+        `Excluir ${company.name}? Oportunidades e contatos vinculados impedem a exclusão.`,
+      )
+    )
+      return;
     await companyMutations.remove.mutateAsync({ id: company.id });
     setSelected(null);
   };
@@ -99,18 +110,24 @@ function EmpresasPage() {
             </TableHeader>
             <TableBody>
               {rows.map((c) => (
-                <TableRow
-                  key={c.id}
-                  onClick={() => setSelected(c)}
-                  className="cursor-pointer"
-                >
+                <TableRow key={c.id} onClick={() => setSelected(c)} className="cursor-pointer">
                   <TableCell className="font-medium">{c.name}</TableCell>
-                  <TableCell><Tag>{c.segment}</Tag></TableCell>
+                  <TableCell>
+                    <Tag>{c.segment}</Tag>
+                  </TableCell>
                   <TableCell className="tabular-nums">{currency(c.mrr)}</TableCell>
                   <TableCell className="text-muted-foreground">{c.owner}</TableCell>
                   <TableCell className="tabular-nums">{c.opportunities}</TableCell>
                   <TableCell>
-                    <Tag tone={c.status === "Cliente" ? "success" : c.status === "Em negociação" ? "warning" : "info"}>
+                    <Tag
+                      tone={
+                        c.status === "Cliente"
+                          ? "success"
+                          : c.status === "Em negociação"
+                            ? "warning"
+                            : "info"
+                      }
+                    >
                       {c.status}
                     </Tag>
                   </TableCell>
@@ -122,11 +139,16 @@ function EmpresasPage() {
       </Panel>
 
       <Sheet open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
-        <SheetContent side="right" className="scroll-slim w-full overflow-y-auto p-0 sm:max-w-[620px]">
+        <SheetContent
+          side="right"
+          className="scroll-slim w-full overflow-y-auto p-0 sm:max-w-[620px]"
+        >
           {selected && (
             <div className="space-y-5 p-6">
               <div>
-                <p className="text-xs text-muted-foreground">{selected.segment} · {selected.city}</p>
+                <p className="text-xs text-muted-foreground">
+                  {selected.segment} · {selected.city}
+                </p>
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <h2 className="font-display text-xl font-bold">{selected.name}</h2>
                   <div className="flex items-center gap-1.5">
@@ -188,12 +210,16 @@ function EmpresasPage() {
                     bodyClassName="space-y-2.5"
                   >
                     {companyContacts.length === 0 && (
-                      <p className="text-xs text-muted-foreground">Nenhum contato cadastrado para esta empresa.</p>
+                      <p className="text-xs text-muted-foreground">
+                        Nenhum contato cadastrado para esta empresa.
+                      </p>
                     )}
                     {companyContacts.map((c) => (
                       <div key={c.id} className="rounded-lg border p-3">
                         <p className="text-sm font-medium">{c.name}</p>
-                        <p className="text-xs text-muted-foreground">{c.role} · {c.email}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {c.role} · {c.email}
+                        </p>
                       </div>
                     ))}
                   </Panel>
@@ -205,7 +231,9 @@ function EmpresasPage() {
                       <div key={o.id} className="flex items-center gap-3 rounded-lg border p-3">
                         <div className="min-w-0 flex-1">
                           <p className="truncate text-sm font-medium">{o.title}</p>
-                          <p className="text-xs text-muted-foreground">{o.owner} · {o.probability}%</p>
+                          <p className="text-xs text-muted-foreground">
+                            {o.owner} · {o.probability}%
+                          </p>
                         </div>
                         <span className="text-sm font-semibold">{currency(o.value)}</span>
                       </div>
@@ -224,7 +252,9 @@ function EmpresasPage() {
                     {(companyOps[0]?.meetings ?? []).map((m, i) => (
                       <div key={i} className="rounded-lg border p-3">
                         <p className="text-sm font-medium">{m.title}</p>
-                        <p className="text-xs text-muted-foreground">{m.date} · {m.participants}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {m.date} · {m.participants}
+                        </p>
                       </div>
                     ))}
                   </Panel>
@@ -235,7 +265,9 @@ function EmpresasPage() {
                     {(companyOps[0]?.files ?? []).map((f) => (
                       <div key={f.name} className="rounded-lg border p-3">
                         <p className="text-sm font-medium">{f.name}</p>
-                        <p className="text-xs text-muted-foreground">{f.size} · {f.date}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {f.size} · {f.date}
+                        </p>
                       </div>
                     ))}
                   </Panel>

@@ -34,14 +34,17 @@ export function OpportunityHistory({ opportunityId }: { opportunityId: string })
       {query.isLoading && <p className="text-xs text-muted-foreground">Carregando histórico…</p>}
       {!query.isLoading && events.length === 0 && (
         <p className="text-xs text-muted-foreground">
-          Nenhum evento registrado ainda. Mudanças de etapa, atividades, reuniões e notas aparecem aqui.
+          Nenhum evento registrado ainda. Mudanças de etapa, atividades, reuniões e notas aparecem
+          aqui.
         </p>
       )}
       {events.map((e) => (
         <div key={e.id} className="rounded-lg border p-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="text-sm font-medium">{e.title}</p>
-            <span className="text-[11px] text-muted-foreground">{formatDateTime(e.occurred_at)}</span>
+            <span className="text-[11px] text-muted-foreground">
+              {formatDateTime(e.occurred_at)}
+            </span>
           </div>
           <p className="mt-0.5 text-[11px] uppercase tracking-wide text-muted-foreground">
             {KIND_LABEL[e.kind] ?? e.kind}

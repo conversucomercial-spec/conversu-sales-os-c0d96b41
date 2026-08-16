@@ -22,9 +22,15 @@ export const Route = createFileRoute("/_authenticated/contatos")({
   head: () => ({
     meta: [
       { title: "Contatos | Conversu Sales OS" },
-      { name: "description", content: "Todos os contatos comerciais com cargo, canais e histórico de relacionamento." },
+      {
+        name: "description",
+        content: "Todos os contatos comerciais com cargo, canais e histórico de relacionamento.",
+      },
       { property: "og:title", content: "Contatos | Conversu Sales OS" },
-      { property: "og:description", content: "Contatos com cargo, canais de contato e histórico de relacionamento." },
+      {
+        property: "og:description",
+        content: "Contatos com cargo, canais de contato e histórico de relacionamento.",
+      },
     ],
   }),
   component: ContatosPage,
@@ -59,7 +65,9 @@ function ContatosPage() {
     <div className="space-y-5">
       <PageHeader
         title="Contatos"
-        description={isLoading ? "Carregando contatos…" : `${rows.length} pessoas mapeadas nas contas`}
+        description={
+          isLoading ? "Carregando contatos…" : `${rows.length} pessoas mapeadas nas contas`
+        }
         actions={
           <Button
             onClick={() => {
@@ -75,7 +83,12 @@ function ContatosPage() {
       <Panel bodyClassName="p-0">
         <div className="relative border-b p-3">
           <Search className="absolute left-6 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Buscar contato ou empresa" className="pl-9" />
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Buscar contato ou empresa"
+            className="pl-9"
+          />
         </div>
         <div className="scroll-slim overflow-x-auto">
           <Table>
@@ -98,7 +111,15 @@ function ContatosPage() {
                   <TableCell className="text-muted-foreground">{c.email}</TableCell>
                   <TableCell className="tabular-nums text-muted-foreground">{c.phone}</TableCell>
                   <TableCell>
-                    <Tag tone={c.relationship === "Forte" ? "success" : c.relationship === "Neutro" ? "neutral" : "warning"}>
+                    <Tag
+                      tone={
+                        c.relationship === "Forte"
+                          ? "success"
+                          : c.relationship === "Neutro"
+                            ? "neutral"
+                            : "warning"
+                      }
+                    >
                       {c.relationship}
                     </Tag>
                   </TableCell>
@@ -110,7 +131,10 @@ function ContatosPage() {
       </Panel>
 
       <Sheet open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
-        <SheetContent side="right" className="scroll-slim w-full overflow-y-auto p-0 sm:max-w-[560px]">
+        <SheetContent
+          side="right"
+          className="scroll-slim w-full overflow-y-auto p-0 sm:max-w-[560px]"
+        >
           {selected && (
             <div className="space-y-5 p-6">
               <div>
@@ -142,7 +166,10 @@ function ContatosPage() {
                 ].map(([Icon, label, value]) => {
                   const I = Icon as typeof Phone;
                   return (
-                    <div key={label as string} className="flex items-center gap-3 rounded-lg border p-3">
+                    <div
+                      key={label as string}
+                      className="flex items-center gap-3 rounded-lg border p-3"
+                    >
                       <I className="h-4 w-4 shrink-0 text-primary" />
                       <div className="min-w-0">
                         <p className="text-[11px] text-muted-foreground">{label as string}</p>
@@ -161,7 +188,8 @@ function ContatosPage() {
               <Panel title="Histórico">
                 <Timeline
                   items={
-                    data.opportunities.find((o) => o.companyId === selected.companyId)?.timeline ?? []
+                    data.opportunities.find((o) => o.companyId === selected.companyId)?.timeline ??
+                    []
                   }
                 />
               </Panel>

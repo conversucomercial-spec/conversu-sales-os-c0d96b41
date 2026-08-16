@@ -107,20 +107,28 @@ export function ActivityDialog({
         <div className="grid gap-3 sm:grid-cols-2">
           <Field label="Tipo">
             <Select value={type} onValueChange={setType}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 {ACTIVITY_TYPES.map((t) => (
-                  <SelectItem key={t} value={t}>{ACTIVITY_TYPE_LABEL[t]}</SelectItem>
+                  <SelectItem key={t} value={t}>
+                    {ACTIVITY_TYPE_LABEL[t]}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </Field>
           <Field label="Prioridade">
             <Select value={priority} onValueChange={setPriority}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 {ACTIVITY_PRIORITIES.map((p) => (
-                  <SelectItem key={p} value={p}>{ACTIVITY_PRIORITY_LABEL[p]}</SelectItem>
+                  <SelectItem key={p} value={p}>
+                    {ACTIVITY_PRIORITY_LABEL[p]}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -152,35 +160,47 @@ export function ActivityDialog({
                     setContactId("nenhum");
                   }}
                 >
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="nenhuma">Sem empresa</SelectItem>
                     {data.companies.map((c) => (
-                      <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.name}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </Field>
               <Field label="Contato">
                 <Select value={contactId} onValueChange={setContactId}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="nenhum">Sem contato</SelectItem>
                     {contacts.map((c) => (
-                      <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.name}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </Field>
               <Field label="Oportunidade" className="sm:col-span-2">
                 <Select value={opportunityId} onValueChange={setOpportunityId}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="nenhuma">Sem oportunidade</SelectItem>
                     {data.opportunities
                       .filter((o) => companyId === "nenhuma" || o.companyId === companyId)
                       .map((o) => (
-                        <SelectItem key={o.id} value={o.id}>{o.title}</SelectItem>
+                        <SelectItem key={o.id} value={o.id}>
+                          {o.title}
+                        </SelectItem>
                       ))}
                   </SelectContent>
                 </Select>
@@ -199,7 +219,9 @@ export function ActivityDialog({
         </div>
 
         <DialogFooter>
-          <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancelar</Button>
+          <Button variant="ghost" onClick={() => onOpenChange(false)}>
+            Cancelar
+          </Button>
           <Button onClick={() => void submit()} disabled={isSaving || !title.trim()}>
             {activity ? "Salvar" : "Criar atividade"}
           </Button>

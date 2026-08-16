@@ -19,11 +19,7 @@ import { OpportunityEditDialog } from "@/components/opportunity-edit-dialog";
 import { OpportunityHistory, OpportunityNotes } from "@/components/opportunity-history";
 import { useActivities } from "@/hooks/use-activities";
 import { useCrmMutations } from "@/hooks/use-accounts";
-import {
-  ACTIVITY_PRIORITY_LABEL,
-  ACTIVITY_TYPE_LABEL,
-  formatDateTime,
-} from "@/lib/activities";
+import { ACTIVITY_PRIORITY_LABEL, ACTIVITY_TYPE_LABEL, formatDateTime } from "@/lib/activities";
 
 function Field({ label, value }: { label: string; value: string }) {
   return (
@@ -107,7 +103,11 @@ export function OpportunityDrawer({
                 <Field label="Próximo passo" value={op.nextStep} />
                 <Field
                   label="Setup (R$)"
-                  value={op.setupValue === null || op.setupValue === undefined ? "—" : currency(op.setupValue)}
+                  value={
+                    op.setupValue === null || op.setupValue === undefined
+                      ? "—"
+                      : currency(op.setupValue)
+                  }
                 />
                 <Field label="Motivo de perda" value={op.lossReason || "—"} />
                 <Field label="Responsável (origem)" value={op.ownerLabel || "—"} />
@@ -175,11 +175,15 @@ export function OpportunityDrawer({
                       </p>
                     )}
                     {activities.map((a) => (
-                      <div key={a.id} className="flex flex-wrap items-center gap-3 rounded-lg border p-3">
+                      <div
+                        key={a.id}
+                        className="flex flex-wrap items-center gap-3 rounded-lg border p-3"
+                      >
                         <div className="min-w-0 flex-1">
                           <p className="truncate text-sm font-medium">{a.title}</p>
                           <p className="text-xs text-muted-foreground">
-                            {ACTIVITY_TYPE_LABEL[a.type]} · {formatDateTime(a.dueAt)} · {a.ownerName}
+                            {ACTIVITY_TYPE_LABEL[a.type]} · {formatDateTime(a.dueAt)} ·{" "}
+                            {a.ownerName}
                           </p>
                         </div>
                         <Tag>{ACTIVITY_PRIORITY_LABEL[a.priority]}</Tag>
@@ -202,27 +206,30 @@ export function OpportunityDrawer({
 
                 <TabsContent value="reunioes" className="mt-4">
                   <div className="space-y-4">
-                  <MeetingPanel op={op} />
-                  <Panel bodyClassName="space-y-3">
-                    {op.meetings.map((m, i) => (
-                      <div key={i} className="rounded-lg border p-3">
-                        <div className="flex flex-wrap items-center justify-between gap-2">
-                          <p className="text-sm font-medium">{m.title}</p>
-                          <span className="text-[11px] text-muted-foreground">{m.date}</span>
+                    <MeetingPanel op={op} />
+                    <Panel bodyClassName="space-y-3">
+                      {op.meetings.map((m, i) => (
+                        <div key={i} className="rounded-lg border p-3">
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <p className="text-sm font-medium">{m.title}</p>
+                            <span className="text-[11px] text-muted-foreground">{m.date}</span>
+                          </div>
+                          <p className="mt-1 text-xs text-muted-foreground">{m.participants}</p>
+                          <Separator className="my-2" />
+                          <p className="text-xs text-muted-foreground">{m.summary}</p>
                         </div>
-                        <p className="mt-1 text-xs text-muted-foreground">{m.participants}</p>
-                        <Separator className="my-2" />
-                        <p className="text-xs text-muted-foreground">{m.summary}</p>
-                      </div>
-                    ))}
-                  </Panel>
+                      ))}
+                    </Panel>
                   </div>
                 </TabsContent>
 
                 <TabsContent value="propostas" className="mt-4">
                   <Panel bodyClassName="space-y-3">
                     {op.proposals.map((p) => (
-                      <div key={p.id} className="flex flex-wrap items-center gap-3 rounded-lg border p-3">
+                      <div
+                        key={p.id}
+                        className="flex flex-wrap items-center gap-3 rounded-lg border p-3"
+                      >
                         <FileText className="h-4 w-4 text-primary" />
                         <div className="min-w-0 flex-1">
                           <p className="truncate text-sm font-medium">{p.id}</p>
@@ -256,7 +263,10 @@ export function OpportunityDrawer({
                 <TabsContent value="checklist" className="mt-4">
                   <Panel bodyClassName="space-y-3">
                     {op.checklist.map((c) => (
-                      <label key={c.label} className="flex items-center gap-3 rounded-lg border p-3">
+                      <label
+                        key={c.label}
+                        className="flex items-center gap-3 rounded-lg border p-3"
+                      >
                         <Checkbox checked={c.done} />
                         <span className="text-sm">{c.label}</span>
                       </label>
@@ -280,7 +290,10 @@ export function OpportunityDrawer({
               >
                 <Field label="Origem" value={originLabel(op.origin)} />
                 <Field label="Parceiro" value={op.partner ?? "—"} />
-                <Field label="Última interação" value={`${op.lastContact} (${op.lastContactDays}d)`} />
+                <Field
+                  label="Última interação"
+                  value={`${op.lastContact} (${op.lastContactDays}d)`}
+                />
                 {getPipeline(op.pipelineId).customFields.map((f) => (
                   <Field key={f.id} label={f.label} value={op.custom[f.id] ?? "—"} />
                 ))}

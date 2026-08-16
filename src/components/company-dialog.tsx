@@ -103,9 +103,15 @@ export function CompanyDialog({
           </Field>
           <Field label="Status">
             <Select value={form.status} onValueChange={set("status")}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
-                {STATUS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                {STATUS.map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {s}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </Field>
@@ -119,13 +125,23 @@ export function CompanyDialog({
             <Input type="number" value={form.mrr} onChange={(e) => set("mrr")(e.target.value)} />
           </Field>
           <Field label="Colaboradores">
-            <Input type="number" value={form.employees} onChange={(e) => set("employees")(e.target.value)} />
+            <Input
+              type="number"
+              value={form.employees}
+              onChange={(e) => set("employees")(e.target.value)}
+            />
           </Field>
           <Field label="Origem">
             <Select value={form.origin} onValueChange={set("origin")}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
-                {ORIGINS.map((o) => <SelectItem key={o.id} value={o.id}>{o.label}</SelectItem>)}
+                {ORIGINS.map((o) => (
+                  <SelectItem key={o.id} value={o.id}>
+                    {o.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </Field>
@@ -137,7 +153,9 @@ export function CompanyDialog({
           </Field>
         </div>
         <DialogFooter>
-          <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancelar</Button>
+          <Button variant="ghost" onClick={() => onOpenChange(false)}>
+            Cancelar
+          </Button>
           <Button onClick={() => void submit()} disabled={saving || !form.name.trim()}>
             {company ? "Salvar" : "Criar empresa"}
           </Button>
