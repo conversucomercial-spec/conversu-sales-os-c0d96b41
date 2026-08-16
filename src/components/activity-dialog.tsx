@@ -65,7 +65,7 @@ export function ActivityDialog({
     setTitle(activity?.title ?? "");
     setDescription(activity?.description ?? "");
     setPriority(activity?.priority ?? "media");
-    setDueAt(toLocalInput(activity?.dueAt ?? null));
+    setDueAt(toLocalInput(activity?.dueAt ?? null) || toLocalInput(new Date().toISOString()));
     setCompanyId(activity?.companyId ?? "nenhuma");
     setContactId(activity?.contactId ?? "nenhum");
     setOpportunityId(activity?.opportunityId ?? defaultOpportunityId ?? "nenhuma");
