@@ -17,21 +17,28 @@ import {
   createTag,
   deleteTag,
   removeOpportunityTag,
+  setEntityTag,
 } from "@/lib/tags.functions";
 import type { TagRef } from "@/lib/data";
 
-/** Seleção, criação e remoção de tags personalizadas de uma oportunidade. */
+/** Seleção, criação e remoção de tags de oportunidade, empresa ou contato. */
 export function TagPicker({
   opportunityId,
+  entity = "opportunity",
+  entityId,
   tags,
 }: {
-  opportunityId: string;
+  opportunityId?: string;
+  entity?: "opportunity" | "company" | "contact";
+  entityId?: string;
   tags: TagRef[];
 }) {
+  const targetId = entity === "opportunity" ? (opportunityId ?? entityId ?? "") : (entityId ?? "");
   const { data } = useCrm();
   const queryClient = useQueryClient();
   const addTag = useServerFn(addOpportunityTag);
   const removeTag = useServerFn(removeOpportunityTag);
+  const setTag = useServerFn(setEntityTag);
   const create = useServerFn(createTag);
   const remove = useServerFn(deleteTag);
   const [name, setName] = useState("");
@@ -40,11 +47,17 @@ export function TagPicker({
   const refresh = () => queryClient.invalidateQueries({ queryKey: CRM_QUERY_KEY });
   const onError = (error: Error) => toast.error(error.message);
 
+  const apply = (tagId: string, on: boolean) => {
+    if (entity !== "opportunity") {
+      return setTag({ data: { entity, entityId: targetId, tagId, on } });
+    }
+    return on
+      ? addTag({ data: { opportunityId: targetId, tagId } })
+      : removeTag({ data: { opportunityId: targetId, tagId } });
+  };
+
   const toggle = useMutation({
-    mutationFn: (vars: { tagId: string; on: boolean }) =>
-      vars.on
-        ? addTag({ data: { opportunityId, tagId: vars.tagId } })
-        : removeTag({ data: { opportunityId, tagId: vars.tagId } }),
+    mutationFn: (vars: { tagId: string; on: boolean }) => apply(vars.tagId, vars.on),
     onSuccess: refresh,
     onError,
   });
@@ -52,7 +65,7 @@ export function TagPicker({
   const createMutation = useMutation({
     mutationFn: async () => {
       const tag = await create({ data: { name, color } });
-      await addTag({ data: { opportunityId, tagId: tag.id } });
+      await apply(tag.id, true);
     },
     onSuccess: () => {
       setName("");

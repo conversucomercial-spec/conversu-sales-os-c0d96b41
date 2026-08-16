@@ -44,18 +44,14 @@ export const partnerMetrics: PartnerMetrics[] = PARTNERS.map((partner) => {
 }).sort((a, b) => b.pipeline - a.pipeline);
 
 export const partnerRevenueShare = Math.round(
-  (opportunities
-    .filter((o) => o.stage === "ganho" && o.partner)
-    .reduce((s, o) => s + o.value, 0) /
+  (opportunities.filter((o) => o.stage === "ganho" && o.partner).reduce((s, o) => s + o.value, 0) /
     (totalWonRevenue || 1)) *
     100,
 );
 
-export const topPartnerByPipeline =
-  [...partnerMetrics].sort((a, b) => b.pipeline - a.pipeline)[0];
+export const topPartnerByPipeline = [...partnerMetrics].sort((a, b) => b.pipeline - a.pipeline)[0];
 
-export const topPartnerByRevenue =
-  [...partnerMetrics].sort((a, b) => b.revenue - a.revenue)[0];
+export const topPartnerByRevenue = [...partnerMetrics].sort((a, b) => b.revenue - a.revenue)[0];
 
 export const originBreakdown: { id: OriginId; label: string; count: number; value: number }[] =
   ORIGINS.map((o) => {
@@ -70,6 +66,7 @@ export const originBreakdown: { id: OriginId; label: string; count: number; valu
 
 export const PARTNER_OPTIONS = [
   { value: "todos", label: "Todos os parceiros" },
+  { value: "sem", label: "Nenhum parceiro" },
   ...PARTNERS.map((p) => ({ value: p, label: p })),
 ];
 

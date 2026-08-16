@@ -28,6 +28,14 @@ import {
 import { compact, currency, STAGES, type Opportunity, type StageId } from "@/lib/data";
 import { useCrm, CRM_QUERY_KEY } from "@/hooks/use-crm";
 import { moveOpportunityStage } from "@/lib/crm.functions";
+import {
+  DEFAULT_PERIOD,
+  PeriodFilter,
+  usePeriodRange,
+  type PeriodValue,
+} from "@/components/period-filter";
+import { inPeriodOrUndated, parseBRDate } from "@/lib/period";
+import { PARTNER_OPTIONS } from "@/lib/partners";
 
 export const Route = createFileRoute("/_authenticated/pipeline")({
   head: () => ({
@@ -63,6 +71,9 @@ function PipelinePage() {
   const [priority, setPriority] = useState("todas");
   const [tagIds, setTagIds] = useState<string[]>([]);
   const [tagMode, setTagMode] = useState<"any" | "all">("any");
+  const [partner, setPartner] = useState("todos");
+  const [period, setPeriod] = useState<PeriodValue>({ id: "ano" });
+  const range = usePeriodRange(period);
   const [view, setView] = useState<"kanban" | "lista">("kanban");
   const [dragId, setDragId] = useState<string | null>(null);
   const [overStage, setOverStage] = useState<StageId | null>(null);
@@ -93,12 +104,14 @@ function PipelinePage() {
           (owner === "todos" || o.owner === owner) &&
           (temp === "todas" || o.temperature === temp) &&
           (priority === "todas" || o.priority === priority) &&
+          (partner === "todos" || (partner === "sem" ? !o.partner : o.partner === partner)) &&
+          inPeriodOrUndated(parseBRDate(o.closeDate), range) &&
           (o.company.toLowerCase().includes(query.toLowerCase()) ||
             o.contact.toLowerCase().includes(query.toLowerCase()) ||
             o.title.toLowerCase().includes(query.toLowerCase()))
         );
       }),
-    [items, query, owner, temp, priority, tagIds, tagMode],
+    [items, query, owner, temp, priority, tagIds, tagMode, partner, range],
   );
 
   const moveTo = (stage: StageId) => {
@@ -136,23 +149,23 @@ function PipelinePage() {
         }
         actions={
           <div className="flex flex-wrap items-center gap-2">
-          <NewOpportunityDialog />
-          <div className="flex rounded-lg border p-0.5">
-            <Button
-              size="sm"
-              variant={view === "kanban" ? "secondary" : "ghost"}
-              onClick={() => setView("kanban")}
-            >
-              <LayoutGrid className="h-3.5 w-3.5" /> Kanban
-            </Button>
-            <Button
-              size="sm"
-              variant={view === "lista" ? "secondary" : "ghost"}
-              onClick={() => setView("lista")}
-            >
-              <Rows3 className="h-3.5 w-3.5" /> Lista
-            </Button>
-          </div>
+            <NewOpportunityDialog />
+            <div className="flex rounded-lg border p-0.5">
+              <Button
+                size="sm"
+                variant={view === "kanban" ? "secondary" : "ghost"}
+                onClick={() => setView("kanban")}
+              >
+                <LayoutGrid className="h-3.5 w-3.5" /> Kanban
+              </Button>
+              <Button
+                size="sm"
+                variant={view === "lista" ? "secondary" : "ghost"}
+                onClick={() => setView("lista")}
+              >
+                <Rows3 className="h-3.5 w-3.5" /> Lista
+              </Button>
+            </div>
           </div>
         }
       />
@@ -194,6 +207,12 @@ function PipelinePage() {
             { value: "Baixa", label: "Baixa" },
           ]}
         />
+        <FilterSelect
+          value={partner}
+          onChange={setPartner}
+          className="sm:w-48"
+          options={PARTNER_OPTIONS}
+        />
         <TagFilter
           tags={data.tags}
           selected={tagIds}
@@ -201,6 +220,13 @@ function PipelinePage() {
           mode={tagMode}
           onModeChange={setTagMode}
         />
+      </Toolbar>
+
+      <Toolbar>
+        <PeriodFilter value={period} onChange={setPeriod} />
+        <span className="text-xs text-muted-foreground sm:ml-auto">
+          Filtro por previsão de fechamento (negociações sem data continuam visíveis)
+        </span>
       </Toolbar>
 
       {view === "kanban" ? (
@@ -275,7 +301,11 @@ function PipelinePage() {
               </TableHeader>
               <TableBody>
                 {filtered.map((o) => (
-                  <TableRow key={o.id} className="cursor-pointer" onClick={() => setSelectedId(o.id)}>
+                  <TableRow
+                    key={o.id}
+                    className="cursor-pointer"
+                    onClick={() => setSelectedId(o.id)}
+                  >
                     <TableCell className="font-medium">{o.company}</TableCell>
                     <TableCell>
                       <Tag tone="info">{STAGES.find((s) => s.id === o.stage)?.label}</Tag>

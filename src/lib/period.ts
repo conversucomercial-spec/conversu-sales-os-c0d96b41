@@ -10,6 +10,8 @@ export type PeriodId =
   | "hoje"
   | "semana"
   | "mes"
+  | "mes-anterior"
+  | "proximo-mes"
   | "trimestre"
   | "semestre"
   | "ano"
@@ -21,6 +23,8 @@ export const PERIODS: { id: PeriodId; label: string }[] = [
   { id: "hoje", label: "Hoje" },
   { id: "semana", label: "Esta semana" },
   { id: "mes", label: "Este mês" },
+  { id: "mes-anterior", label: "Mês anterior" },
+  { id: "proximo-mes", label: "Próximo mês" },
   { id: "trimestre", label: "Trimestre" },
   { id: "semestre", label: "Semestre" },
   { id: "ano", label: "Ano" },
@@ -52,6 +56,10 @@ export function resolvePeriod(
     }
     case "mes":
       return { id, label, start: new Date(y, m, 1), end: endOfDay(new Date(y, m + 1, 0)) };
+    case "mes-anterior":
+      return { id, label, start: new Date(y, m - 1, 1), end: endOfDay(new Date(y, m, 0)) };
+    case "proximo-mes":
+      return { id, label, start: new Date(y, m + 1, 1), end: endOfDay(new Date(y, m + 2, 0)) };
     case "trimestre": {
       const q = Math.floor(m / 3) * 3;
       return { id, label, start: new Date(y, q, 1), end: endOfDay(new Date(y, q + 3, 0)) };
@@ -83,4 +91,18 @@ export function formatRange(range: PeriodRange): string {
   return range.start.toDateString() === range.end.toDateString()
     ? fmt(range.start)
     : `${fmt(range.start)} – ${fmt(range.end)}`;
+}
+
+/** Converte "dd/mm/aaaa" da interface em Date; retorna null quando vazio/inválido. */
+export function parseBRDate(value: string | null | undefined): Date | null {
+  if (!value) return null;
+  const [d, m, y] = value.split("/");
+  if (!d || !m || !y) return null;
+  const date = new Date(Number(y), Number(m) - 1, Number(d));
+  return Number.isFinite(date.getTime()) ? date : null;
+}
+
+/** Dentro do período, tratando registros sem data como sempre visíveis. */
+export function inPeriodOrUndated(date: Date | null, range: PeriodRange): boolean {
+  return date === null ? true : inPeriod(date, range);
 }

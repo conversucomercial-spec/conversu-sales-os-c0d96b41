@@ -11,6 +11,7 @@ import { LinkedInPanel } from "@/components/linkedin-panel";
 import { DiscoveryPanel } from "@/components/discovery-panel";
 import { MeetingPanel } from "@/components/meeting-panel";
 import { TagPicker } from "@/components/tag-picker";
+import { DocumentsPanel } from "@/components/documents-panel";
 import { getPipeline, originLabel } from "@/lib/config";
 import { currency, STAGES, type Opportunity } from "@/lib/data";
 import { CalendarDays, FileText, Paperclip, Pencil, PhoneCall, Trash2 } from "lucide-react";
@@ -245,19 +246,7 @@ export function OpportunityDrawer({
                 </TabsContent>
 
                 <TabsContent value="arquivos" className="mt-4">
-                  <Panel bodyClassName="space-y-3">
-                    {op.files.map((f) => (
-                      <div key={f.name} className="flex items-center gap-3 rounded-lg border p-3">
-                        <Paperclip className="h-4 w-4 shrink-0 text-muted-foreground" />
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate text-sm font-medium">{f.name}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {f.size} · {f.date}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </Panel>
+                  <DocumentsPanel scope={{ opportunityId: op.id }} />
                 </TabsContent>
 
                 <TabsContent value="checklist" className="mt-4">

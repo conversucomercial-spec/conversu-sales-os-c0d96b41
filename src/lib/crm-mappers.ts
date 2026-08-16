@@ -24,6 +24,7 @@ export type CrmCompany = {
   employees: number;
   origin: OriginKey;
   partner?: string | undefined;
+  tags: TagRef[];
 };
 
 export type CrmContact = {
@@ -38,6 +39,7 @@ export type CrmContact = {
   linkedin: string;
   relationship: string;
   lastInteraction: string;
+  tags: TagRef[];
 };
 
 export type CrmStage = { id: string; key: string; name: string; pipelineKey: string };
@@ -60,14 +62,16 @@ export const toBR = (date: string | null): string => {
 };
 
 const daysSince = (date: string | null) =>
-  date ? Math.max(0, Math.round((TODAY.getTime() - new Date(`${date}T00:00:00`).getTime()) / 86400000)) : 0;
+  date
+    ? Math.max(0, Math.round((TODAY.getTime() - new Date(`${date}T00:00:00`).getTime()) / 86400000))
+    : 0;
 
 const asArray = <T>(value: unknown, fallback: T[] = []): T[] =>
   Array.isArray(value) ? (value as T[]) : fallback;
 
 export function mapCompany(
   row: Tables<"companies">,
-  extra: { ownerName: string; opportunities: number },
+  extra: { ownerName: string; opportunities: number; tags?: TagRef[] },
 ): CrmCompany {
   return {
     id: row.id,
@@ -82,12 +86,13 @@ export function mapCompany(
     employees: row.employees ?? 0,
     origin: (row.origin ?? "outros") as OriginKey,
     partner: row.partner ?? undefined,
+    tags: extra.tags ?? [],
   };
 }
 
 export function mapContact(
   row: Tables<"contacts">,
-  extra: { companyName: string },
+  extra: { companyName: string; tags?: TagRef[] },
 ): CrmContact {
   return {
     id: row.id,
@@ -101,6 +106,7 @@ export function mapContact(
     linkedin: row.linkedin ?? "",
     relationship: row.relationship ?? "Neutro",
     lastInteraction: row.last_interaction ?? "—",
+    tags: extra.tags ?? [],
   };
 }
 
