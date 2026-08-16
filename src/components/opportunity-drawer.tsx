@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -12,7 +13,17 @@ import { MeetingPanel } from "@/components/meeting-panel";
 import { TagPicker } from "@/components/tag-picker";
 import { getPipeline, originLabel } from "@/lib/config";
 import { currency, STAGES, type Opportunity } from "@/lib/data";
-import { CalendarDays, FileText, Paperclip, PhoneCall, Users } from "lucide-react";
+import { CalendarDays, FileText, Paperclip, Pencil, PhoneCall, Trash2 } from "lucide-react";
+import { ActivityDialog } from "@/components/activity-dialog";
+import { OpportunityEditDialog } from "@/components/opportunity-edit-dialog";
+import { OpportunityHistory, OpportunityNotes } from "@/components/opportunity-history";
+import { useActivities } from "@/hooks/use-activities";
+import { useCrmMutations } from "@/hooks/use-accounts";
+import {
+  ACTIVITY_PRIORITY_LABEL,
+  ACTIVITY_TYPE_LABEL,
+  formatDateTime,
+} from "@/lib/activities";
 
 function Field({ label, value }: { label: string; value: string }) {
   return (
@@ -30,6 +41,20 @@ export function OpportunityDrawer({
   op: Opportunity | null;
   onOpenChange: (open: boolean) => void;
 }) {
+  const [editOpen, setEditOpen] = useState(false);
+  const [activityOpen, setActivityOpen] = useState(false);
+  const { items, updateActivity } = useActivities();
+  const { opportunity: opMutations } = useCrmMutations();
+
+  const activities = op ? items.filter((a) => a.opportunityId === op.id) : [];
+
+  const removeOpportunity = async () => {
+    if (!op) return;
+    if (!window.confirm(`Excluir a oportunidade "${op.title}"?`)) return;
+    await opMutations.remove.mutateAsync({ id: op.id });
+    onOpenChange(false);
+  };
+
   return (
     <Sheet open={!!op} onOpenChange={onOpenChange}>
       <SheetContent
@@ -60,14 +85,14 @@ export function OpportunityDrawer({
                 </div>
               </div>
               <div className="mt-4 flex flex-wrap gap-2">
-                <Button size="sm">
-                  <PhoneCall className="h-3.5 w-3.5" /> Registrar contato
+                <Button size="sm" onClick={() => setActivityOpen(true)}>
+                  <PhoneCall className="h-3.5 w-3.5" /> Registrar atividade
                 </Button>
-                <Button size="sm" variant="outline">
-                  <CalendarDays className="h-3.5 w-3.5" /> Agendar reunião
+                <Button size="sm" variant="outline" onClick={() => setEditOpen(true)}>
+                  <Pencil className="h-3.5 w-3.5" /> Editar oportunidade
                 </Button>
-                <Button size="sm" variant="outline">
-                  <FileText className="h-3.5 w-3.5" /> Nova proposta
+                <Button size="sm" variant="ghost" onClick={() => void removeOpportunity()}>
+                  <Trash2 className="h-3.5 w-3.5" /> Excluir
                 </Button>
               </div>
             </div>
@@ -114,10 +139,13 @@ export function OpportunityDrawer({
                   <TabsTrigger value="playbook">Playbook</TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="timeline" className="mt-4">
-                  <Panel>
-                    <Timeline items={op.timeline} />
-                  </Panel>
+                <TabsContent value="timeline" className="mt-4 space-y-4">
+                  <OpportunityHistory opportunityId={op.id} />
+                  {op.timeline.length > 0 && (
+                    <Panel title="Histórico importado">
+                      <Timeline items={op.timeline} />
+                    </Panel>
+                  )}
                 </TabsContent>
 
                 <TabsContent value="prospeccao" className="mt-4">
@@ -129,39 +157,46 @@ export function OpportunityDrawer({
                 </TabsContent>
 
                 <TabsContent value="notas" className="mt-4">
-                  <Panel bodyClassName="space-y-3">
-                    {op.notes.map((n, i) => (
-                      <div key={i} className="rounded-lg border p-3">
-                        <div className="flex items-center justify-between">
-                          <p className="text-xs font-semibold">{n.author}</p>
-                          <span className="text-[11px] text-muted-foreground">{n.date}</span>
-                        </div>
-                        <p className="mt-1 text-xs text-muted-foreground">{n.text}</p>
-                      </div>
-                    ))}
-                  </Panel>
+                  <OpportunityNotes opportunityId={op.id} />
                 </TabsContent>
 
                 <TabsContent value="atividades" className="mt-4">
-                  <Panel bodyClassName="space-y-3">
-                    <div className="flex items-center gap-3 rounded-lg border p-3">
-                      <PhoneCall className="h-4 w-4 shrink-0 text-primary" />
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-medium">{op.nextActivity}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {op.nextActivityDate} · {op.owner}
-                        </p>
+                  <Panel
+                    actions={
+                      <Button size="sm" variant="outline" onClick={() => setActivityOpen(true)}>
+                        Nova atividade
+                      </Button>
+                    }
+                    bodyClassName="space-y-3"
+                  >
+                    {activities.length === 0 && (
+                      <p className="text-xs text-muted-foreground">
+                        Nenhuma atividade vinculada a esta oportunidade.
+                      </p>
+                    )}
+                    {activities.map((a) => (
+                      <div key={a.id} className="flex flex-wrap items-center gap-3 rounded-lg border p-3">
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-medium">{a.title}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {ACTIVITY_TYPE_LABEL[a.type]} · {formatDateTime(a.dueAt)} · {a.ownerName}
+                          </p>
+                        </div>
+                        <Tag>{ACTIVITY_PRIORITY_LABEL[a.priority]}</Tag>
+                        <Button
+                          size="sm"
+                          variant={a.status === "concluida" ? "ghost" : "outline"}
+                          onClick={() =>
+                            void updateActivity({
+                              id: a.id,
+                              status: a.status === "concluida" ? "pendente" : "concluida",
+                            })
+                          }
+                        >
+                          {a.status === "concluida" ? "Reabrir" : "Concluir"}
+                        </Button>
                       </div>
-                      <Tag tone="warning">Pendente</Tag>
-                    </div>
-                    <div className="flex items-center gap-3 rounded-lg border p-3">
-                      <Users className="h-4 w-4 shrink-0 text-muted-foreground" />
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-medium">Alinhamento com decisor</p>
-                        <p className="text-xs text-muted-foreground">Concluída · {op.owner}</p>
-                      </div>
-                      <Tag tone="success">Concluída</Tag>
-                    </div>
+                    ))}
                   </Panel>
                 </TabsContent>
 
@@ -253,6 +288,14 @@ export function OpportunityDrawer({
 
               <AiInsightPanel op={op} />
             </div>
+
+            <OpportunityEditDialog open={editOpen} onOpenChange={setEditOpen} op={op} />
+            <ActivityDialog
+              open={activityOpen}
+              onOpenChange={setActivityOpen}
+              defaultOpportunityId={op.id}
+            />
+          </div>
           </div>
         )}
       </SheetContent>
