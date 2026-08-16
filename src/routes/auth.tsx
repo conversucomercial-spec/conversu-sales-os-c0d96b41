@@ -29,10 +29,8 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"entrar" | "criar">("entrar");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(true);
 
@@ -47,25 +45,11 @@ function AuthPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      if (mode === "entrar") {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        navigate({ to: "/dashboard", replace: true });
-      } else {
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: window.location.origin,
-            data: { full_name: fullName },
-          },
-        });
-        if (error) throw error;
-        if (data.session) navigate({ to: "/dashboard", replace: true });
-        else toast.success("Conta criada. Confirme o e-mail para acessar.");
-      }
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Não foi possível concluir.");
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      navigate({ to: "/dashboard", replace: true });
+    } catch {
+      toast.error("E-mail ou senha inválidos.");
     } finally {
       setLoading(false);
     }
@@ -120,27 +104,13 @@ function AuthPage() {
             </div>
           </div>
           <h1 className="font-display text-2xl font-bold tracking-tight">
-            {mode === "entrar" ? "Entrar no Conversu" : "Criar sua conta"}
+Entrar no Conversu
           </h1>
           <p className="mt-1.5 text-sm text-muted-foreground">
-            {mode === "entrar"
-              ? "Acesse a plataforma comercial da Conversu."
-              : "Comece a acompanhar seu funil em minutos."}
+Acesse a plataforma comercial da Conversu.
           </p>
 
           <form onSubmit={submit} className="mt-7 space-y-4">
-            {mode === "criar" && (
-              <div className="space-y-1.5">
-                <Label htmlFor="nome">Nome completo</Label>
-                <Input
-                  id="nome"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Marina Duarte"
-                  required
-                />
-              </div>
-            )}
             <div className="space-y-1.5">
               <Label htmlFor="email">E-mail corporativo</Label>
               <Input
@@ -166,7 +136,7 @@ function AuthPage() {
             </div>
             <Button type="submit" className="w-full rounded-xl" disabled={loading}>
               {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-              {mode === "entrar" ? "Entrar" : "Criar conta"}
+Entrar
             </Button>
           </form>
 
@@ -180,15 +150,9 @@ function AuthPage() {
             Continuar com Google
           </Button>
 
-          <p className="mt-6 text-center text-sm text-muted-foreground">
-            {mode === "entrar" ? "Ainda não tem conta?" : "Já tem conta?"}{" "}
-            <button
-              type="button"
-              className="font-medium text-primary hover:underline"
-              onClick={() => setMode(mode === "entrar" ? "criar" : "entrar")}
-            >
-              {mode === "entrar" ? "Criar conta" : "Entrar"}
-            </button>
+          <p className="mt-6 text-center text-xs text-muted-foreground">
+            O acesso ao Conversu Sales OS é liberado pelo administrador. Precisa de uma conta? Fale
+            com matheus@useconversu.com.
           </p>
         </div>
       </div>
