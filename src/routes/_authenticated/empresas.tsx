@@ -51,7 +51,7 @@ function EmpresasPage() {
 
   const removeCompany = async (company: CrmCompany) => {
     if (!window.confirm(`Excluir ${company.name}? Oportunidades e contatos vinculados impedem a exclusão.`)) return;
-    await companyMutations.remove.mutateAsync(company.id);
+    await companyMutations.remove.mutateAsync({ id: company.id });
     setSelected(null);
   };
 
